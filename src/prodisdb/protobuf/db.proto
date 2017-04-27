@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package prodisdb.protobuf;
+
+option go_package = "gitlab.com/prodisdb/protobuf/db";
+option csharp_namespace = "ProdisDB.Protobuf";
+option java_package = "com.prodisdb.protobuf";
+option objc_class_prefix = "PDB";
+
+message Empty {}
+
+message Serializable {
+  string descriptor = 1;
+  bytes blob = 2;
+}
+
+message PrimaryKey {
+  string descriptor = 1;
+  bytes uid = 2;
+}
+
+service Prodis {
+  rpc Get (PrimaryKey) returns (Serializable);
+
+  rpc Create (Serializable) returns (Empty);
+
+  rpc Delete (PrimaryKey) returns (Empty);
+
+  rpc Update (Serializable) returns (Empty);
+}

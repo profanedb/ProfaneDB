@@ -208,22 +208,22 @@ class FieldOptions : public ::google::protobuf::Message /* @@protoc_insertion_po
 
   // accessors -------------------------------------------------------
 
-  // optional bool pk = 1;
-  bool has_pk() const;
-  void clear_pk();
-  static const int kPkFieldNumber = 1;
-  bool pk() const;
-  void set_pk(bool value);
+  // optional bool key = 1;
+  bool has_key() const;
+  void clear_key();
+  static const int kKeyFieldNumber = 1;
+  bool key() const;
+  void set_key(bool value);
 
   // @@protoc_insertion_point(class_scope:prodisdb.protobuf.FieldOptions)
  private:
-  void set_has_pk();
-  void clear_has_pk();
+  void set_has_key();
+  void clear_has_key();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
-  bool pk_;
+  bool key_;
   friend struct  protobuf_options_2eproto::TableStruct;
 };
 // ===================================================================
@@ -238,28 +238,28 @@ extern ::google::protobuf::internal::ExtensionIdentifier< ::google::protobuf::Fi
 #if !PROTOBUF_INLINE_NOT_IN_HEADERS
 // FieldOptions
 
-// optional bool pk = 1;
-inline bool FieldOptions::has_pk() const {
+// optional bool key = 1;
+inline bool FieldOptions::has_key() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void FieldOptions::set_has_pk() {
+inline void FieldOptions::set_has_key() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void FieldOptions::clear_has_pk() {
+inline void FieldOptions::clear_has_key() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void FieldOptions::clear_pk() {
-  pk_ = false;
-  clear_has_pk();
+inline void FieldOptions::clear_key() {
+  key_ = false;
+  clear_has_key();
 }
-inline bool FieldOptions::pk() const {
-  // @@protoc_insertion_point(field_get:prodisdb.protobuf.FieldOptions.pk)
-  return pk_;
+inline bool FieldOptions::key() const {
+  // @@protoc_insertion_point(field_get:prodisdb.protobuf.FieldOptions.key)
+  return key_;
 }
-inline void FieldOptions::set_pk(bool value) {
-  set_has_pk();
-  pk_ = value;
-  // @@protoc_insertion_point(field_set:prodisdb.protobuf.FieldOptions.pk)
+inline void FieldOptions::set_key(bool value) {
+  set_has_key();
+  key_ = value;
+  // @@protoc_insertion_point(field_set:prodisdb.protobuf.FieldOptions.key)
 }
 
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS

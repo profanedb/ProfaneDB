@@ -42,11 +42,11 @@ int main(int argc, char *argv[]) {
         fd = message->field(idx);
         std::cout
             << fd->full_name()
-            << " is primary key: "
-            << fd->options().GetExtension(prodisdb::protobuf::options).pk()
+            << " is key: "
+            << fd->options().GetExtension(prodisdb::protobuf::options).key()
             << "\n";
         
-        if (fd->options().GetExtension(prodisdb::protobuf::options).pk()) {
+        if (fd->options().GetExtension(prodisdb::protobuf::options).key()) {
             break;
         }
     }

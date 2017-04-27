@@ -36,7 +36,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] = {
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldOptions, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldOptions, pk_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FieldOptions, key_),
   0,
 };
 
@@ -96,15 +96,15 @@ void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] = {
       "\n\roptions.proto\022\021prodisdb.protobuf\032 goog"
-      "le/protobuf/descriptor.proto\"\032\n\014FieldOpt"
-      "ions\022\n\n\002pk\030\001 \001(\010:Q\n\007options\022\035.google.pro"
-      "tobuf.FieldOptions\030\237\215\006 \001(\0132\037.prodisdb.pr"
-      "otobuf.FieldOptionsBW\n\025com.prodisdb.prot"
-      "obufZ$gitlab.com/prodisdb/protobuf/optio"
-      "ns\242\002\003PDB\252\002\021ProdisDB.Protobuf"
+      "le/protobuf/descriptor.proto\"\033\n\014FieldOpt"
+      "ions\022\013\n\003key\030\001 \001(\010:Q\n\007options\022\035.google.pr"
+      "otobuf.FieldOptions\030\237\215\006 \001(\0132\037.prodisdb.p"
+      "rotobuf.FieldOptionsBW\n\025com.prodisdb.pro"
+      "tobufZ$gitlab.com/prodisdb/protobuf/opti"
+      "ons\242\002\003PDB\252\002\021ProdisDB.Protobuf"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 268);
+      descriptor, 269);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "options.proto", &protobuf_RegisterTypes);
   ::google::protobuf::protobuf_google_2fprotobuf_2fdescriptor_2eproto::AddDescriptors();
@@ -128,7 +128,7 @@ struct StaticDescriptorInitializer {
 // ===================================================================
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int FieldOptions::kPkFieldNumber;
+const int FieldOptions::kKeyFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 FieldOptions::FieldOptions()
@@ -145,13 +145,13 @@ FieldOptions::FieldOptions(const FieldOptions& from)
       _has_bits_(from._has_bits_),
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  pk_ = from.pk_;
+  key_ = from.key_;
   // @@protoc_insertion_point(copy_constructor:prodisdb.protobuf.FieldOptions)
 }
 
 void FieldOptions::SharedCtor() {
   _cached_size_ = 0;
-  pk_ = false;
+  key_ = false;
 }
 
 FieldOptions::~FieldOptions() {
@@ -187,7 +187,7 @@ FieldOptions* FieldOptions::New(::google::protobuf::Arena* arena) const {
 
 void FieldOptions::Clear() {
 // @@protoc_insertion_point(message_clear_start:prodisdb.protobuf.FieldOptions)
-  pk_ = false;
+  key_ = false;
   _has_bits_.Clear();
   _internal_metadata_.Clear();
 }
@@ -202,13 +202,13 @@ bool FieldOptions::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional bool pk = 1;
+      // optional bool key = 1;
       case 1: {
         if (tag == 8u) {
-          set_has_pk();
+          set_has_key();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
-                 input, &pk_)));
+                 input, &key_)));
         } else {
           goto handle_unusual;
         }
@@ -240,9 +240,9 @@ failure:
 void FieldOptions::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // @@protoc_insertion_point(serialize_start:prodisdb.protobuf.FieldOptions)
-  // optional bool pk = 1;
-  if (has_pk()) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->pk(), output);
+  // optional bool key = 1;
+  if (has_key()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(1, this->key(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -256,9 +256,9 @@ void FieldOptions::SerializeWithCachedSizes(
     bool deterministic, ::google::protobuf::uint8* target) const {
   (void)deterministic;  // Unused
   // @@protoc_insertion_point(serialize_to_array_start:prodisdb.protobuf.FieldOptions)
-  // optional bool pk = 1;
-  if (has_pk()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->pk(), target);
+  // optional bool key = 1;
+  if (has_key()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(1, this->key(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -278,8 +278,8 @@ size_t FieldOptions::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         unknown_fields());
   }
-  // optional bool pk = 1;
-  if (has_pk()) {
+  // optional bool key = 1;
+  if (has_key()) {
     total_size += 1 + 1;
   }
 
@@ -309,8 +309,8 @@ void FieldOptions::MergeFrom(const FieldOptions& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:prodisdb.protobuf.FieldOptions)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  if (from.has_pk()) {
-    set_pk(from.pk());
+  if (from.has_key()) {
+    set_key(from.key());
   }
 }
 
@@ -337,7 +337,7 @@ void FieldOptions::Swap(FieldOptions* other) {
   InternalSwap(other);
 }
 void FieldOptions::InternalSwap(FieldOptions* other) {
-  std::swap(pk_, other->pk_);
+  std::swap(key_, other->key_);
   std::swap(_has_bits_[0], other->_has_bits_[0]);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   std::swap(_cached_size_, other->_cached_size_);
@@ -351,28 +351,28 @@ void FieldOptions::InternalSwap(FieldOptions* other) {
 #if PROTOBUF_INLINE_NOT_IN_HEADERS
 // FieldOptions
 
-// optional bool pk = 1;
-bool FieldOptions::has_pk() const {
+// optional bool key = 1;
+bool FieldOptions::has_key() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-void FieldOptions::set_has_pk() {
+void FieldOptions::set_has_key() {
   _has_bits_[0] |= 0x00000001u;
 }
-void FieldOptions::clear_has_pk() {
+void FieldOptions::clear_has_key() {
   _has_bits_[0] &= ~0x00000001u;
 }
-void FieldOptions::clear_pk() {
-  pk_ = false;
-  clear_has_pk();
+void FieldOptions::clear_key() {
+  key_ = false;
+  clear_has_key();
 }
-bool FieldOptions::pk() const {
-  // @@protoc_insertion_point(field_get:prodisdb.protobuf.FieldOptions.pk)
-  return pk_;
+bool FieldOptions::key() const {
+  // @@protoc_insertion_point(field_get:prodisdb.protobuf.FieldOptions.key)
+  return key_;
 }
-void FieldOptions::set_pk(bool value) {
-  set_has_pk();
-  pk_ = value;
-  // @@protoc_insertion_point(field_set:prodisdb.protobuf.FieldOptions.pk)
+void FieldOptions::set_key(bool value) {
+  set_has_key();
+  key_ = value;
+  // @@protoc_insertion_point(field_set:prodisdb.protobuf.FieldOptions.key)
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

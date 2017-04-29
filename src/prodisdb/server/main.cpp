@@ -6,38 +6,42 @@
 #include <prodisdb/protobuf/options.pb.h>
 #include <prodisdb/server/prodis_error_collector.h>
 
-const std::string VIRTUAL_PROTO_MAP = "schema";
 const std::string PROTO_DIR = "/home/giorgio/Documents/ProdisDB/test"; // TODO Should be config
 
+using namespace google::protobuf;
+
 int main(int argc, char *argv[]) {
-    google::protobuf::compiler::DiskSourceTree *sourceTree;
-    google::protobuf::io::ZeroCopyInputStream *inputStream;
-    google::protobuf::compiler::MultiFileErrorCollector *errCollector = new ProdisErrorCollector();
-    google::protobuf::compiler::Importer *importer;
-    google::protobuf::compiler::SourceTreeDescriptorDatabase *descriptorDb;
-    google::protobuf::DescriptorPool *pool;
+    compiler::DiskSourceTree *sourceTree;
+    io::ZeroCopyInputStream *inputStream;
+    compiler::MultiFileErrorCollector *errCollector = new ProdisErrorCollector();
+    compiler::Importer *importer;
+    compiler::SourceTreeDescriptorDatabase *descriptorDb;
+    DescriptorPool *pool;
+
+    sourceTree = new compiler::DiskSourceTree();
+    sourceTree->MapPath("", "/home/giorgio/Documents/ProdisDB/src"); // prodis options
+    sourceTree->MapPath("", "/usr/include"); // /usr/include is for google/protobuf/... files
     
-    sourceTree = new google::protobuf::compiler::DiskSourceTree();
-    sourceTree->MapPath(VIRTUAL_PROTO_MAP, PROTO_DIR);
-    sourceTree->MapPath("", "/home/giorgio/Documents/ProdisDB/src");
-    sourceTree->MapPath("", "/usr/include");
+    sourceTree->MapPath("", PROTO_DIR); // Here goes the schema defined by the user
     
-    inputStream = sourceTree->Open(VIRTUAL_PROTO_MAP);
+    inputStream = sourceTree->Open(""); // To load files in PROTO_DIR
     if (inputStream == NULL) {
         std::cerr << "Couldn't open .proto source tree: " << sourceTree->GetLastErrorMessage() << "\n";
     }
     
-    descriptorDb = new google::protobuf::compiler::SourceTreeDescriptorDatabase(sourceTree);
+    descriptorDb = new compiler::SourceTreeDescriptorDatabase(sourceTree);
     descriptorDb->RecordErrorsTo(errCollector);
     
-    pool = new google::protobuf::DescriptorPool(descriptorDb);
+    pool = new DescriptorPool(descriptorDb);
     
+    // HACK DescriptorPool::BuildFile should be used (for performance)
     pool->FindFileByName("prodisdb/protobuf/options.proto");
-    pool->FindFileByName(VIRTUAL_PROTO_MAP + "/test.proto");
+    pool->FindFileByName("test.proto");
     
-    const google::protobuf::Descriptor *message = pool->FindMessageTypeByName("test.Test");
-    const google::protobuf::FieldDescriptor *fd;
+    const Descriptor *message = pool->FindMessageTypeByName("test.Test");
+    const FieldDescriptor *fd;
     
+    // TODO Should check for multiple keys (might be supported later), for now throw error
     for (int idx = 0; idx < message->field_count(); idx++) {
         fd = message->field(idx);
         std::cout

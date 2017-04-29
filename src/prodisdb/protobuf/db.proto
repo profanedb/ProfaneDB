@@ -10,16 +10,16 @@ option objc_class_prefix = "PDB";
 message Empty {}
 
 message Serializable {
-  string descriptor = 1;
+  string type = 1;
   bytes blob = 2;
 }
 
 message PrimaryKey {
-  string descriptor = 1;
+  string type = 1;
   bytes uid = 2;
 }
 
-service Prodis {
+service Db {
   rpc Get (PrimaryKey) returns (Serializable);
 
   rpc Create (Serializable) returns (Empty);

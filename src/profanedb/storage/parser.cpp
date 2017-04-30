@@ -1,6 +1,6 @@
 #include "parser.h"
 
-profanedb::server::Parser::Parser()
+profanedb::storage::Parser::Parser()
 {
     sourceTree.MapPath("", "/usr/include"); // google/protobuf/... should be here
     sourceTree.MapPath("", "/home/giorgio/Documents/ProfaneDB/src"); // HACK profanedb/options
@@ -20,11 +20,11 @@ profanedb::server::Parser::Parser()
     pool->FindFileByName("test.proto");
 }
 
-profanedb::server::Parser::~Parser()
+profanedb::storage::Parser::~Parser()
 {
 }
 
-void profanedb::server::Parser::ParseMessage(const Any& serializable)
+void profanedb::storage::Parser::ParseMessage(const Any& serializable)
 {
     std::string type = serializable.type_url();
     
@@ -47,11 +47,11 @@ void profanedb::server::Parser::ParseMessage(const Any& serializable)
     std::cout << container->GetReflection()->GetInt32(*container, fd) << std::endl;
 }
 
-profanedb::server::Parser::ErrorCollector::ErrorCollector()
+profanedb::storage::Parser::ErrorCollector::ErrorCollector()
 {
 }
 
-void profanedb::server::Parser::ErrorCollector::AddError(const string& filename, int line, int column, const string& message)
+void profanedb::storage::Parser::ErrorCollector::AddError(const string& filename, int line, int column, const string& message)
 {
     if (line == -1) { // Entire file error
         std::cerr << filename << " error: " << message << "\n";
@@ -60,7 +60,7 @@ void profanedb::server::Parser::ErrorCollector::AddError(const string& filename,
     }
 }
 
-void profanedb::server::Parser::ErrorCollector::AddWarning(const string& filename, int line, int column, const string& message)
+void profanedb::storage::Parser::ErrorCollector::AddWarning(const string& filename, int line, int column, const string& message)
 {
     std::cerr << filename << " " << line+1 << ":" << column+1 << " warning: " << message << "\n";
 }

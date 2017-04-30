@@ -13,22 +13,24 @@
 using namespace google::protobuf;
 
 namespace profanedb {
-namespace server {
+namespace storage {
     
+// Given a Any message, Parser looks for the corresponding definition in .proto files,
+// and generates a Graph
 class Parser
 {
 public:
     Parser();
     ~Parser();
     
-    void ParseMessage(const Any& serializable);
+    void ParseMessage(const Any & serializable);
 
 private:
-    io::ZeroCopyInputStream* inputStream;
+    io::ZeroCopyInputStream * inputStream;
     compiler::DiskSourceTree sourceTree;
-    compiler::MultiFileErrorCollector* errCollector = new ErrorCollector();
-    compiler::SourceTreeDescriptorDatabase* descriptorDb;
-    DescriptorPool* pool;
+    compiler::MultiFileErrorCollector * errCollector = new ErrorCollector();
+    compiler::SourceTreeDescriptorDatabase * descriptorDb;
+    DescriptorPool * pool;
     
     DynamicMessageFactory messageFactory;
     

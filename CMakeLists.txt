@@ -8,6 +8,10 @@ set(PROTOBUF_IMPORT_DIRS "${CMAKE_SOURCE_DIR}/src")
 find_package(Threads REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
+find_package(RocksDB REQUIRED)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(src/profanedb/protobuf)
+add_subdirectory(src/profanedb/storage)
 add_subdirectory(src/profanedb/server)

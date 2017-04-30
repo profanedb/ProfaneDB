@@ -23,8 +23,7 @@ public:
     Parser();
     ~Parser();
     
-    void ParseMessage(const Any & serializable);
-
+    std::string ParseMessage(const Any & serializable);
 private:
     io::ZeroCopyInputStream * inputStream;
     compiler::DiskSourceTree sourceTree;
@@ -33,6 +32,8 @@ private:
     DescriptorPool * pool;
     
     DynamicMessageFactory messageFactory;
+    
+    std::string FieldToString(const Message * container, const FieldDescriptor * fd);
     
     class ErrorCollector : public compiler::MultiFileErrorCollector {
     public:

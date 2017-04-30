@@ -9,11 +9,10 @@
 #include <profanedb/protobuf/db.pb.h>
 #include <profanedb/protobuf/db.grpc.pb.h>
 
-using profanedb::protobuf::Db;
-
 namespace profanedb {
 namespace server {
 
+// This is a thin layer to use ProfaneDB with gRPC
 class Server
 {
 public:
@@ -27,7 +26,7 @@ private:
     
     std::unique_ptr<grpc::Server> server;
     
-    class DbServiceImpl : public Db::Service {
+    class DbServiceImpl : public profanedb::protobuf::Db::Service {
     public:
         grpc::Status Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp* response) override;
         

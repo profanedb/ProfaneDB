@@ -30,21 +30,21 @@ void profanedb::server::Server::HandleRpcs()
     server->Wait();
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext* context, const profanedb::protobuf::GetReq* request, profanedb::protobuf::GetResp* response)
+grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp * response)
 {
     db.Get(*request);
     
     return grpc::Status::OK;
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext* context, const profanedb::protobuf::PutReq* request, profanedb::protobuf::PutResp* response)
+grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response)
 {
     db.Put(*request);
     
     return grpc::Status::OK;
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Delete(grpc::ServerContext* context, const profanedb::protobuf::DelReq* request, profanedb::protobuf::DelResp* response)
+grpc::Status profanedb::server::Server::DbServiceImpl::Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response)
 {
     db.Delete(*request);
     

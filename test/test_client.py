@@ -1,6 +1,6 @@
 import grpc
 
-from prodisdb.protobuf import db_pb2, db_pb2_grpc
+from profanedb.protobuf import db_pb2, db_pb2_grpc
 
 import test_pb2
 

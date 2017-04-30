@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package test;
 
-import "prodisdb/protobuf/options.proto";
+import "profanedb/protobuf/options.proto";
 
 message Test {
-    int32 field_one_int = 1 [ (prodisdb.protobuf.options).key = true ];
+    int32 field_one_int = 1 [ (profanedb.protobuf.options).key = true ];
     string field_two_str = 2;
     bool field_three_bool = 3;
     bytes field_four_bytes = 4;

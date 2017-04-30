@@ -1,10 +1,10 @@
 syntax = "proto2";
 
-package prodisdb.protobuf;
+package profanedb.protobuf;
 
-option go_package = "gitlab.com/prodisdb/protobuf/options";
-option csharp_namespace = "ProdisDB.Protobuf";
-option java_package = "com.prodisdb.protobuf";
+option go_package = "gitlab.com/profanedb/protobuf/options";
+option csharp_namespace = "ProfaneDB.Protobuf";
+option java_package = "com.profanedb.protobuf";
 option objc_class_prefix = "PDB";
 
 import "google/protobuf/descriptor.proto";

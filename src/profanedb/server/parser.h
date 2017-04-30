@@ -7,12 +7,12 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/dynamic_message.h>
 
-#include <prodisdb/protobuf/db.pb.h>
-#include <prodisdb/protobuf/options.pb.h>
+#include <profanedb/protobuf/db.pb.h>
+#include <profanedb/protobuf/options.pb.h>
 
 using namespace google::protobuf;
 
-namespace prodisdb {
+namespace profanedb {
 namespace server {
     
 class Parser

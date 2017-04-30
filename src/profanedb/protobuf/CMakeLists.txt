@@ -4,5 +4,5 @@ PROTOBUF_GENERATE_GRPC_CPP(GRPC_CC GRPC_H ${Proto})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/../..)
 
-add_library(prodisdb_protobuf ${PROTO_CC} ${PROTO_H} ${GRPC_CC} ${GRPC_H})
-target_link_libraries(prodisdb_protobuf ${CMAKE_THREAD_LIBS_INIT} ${PROTOBUF_LIBRARIES} ${GRPC_LIBRARIES})
+add_library(profanedb_protobuf ${PROTO_CC} ${PROTO_H} ${GRPC_CC} ${GRPC_H})
+target_link_libraries(profanedb_protobuf ${CMAKE_THREAD_LIBS_INIT} ${PROTOBUF_LIBRARIES} ${GRPC_LIBRARIES})

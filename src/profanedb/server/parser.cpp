@@ -1,10 +1,10 @@
 #include "parser.h"
 
-prodisdb::server::Parser::Parser()
+profanedb::server::Parser::Parser()
 {
     sourceTree.MapPath("", "/usr/include"); // google/protobuf/... should be here
-    sourceTree.MapPath("", "/home/giorgio/Documents/ProdisDB/src"); // HACK prodisdb/options
-    sourceTree.MapPath("", "/home/giorgio/Documents/ProdisDB/test"); // HACK The DB schema defined by the user
+    sourceTree.MapPath("", "/home/giorgio/Documents/ProfaneDB/src"); // HACK profanedb/options
+    sourceTree.MapPath("", "/home/giorgio/Documents/ProfaneDB/test"); // HACK The DB schema defined by the user
     
     inputStream = sourceTree.Open("");
     if (inputStream == NULL) {
@@ -16,15 +16,15 @@ prodisdb::server::Parser::Parser()
     
     pool = new DescriptorPool(descriptorDb);
     
-    pool->FindFileByName("prodisdb/protobuf/options.proto");
+    pool->FindFileByName("profanedb/protobuf/options.proto");
     pool->FindFileByName("test.proto");
 }
 
-prodisdb::server::Parser::~Parser()
+profanedb::server::Parser::~Parser()
 {
 }
 
-void prodisdb::server::Parser::ParseMessage(const Any& serializable)
+void profanedb::server::Parser::ParseMessage(const Any& serializable)
 {
     std::string type = serializable.type_url();
     
@@ -35,7 +35,7 @@ void prodisdb::server::Parser::ParseMessage(const Any& serializable)
     for (int idx = 0; idx < definition->field_count(); idx++) {
         fd = definition->field(idx);
         
-        if (fd->options().GetExtension(prodisdb::protobuf::options).key()) {
+        if (fd->options().GetExtension(profanedb::protobuf::options).key()) {
             std::cout << fd->full_name() << " is key" << std::endl;
             break;
         }
@@ -47,11 +47,11 @@ void prodisdb::server::Parser::ParseMessage(const Any& serializable)
     std::cout << container->GetReflection()->GetInt32(*container, fd) << std::endl;
 }
 
-prodisdb::server::Parser::ErrorCollector::ErrorCollector()
+profanedb::server::Parser::ErrorCollector::ErrorCollector()
 {
 }
 
-void prodisdb::server::Parser::ErrorCollector::AddError(const string& filename, int line, int column, const string& message)
+void profanedb::server::Parser::ErrorCollector::AddError(const string& filename, int line, int column, const string& message)
 {
     if (line == -1) { // Entire file error
         std::cerr << filename << " error: " << message << "\n";
@@ -60,7 +60,7 @@ void prodisdb::server::Parser::ErrorCollector::AddError(const string& filename, 
     }
 }
 
-void prodisdb::server::Parser::ErrorCollector::AddWarning(const string& filename, int line, int column, const string& message)
+void profanedb::server::Parser::ErrorCollector::AddWarning(const string& filename, int line, int column, const string& message)
 {
     std::cerr << filename << " " << line+1 << ":" << column+1 << " warning: " << message << "\n";
 }

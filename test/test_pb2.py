@@ -13,16 +13,16 @@ from google.protobuf import descriptor_pb2
 _sym_db = _symbol_database.Default()
 
 
-from prodisdb.protobuf import options_pb2 as prodisdb_dot_protobuf_dot_options__pb2
+from profanedb.protobuf import options_pb2 as profanedb_dot_protobuf_dot_options__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='test.proto',
   package='test',
   syntax='proto3',
-  serialized_pb=_b('\n\ntest.proto\x12\x04test\x1a\x1fprodisdb/protobuf/options.proto\"p\n\x04Test\x12\x1d\n\rfield_one_int\x18\x01 \x01(\x05\x42\x06\xfa\xe9\x30\x02\x08\x01\x12\x15\n\rfield_two_str\x18\x02 \x01(\t\x12\x18\n\x10\x66ield_three_bool\x18\x03 \x01(\x08\x12\x18\n\x10\x66ield_four_bytes\x18\x04 \x01(\x0c\x62\x06proto3')
+  serialized_pb=_b('\n\ntest.proto\x12\x04test\x1a profanedb/protobuf/options.proto\"p\n\x04Test\x12\x1d\n\rfield_one_int\x18\x01 \x01(\x05\x42\x06\xfa\xe9\x30\x02\x08\x01\x12\x15\n\rfield_two_str\x18\x02 \x01(\t\x12\x18\n\x10\x66ield_three_bool\x18\x03 \x01(\x08\x12\x18\n\x10\x66ield_four_bytes\x18\x04 \x01(\x0c\x62\x06proto3')
   ,
-  dependencies=[prodisdb_dot_protobuf_dot_options__pb2.DESCRIPTOR,])
+  dependencies=[profanedb_dot_protobuf_dot_options__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
@@ -75,8 +75,8 @@ _TEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=53,
-  serialized_end=165,
+  serialized_start=54,
+  serialized_end=166,
 )
 
 DESCRIPTOR.message_types_by_name['Test'] = _TEST

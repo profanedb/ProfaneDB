@@ -5,6 +5,7 @@
 
 #include <google/protobuf/compiler/importer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/dynamic_message.h>
 
 #include <prodisdb/protobuf/db.pb.h>
 #include <prodisdb/protobuf/options.pb.h>
@@ -20,7 +21,7 @@ public:
     Parser();
     ~Parser();
     
-    void ParseMessage(const protobuf::Serializable& message);
+    void ParseMessage(const Any& serializable);
 
 private:
     io::ZeroCopyInputStream* inputStream;
@@ -28,6 +29,8 @@ private:
     compiler::MultiFileErrorCollector* errCollector = new ErrorCollector();
     compiler::SourceTreeDescriptorDatabase* descriptorDb;
     DescriptorPool* pool;
+    
+    DynamicMessageFactory messageFactory;
     
     class ErrorCollector : public compiler::MultiFileErrorCollector {
     public:

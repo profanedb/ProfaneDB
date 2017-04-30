@@ -30,19 +30,17 @@ void prodisdb::server::Server::HandleRpcs()
     server->Wait();
 }
 
-grpc::Status prodisdb::server::Server::DbServiceImpl::Get(grpc::ServerContext* context, const prodisdb::protobuf::PrimaryKey* request, prodisdb::protobuf::Serializable* response)
+grpc::Status prodisdb::server::Server::DbServiceImpl::Get(grpc::ServerContext* context, const prodisdb::protobuf::GetReq* request, prodisdb::protobuf::GetResp* response)
 {
 }
 
-grpc::Status prodisdb::server::Server::DbServiceImpl::Create(grpc::ServerContext* context, const prodisdb::protobuf::Serializable* request, prodisdb::protobuf::Empty* response)
+grpc::Status prodisdb::server::Server::DbServiceImpl::Put(grpc::ServerContext* context, const prodisdb::protobuf::PutReq* request, prodisdb::protobuf::PutResp* response)
 {
-    parser.ParseMessage(*request);
+    parser.ParseMessage(request->serializable());
+    
+    return grpc::Status::OK;
 }
 
-grpc::Status prodisdb::server::Server::DbServiceImpl::Delete(::grpc::ServerContext* context, const prodisdb::protobuf::PrimaryKey* request, prodisdb::protobuf::Empty* response)
-{
-}
-
-grpc::Status prodisdb::server::Server::DbServiceImpl::Update(grpc::ServerContext* context, const prodisdb::protobuf::Serializable* request, prodisdb::protobuf::Empty* response)
+grpc::Status prodisdb::server::Server::DbServiceImpl::Delete(grpc::ServerContext* context, const prodisdb::protobuf::DelReq* request, prodisdb::protobuf::DelResp* response)
 {
 }

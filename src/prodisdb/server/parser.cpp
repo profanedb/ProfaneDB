@@ -18,34 +18,33 @@ prodisdb::server::Parser::Parser()
     
     pool->FindFileByName("prodisdb/protobuf/options.proto");
     pool->FindFileByName("test.proto");
-    
-
 }
 
 prodisdb::server::Parser::~Parser()
 {
 }
 
-void prodisdb::server::Parser::ParseMessage(const protobuf::Serializable& message)
+void prodisdb::server::Parser::ParseMessage(const Any& serializable)
 {
-    const Descriptor* definition = pool->FindMessageTypeByName(message.type());
+    std::string type = serializable.type_url();
+    
+    const Descriptor* definition = pool->FindMessageTypeByName(type.substr(type.rfind('/')+1, string::npos));
     const FieldDescriptor* fd;
     
     // TODO Should check for multiple keys (might be supported later), for now throw error
     for (int idx = 0; idx < definition->field_count(); idx++) {
         fd = definition->field(idx);
-        std::cout
-            << fd->full_name()
-            << " is key: "
-            << fd->options().GetExtension(prodisdb::protobuf::options).key()
-            << std::endl;
         
         if (fd->options().GetExtension(prodisdb::protobuf::options).key()) {
+            std::cout << fd->full_name() << " is key" << std::endl;
             break;
         }
     }
     
-    std::cout << message.type() << std::endl;
+    Message* container = messageFactory.GetPrototype(definition)->New();
+    
+    serializable.UnpackTo(container);
+    std::cout << container->GetReflection()->GetInt32(*container, fd) << std::endl;
 }
 
 prodisdb::server::Parser::ErrorCollector::ErrorCollector()

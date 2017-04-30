@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package prodisdb.protobuf;
+
+option go_package = "gitlab.com/prodisdb/protobuf/options";
+option csharp_namespace = "ProdisDB.Protobuf";
+option java_package = "com.prodisdb.protobuf";
+option objc_class_prefix = "PDB";
+
+import "google/protobuf/descriptor.proto";
+
+// These options should be used during schema definition,
+// applying them to some of the fields in protobuf
+message FieldOptions {
+  optional bool key = 1;
+}
+
+extend google.protobuf.FieldOptions {
+  optional FieldOptions options = 99999;
+}

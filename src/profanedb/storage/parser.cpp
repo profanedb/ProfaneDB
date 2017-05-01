@@ -2,9 +2,14 @@
 
 profanedb::storage::Parser::Parser()
 {
+    // HACK Should be in config
+    const auto kOptions = boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/src");
+    const auto kDbSchema = boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/test");
+
+    // Everything is mapped to "" to preserve directory structure
     sourceTree.MapPath("", "/usr/include"); // google/protobuf/... should be here
-    sourceTree.MapPath("", "/home/giorgio/Documents/ProfaneDB/src"); // HACK profanedb/options
-    sourceTree.MapPath("", "/home/giorgio/Documents/ProfaneDB/test"); // HACK The DB schema defined by the user
+    sourceTree.MapPath("", kOptions.native());
+    sourceTree.MapPath("", kDbSchema.native());
     
     inputStream = sourceTree.Open("");
     if (inputStream == NULL) {
@@ -15,19 +20,31 @@ profanedb::storage::Parser::Parser()
     descriptorDb->RecordErrorsTo(errCollector);
     
     pool = new DescriptorPool(descriptorDb);
-    
+
+    // Load options to be used during file import
     pool->FindFileByName("profanedb/protobuf/options.proto");
-    pool->FindFileByName("test.proto");
+    
+    // Import all `.proto` files in kDbSchema into the pool,
+    // so that FindMessageTypeByName can then be used
+    boost::filesystem::path path(kDbSchema);
+    for (auto const & file: boost::filesystem::recursive_directory_iterator(path, boost::filesystem::symlink_option::recurse)) {
+        
+        if (file.path().extension() == ".proto") {
+            // For the pool every file is relative to the mapping provided before (kDbSchema)
+            pool->FindFileByName(file.path().lexically_relative(kDbSchema).native());
+        }
+    }
 }
 
 profanedb::storage::Parser::~Parser()
 {
 }
 
-map<std::string, const google::protobuf::Message &> profanedb::storage::Parser::ParseMessage(const google::protobuf::Any& serializable)
+map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::ParseMessage(const google::protobuf::Any& serializable)
 {
+    // The Descriptor is manually extracted from the pool,
+    // removing the prepending `type.googleapis.com/` in the Any message
     std::string type = serializable.type_url();
-    
     const Descriptor * definition = pool->FindMessageTypeByName(type.substr(type.rfind('/')+1, string::npos));
     
     Message * container = messageFactory.GetPrototype(definition)->New();
@@ -36,8 +53,9 @@ map<std::string, const google::protobuf::Message &> profanedb::storage::Parser::
     return ParseMessage(*container);
 }
 
-map<std::string, const google::protobuf::Message &> profanedb::storage::Parser::ParseMessage(const google::protobuf::Message& message)
+map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::ParseMessage(const google::protobuf::Message & message)
 {
+    
     auto dependencies = new map<std::string, const google::protobuf::Message &>();
     auto fields = new std::vector< const FieldDescriptor * >();
     

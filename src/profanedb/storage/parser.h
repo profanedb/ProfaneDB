@@ -8,6 +8,8 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/dynamic_message.h>
 
+#include <boost/filesystem.hpp>
+
 #include <profanedb/protobuf/db.pb.h>
 #include <profanedb/protobuf/options.pb.h>
 
@@ -17,7 +19,7 @@ namespace profanedb {
 namespace storage {
     
 // Given a Any message, Parser looks for the corresponding definition in .proto files,
-// and generates a Graph
+// and generates a map with keys of nested messages
 class Parser
 {
 public:

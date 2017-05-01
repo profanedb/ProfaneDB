@@ -13,13 +13,19 @@ def run():
     to_serialize = test_pb2.Test(
         field_one_int = 123,
         field_two_str = "my_string",
-        field_three_bool = True
+        field_three_bool = True,
+        field_four_bytes = b'bytes',
+        
+        field_five_nested =
+            test_pb2.Nested(
+                nested_field_one_str = "nested string",
+                nested_field_two_int = 1902923490,
+                nested_field_three_double = 1728.543344
+            )
     )
 
     serializable = any_pb2.Any()
     serializable.Pack(to_serialize)
-
-    print (serializable.TypeName())
 
     stub.Put(db_pb2.PutReq(
         serializable = serializable

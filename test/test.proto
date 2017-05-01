@@ -9,5 +9,12 @@ message Test {
     string field_two_str = 2;
     bool field_three_bool = 3;
     bytes field_four_bytes = 4;
+    
+    Nested field_five_nested = 5;
 }
 
+message Nested {
+    string nested_field_one_str = 1 [ (profanedb.protobuf.options).key = true ];
+    int64 nested_field_two_int = 2;
+    double nested_field_three_double = 3;
+}

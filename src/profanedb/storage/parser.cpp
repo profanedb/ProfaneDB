@@ -24,7 +24,7 @@ profanedb::storage::Parser::~Parser()
 {
 }
 
-std::string profanedb::storage::Parser::ParseMessage(const Any & serializable)
+map<std::string, const google::protobuf::Message &> profanedb::storage::Parser::ParseMessage(const google::protobuf::Any& serializable)
 {
     std::string type = serializable.type_url();
     
@@ -32,39 +32,35 @@ std::string profanedb::storage::Parser::ParseMessage(const Any & serializable)
     
     Message * container = messageFactory.GetPrototype(definition)->New();
     serializable.UnpackTo(container);
-    
-    auto fields = new std::vector< const FieldDescriptor * >();
-    
-    container->GetReflection()->ListFields(*container, fields);
-    
-    for (auto const & fd: *fields) {
-        if (fd->options().GetExtension(profanedb::protobuf::options).key()) {
-            return fd->full_name() + "=" + FieldToString(container, fd);
-        }
-    }
-    
-    return NULL;
+
+    return ParseMessage(*container);
 }
 
-std::string profanedb::storage::Parser::ParseMessage(const google::protobuf::Message & message)
+map<std::string, const google::protobuf::Message &> profanedb::storage::Parser::ParseMessage(const google::protobuf::Message& message)
 {
+    auto dependencies = new map<std::string, const google::protobuf::Message &>();
     auto fields = new std::vector< const FieldDescriptor * >();
     
     message.GetReflection()->ListFields(message, fields);
     
+    std::string key;
+    
     for (auto const & fd: *fields) {
         if (fd->message_type() != NULL) {
-            ParseMessage(message.GetReflection()->GetMessage(message, fd));
+            auto nested = ParseMessage(message.GetReflection()->GetMessage(message, fd, &messageFactory));
+            dependencies->insert(nested.begin(), nested.end());
         } else {
             auto options = fd->options().GetExtension(profanedb::protobuf::options);
             
             if (options.key()) {
-                return fd->full_name() + "=" + FieldToString(&message, fd);
+                key = fd->full_name() + "$" + FieldToString(&message, fd);
             }
         }
     }
     
-    return NULL;
+    dependencies->insert( std::pair< std::string, const google::protobuf::Message & >(key, message) );
+    
+    return *dependencies;
 }
 
 std::string profanedb::storage::Parser::FieldToString(const google::protobuf::Message * container, const google::protobuf::FieldDescriptor * fd)

@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include <iostream>
+#include <map>
 
 #include <google/protobuf/compiler/importer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
@@ -23,9 +24,12 @@ public:
     Parser();
     ~Parser();
     
-    // Get key out of 
-    std::string ParseMessage(const Any & serializable);
-    std::string ParseMessage(const Message & message);
+    // Generate a Dynamic Message out of an Any object, and return a set of dependent objects
+    map<std::string, const Message &> ParseMessage(const Any & serializable);
+    
+    // Parse and object and return a set of dependent messages
+    map<std::string, const Message &> ParseMessage(const Message & message);
+
 private:
     io::ZeroCopyInputStream * inputStream;
     compiler::DiskSourceTree sourceTree;

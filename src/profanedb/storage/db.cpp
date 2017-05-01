@@ -17,9 +17,11 @@ profanedb::protobuf::GetResp profanedb::storage::Db::Get(const profanedb::protob
 
 profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protobuf::PutReq & request)
 {
+    auto map = parser.ParseMessage(request.serializable());
     
-     std::cout << parser.ParseMessage(request) << std::endl;
-//   std::cout << parser.ParseMessage(request.serializable()) << std::endl;
+    for (auto const & obj: map) {
+        std::cout << obj.first << ":" << std::endl << obj.second.DebugString() << std::endl;
+    }
 }
 
 profanedb::protobuf::DelResp profanedb::storage::Db::Delete(const profanedb::protobuf::DelReq & request)

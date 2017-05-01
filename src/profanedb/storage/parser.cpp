@@ -29,22 +29,42 @@ std::string profanedb::storage::Parser::ParseMessage(const Any & serializable)
     std::string type = serializable.type_url();
     
     const Descriptor * definition = pool->FindMessageTypeByName(type.substr(type.rfind('/')+1, string::npos));
-    const FieldDescriptor * fd;
     
-    // TODO Should check for multiple keys (might be supported later), for now throw error
-    for (int idx = 0; idx < definition->field_count(); idx++) {
-        fd = definition->field(idx);
-        
+    Message * container = messageFactory.GetPrototype(definition)->New();
+    serializable.UnpackTo(container);
+    
+    auto fields = new std::vector< const FieldDescriptor * >();
+    
+    container->GetReflection()->ListFields(*container, fields);
+    
+    for (auto const & fd: *fields) {
         if (fd->options().GetExtension(profanedb::protobuf::options).key()) {
-            break;
+            return fd->full_name() + "=" + FieldToString(container, fd);
         }
     }
     
-    Message * container = messageFactory.GetPrototype(definition)->New();
+    return NULL;
+}
+
+std::string profanedb::storage::Parser::ParseMessage(const google::protobuf::Message & message)
+{
+    auto fields = new std::vector< const FieldDescriptor * >();
     
-    serializable.UnpackTo(container);
+    message.GetReflection()->ListFields(message, fields);
     
-    return definition->full_name() + "$" + FieldToString(container, fd);
+    for (auto const & fd: *fields) {
+        if (fd->message_type() != NULL) {
+            ParseMessage(message.GetReflection()->GetMessage(message, fd));
+        } else {
+            auto options = fd->options().GetExtension(profanedb::protobuf::options);
+            
+            if (options.key()) {
+                return fd->full_name() + "=" + FieldToString(&message, fd);
+            }
+        }
+    }
+    
+    return NULL;
 }
 
 std::string profanedb::storage::Parser::FieldToString(const google::protobuf::Message * container, const google::protobuf::FieldDescriptor * fd)

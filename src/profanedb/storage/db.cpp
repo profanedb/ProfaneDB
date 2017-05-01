@@ -17,7 +17,9 @@ profanedb::protobuf::GetResp profanedb::storage::Db::Get(const profanedb::protob
 
 profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protobuf::PutReq & request)
 {
-    std::cout << parser.ParseMessage(request.serializable()) << std::endl;
+    
+     std::cout << parser.ParseMessage(request) << std::endl;
+//   std::cout << parser.ParseMessage(request.serializable()) << std::endl;
 }
 
 profanedb::protobuf::DelResp profanedb::storage::Db::Delete(const profanedb::protobuf::DelReq & request)

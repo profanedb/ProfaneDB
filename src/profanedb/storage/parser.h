@@ -23,7 +23,9 @@ public:
     Parser();
     ~Parser();
     
+    // Get key out of 
     std::string ParseMessage(const Any & serializable);
+    std::string ParseMessage(const Message & message);
 private:
     io::ZeroCopyInputStream * inputStream;
     compiler::DiskSourceTree sourceTree;

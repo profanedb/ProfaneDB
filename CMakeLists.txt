@@ -9,6 +9,7 @@ find_package(Threads REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
 find_package(RocksDB REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

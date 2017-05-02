@@ -36,7 +36,7 @@ using namespace google::protobuf;
 
 namespace profanedb {
 namespace storage {
-    
+
 // Given a Any message, Parser looks for the corresponding definition in .proto files,
 // and generates a map with keys of nested messages
 class Parser
@@ -44,12 +44,10 @@ class Parser
 public:
     Parser();
     ~Parser();
-    
-    // Generate a Dynamic Message out of an Any object, and return a set of dependent objects
-    map<std::string, const Message &> ParseMessage(const Any & serializable);
-    
-    // Parse and object and return a set of dependent messages
-    map<std::string, const Message &> ParseMessage(const Message & message);
+
+    // Using the provided schema, get a map with all nested messages and their unique key
+    map<std::string, const Message &> NormalizeMessage(const Any & serializable);
+    map<std::string, const Message &> NormalizeMessage(const Message & message);
 
 private:
     io::ZeroCopyInputStream * inputStream;
@@ -57,11 +55,17 @@ private:
     compiler::MultiFileErrorCollector * errCollector = new ErrorCollector();
     compiler::SourceTreeDescriptorDatabase * descriptorDb;
     DescriptorPool * pool;
-    
+
     DynamicMessageFactory messageFactory;
-    
-    std::string FieldToString(const Message * container, const FieldDescriptor * fd);
-    
+
+    // Given a Field
+    std::string FieldToKey(const Message * container, const FieldDescriptor * fd);
+
+    // Given a descriptor, find information about the key and nested objects,
+    // return true if the message has a key
+    bool ParseMessageDescriptor(const Descriptor & descriptor);
+
+    // A simple ErrorCollector for debug, write to stderr
     class ErrorCollector : public compiler::MultiFileErrorCollector {
     public:
         ErrorCollector();

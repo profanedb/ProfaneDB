@@ -49,8 +49,14 @@ profanedb::storage::Parser::Parser()
     for (auto const & file: boost::filesystem::recursive_directory_iterator(path, boost::filesystem::symlink_option::recurse)) {
         if (file.path().extension() == ".proto") {
             // For the pool every file is relative to the mapping provided before (kDbSchema)
-            pool->FindFileByName(file.path().lexically_relative(kDbSchema).native());
+            const FileDescriptor * fileD = pool->FindFileByName(file.path().lexically_relative(kDbSchema).native());
             
+            for (int i = 0; i < fileD->message_type_count(); i++) {
+                const Descriptor * message = fileD->message_type(i);
+               
+                ParseMessageDescriptor(*message);
+            }
+           
             // TODO Here should load all the messages, find the keys and nested messages, and generate Descriptors with references to save in DB
         }
     }
@@ -60,7 +66,39 @@ profanedb::storage::Parser::~Parser()
 {
 }
 
-map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::ParseMessage(const google::protobuf::Any & serializable)
+bool profanedb::storage::Parser::ParseMessageDescriptor(const google::protobuf::Descriptor & descriptor)
+{
+    // A DescriptorProto is needed to generate the message the way it will be serialized,
+    // with keys replacing
+    auto * descriptorProto = new google::protobuf::DescriptorProto();
+    descriptor.CopyTo(descriptorProto);
+    
+    bool hasKey = false;
+    
+    for (int k = 0; k < descriptor.field_count(); k++) {
+        const FieldDescriptor * field = descriptor.field(k);
+        
+        // Recursively call this function to add all nested messages
+        const google::protobuf::Descriptor * nested = field->message_type();
+        if (nested != NULL) {
+            if (ParseMessageDescriptor(*nested)) {
+                // If the nested message has a primary key, set the field to string to hold a reference
+                std::cout << descriptorProto->mutable_field(k)->DebugString() <<  std::endl;
+                descriptorProto->mutable_field(k)->set_type(FieldDescriptorProto_Type_TYPE_STRING);
+            }
+        }
+
+        profanedb::protobuf::FieldOptions options = field->options().GetExtension(profanedb::protobuf::options);
+
+        if (options.key()) {
+            hasKey = true;
+        }
+    }
+    
+    return hasKey;
+}
+
+map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::NormalizeMessage(const google::protobuf::Any & serializable)
 {
     // The Descriptor is manually extracted from the pool,
     // removing the prepending `type.googleapis.com/` in the Any message
@@ -70,10 +108,10 @@ map< std::string, const google::protobuf::Message & > profanedb::storage::Parser
     Message * container = messageFactory.GetPrototype(definition)->New();
     serializable.UnpackTo(container);
     
-    return ParseMessage(*container);
+    return NormalizeMessage(*container);
 }
 
-map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::ParseMessage(const google::protobuf::Message & message)
+map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::NormalizeMessage(const google::protobuf::Message & message)
 {
     auto dependencies = new map<std::string, const google::protobuf::Message &>();
     
@@ -88,9 +126,9 @@ map< std::string, const google::protobuf::Message & > profanedb::storage::Parser
     
     for (auto const & fd: *fields) {
         if (fd->message_type() != NULL) {
-            auto nested = ParseMessage(message.GetReflection()->GetMessage(message, fd, &messageFactory));
+            auto nested = NormalizeMessage(message.GetReflection()->GetMessage(message, fd, &messageFactory));
             
-            // TODO If nested has primary key set a reference
+            // TODO If first nested message has primary key set a reference
             if (nested.size() > 0) {
                 
                 // The nested message might contain other messages, all of them are stored in the dependency map
@@ -101,7 +139,7 @@ map< std::string, const google::protobuf::Message & > profanedb::storage::Parser
             
             // TODO This only uses a single key, one could set multiple keys
             if (options.key()) {
-                key = fd->full_name() + '$' + FieldToString(&message, fd);
+                key = FieldToKey(&message, fd);
             }
         }
     }
@@ -111,42 +149,46 @@ map< std::string, const google::protobuf::Message & > profanedb::storage::Parser
     return *dependencies;
 }
 
-std::string profanedb::storage::Parser::FieldToString(const google::protobuf::Message * container, const google::protobuf::FieldDescriptor * fd)
+std::string profanedb::storage::Parser::FieldToKey(const google::protobuf::Message * container, const google::protobuf::FieldDescriptor * fd)
 {
     const Reflection * reflection = container->GetReflection();
     
+    std::string key_value;
+    
     switch (fd->cpp_type()) {
         case FieldDescriptor::CPPTYPE_INT32:
-            return std::to_string(reflection->GetInt32(*container, fd));
+            key_value = std::to_string(reflection->GetInt32(*container, fd));
             break;
         case FieldDescriptor::CPPTYPE_INT64:
-            return std::to_string(reflection->GetInt64(*container, fd));
+            key_value = std::to_string(reflection->GetInt64(*container, fd));
             break;
         case FieldDescriptor::CPPTYPE_UINT32:
-            return std::to_string(reflection->GetUInt32(*container, fd));
+            key_value = std::to_string(reflection->GetUInt32(*container, fd));
             break;
         case FieldDescriptor::CPPTYPE_UINT64:
-            return std::to_string(reflection->GetUInt64(*container, fd));
+            key_value = std::to_string(reflection->GetUInt64(*container, fd));
             break;
         case FieldDescriptor::CPPTYPE_DOUBLE:
-            return std::to_string(reflection->GetDouble(*container, fd));
+            key_value = std::to_string(reflection->GetDouble(*container, fd));
             break;
         case FieldDescriptor::CPPTYPE_FLOAT:
-            return std::to_string(reflection->GetFloat(*container, fd));
+            key_value = std::to_string(reflection->GetFloat(*container, fd));
             break;
         case FieldDescriptor::CPPTYPE_BOOL:
-            return std::to_string(reflection->GetBool(*container, fd));
+            key_value = std::to_string(reflection->GetBool(*container, fd));
             break;
         case FieldDescriptor::CPPTYPE_ENUM:
-            return std::to_string(reflection->GetEnum(*container, fd)->index());
+            key_value = std::to_string(reflection->GetEnum(*container, fd)->index());
             break;
         case FieldDescriptor::CPPTYPE_STRING:
-            return reflection->GetString(*container, fd);
+            key_value = reflection->GetString(*container, fd);
             break;
         case FieldDescriptor::CPPTYPE_MESSAGE:
-            return reflection->GetMessage(*container, fd, &messageFactory).SerializeAsString();
+            key_value = reflection->GetMessage(*container, fd, &messageFactory).SerializeAsString();
             break;
     }
+    
+    return fd->full_name() + '$' + key_value;
 }
 
 profanedb::storage::Parser::ErrorCollector::ErrorCollector()

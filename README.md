@@ -10,7 +10,7 @@ Schema definition comes with every message definition, using [Protocol Buffer fi
 
 *At the moment only one key per message can be set*
 
-```
+```protobuf
 import "profanedb/protobuf/options.proto";
 
 message Test {
@@ -39,25 +39,37 @@ However, since Protobuf allows nesting messages, whenever a nested message has a
 
 Assuming at least Test.field_one_int and Nested.nested_field_one_str are set in the previous sample definition, an encoded message could look like this:
 
-```
+*(in protobuf text format)*
+
+```protobuf
 Test {
     field_one_int: 123
     field_two_str: "a string"
-    ...
+    
     field_five_nested: Nested {
         nested_field_one_str: "unique key"
     }
 }
 ```
 
-The data is then stored in RocksDB
+Messages are now split. Nested comes with its own key `nested_field_one_str`,
+which identifies it as a unique entity.  
+`Test.field_five_nested` is now made into a `string` field,
+to hold a reference to that message unique key: `Nested$unique key`.
 
-```
-Test.field_one_int$123 => {
-    field_one_int=123,
-    field_two_str="a string",
-    field_five_nested&="Nested.nested_field_one_str$unique key"
+```protobuf
+Nested {
+    nested_field_one_str: "unique key"
 }
 
-Nested.nested_field_one_str$"unique key" => {}
+Test {
+    field_one_int: 123
+    field_two_str: "a string"
+    
+    field_five_nested: "Nested.nested_field_one_str$unique key"
+}
 ```
+
+The data is then stored in RocksDB
+with `Test.field_one_int$123` and `Nested.nested_field_one_str$unique key`
+as keys.

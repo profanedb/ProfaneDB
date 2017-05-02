@@ -14,15 +14,16 @@ _sym_db = _symbol_database.Default()
 
 
 from profanedb.protobuf import options_pb2 as profanedb_dot_protobuf_dot_options__pb2
+import nested_pb2 as nested__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='test.proto',
   package='test',
   syntax='proto3',
-  serialized_pb=_b('\n\ntest.proto\x12\x04test\x1a profanedb/protobuf/options.proto\"\x99\x01\n\x04Test\x12\x1d\n\rfield_one_int\x18\x01 \x01(\x05\x42\x06\xfa\xe9\x30\x02\x08\x01\x12\x15\n\rfield_two_str\x18\x02 \x01(\t\x12\x18\n\x10\x66ield_three_bool\x18\x03 \x01(\x08\x12\x18\n\x10\x66ield_four_bytes\x18\x04 \x01(\x0c\x12\'\n\x11\x66ield_five_nested\x18\x05 \x01(\x0b\x32\x0c.test.Nested\"o\n\x06Nested\x12$\n\x14nested_field_one_str\x18\x01 \x01(\tB\x06\xfa\xe9\x30\x02\x08\x01\x12\x1c\n\x14nested_field_two_int\x18\x02 \x01(\x03\x12!\n\x19nested_field_three_double\x18\x03 \x01(\x01\x62\x06proto3')
+  serialized_pb=_b('\n\ntest.proto\x12\x04test\x1a profanedb/protobuf/options.proto\x1a\x0cnested.proto\"\xd1\x01\n\x04Test\x12\x1d\n\rfield_one_int\x18\x01 \x01(\x05\x42\x06\xfa\xe9\x30\x02\x08\x01\x12\x15\n\rfield_two_str\x18\x02 \x01(\t\x12\x18\n\x10\x66ield_three_bool\x18\x03 \x01(\x08\x12\x18\n\x10\x66ield_four_bytes\x18\x04 \x01(\x0c\x12\'\n\x11\x66ield_five_nested\x18\x05 \x01(\x0b\x32\x0c.test.Nested\x12\x36\n\x18\x66ield_six_externalnested\x18\x06 \x01(\x0b\x32\x14.test.ExternalNested\"o\n\x06Nested\x12$\n\x14nested_field_one_str\x18\x01 \x01(\tB\x06\xfa\xe9\x30\x02\x08\x01\x12\x1c\n\x14nested_field_two_int\x18\x02 \x01(\x03\x12!\n\x19nested_field_three_double\x18\x03 \x01(\x01\x62\x06proto3')
   ,
-  dependencies=[profanedb_dot_protobuf_dot_options__pb2.DESCRIPTOR,])
+  dependencies=[profanedb_dot_protobuf_dot_options__pb2.DESCRIPTOR,nested__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
@@ -70,6 +71,13 @@ _TEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='field_six_externalnested', full_name='test.Test.field_six_externalnested', index=5,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -82,8 +90,8 @@ _TEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=55,
-  serialized_end=208,
+  serialized_start=69,
+  serialized_end=278,
 )
 
 
@@ -127,11 +135,12 @@ _NESTED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=210,
-  serialized_end=321,
+  serialized_start=280,
+  serialized_end=391,
 )
 
 _TEST.fields_by_name['field_five_nested'].message_type = _NESTED
+_TEST.fields_by_name['field_six_externalnested'].message_type = nested__pb2._EXTERNALNESTED
 DESCRIPTOR.message_types_by_name['Test'] = _TEST
 DESCRIPTOR.message_types_by_name['Nested'] = _NESTED
 

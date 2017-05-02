@@ -4,6 +4,8 @@ package test;
 
 import "profanedb/protobuf/options.proto";
 
+import "nested.proto";
+
 message Test {
     int32 field_one_int = 1 [ (profanedb.protobuf.options).key = true ];
     string field_two_str = 2;
@@ -11,6 +13,8 @@ message Test {
     bytes field_four_bytes = 4;
     
     Nested field_five_nested = 5;
+
+    ExternalNested field_six_externalnested = 6;
 }
 
 message Nested {

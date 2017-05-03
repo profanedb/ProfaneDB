@@ -21,4 +21,12 @@ message Nested {
     string nested_field_one_str = 1 [ (profanedb.protobuf.options).key = true ];
     int64 nested_field_two_int = 2;
     double nested_field_three_double = 3;
+
+    message KeyableNestedInNested {
+        string nested_in_nested_field_one_str = 1 [ (profanedb.protobuf.options).key = true ];
+    }
+
+//    message NotKeyableNestedInNested {
+//        int32 nested_in_nested_field_one_int = 1;
+//    }
 }

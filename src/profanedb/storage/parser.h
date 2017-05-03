@@ -41,19 +41,16 @@ using namespace google::protobuf;
 namespace profanedb {
 namespace storage {
     
-// Given a Any message, Parser looks for the corresponding definition in .proto files,
-// and generates a map with keys of nested messages
+// Parser loads the whole schema definition,
+// and generates descriptors where nested keyable messages are made into references.
+// These references are the actual keys
+// which will be used to store this nested messages.
 class Parser
 {
 friend class Normalizer;
 
 public:
     Parser(const Config::ProfaneDB & profaneConfig);
-    ~Parser();
-
-    // Using the provided schema, get a map with all nested messages and their unique key
-    map<std::string, const Message &> NormalizeMessage(const Any & serializable);
-    map<std::string, const Message &> NormalizeMessage(const Message & message);
 
 private:
     std::unique_ptr<compiler::SourceTreeDescriptorDatabase> rootDescriptorDb;
@@ -63,11 +60,15 @@ private:
     std::shared_ptr<DescriptorPool> schemaPool;
     
     std::unique_ptr<SimpleDescriptorDatabase> normalizedDescriptorDb;
+   
+    // Change nested message fields in proto if reference is to be set
+    void ParseMessageDescriptor(
+        const google::protobuf::Descriptor & desc,
+        google::protobuf::DescriptorProto & proto
+    );
     
-    DynamicMessageFactory messageFactory;
-    
-    // Given a Field
-    string FieldToKey(const Message & container, const FieldDescriptor & fd);
+    // Check if a message has a key defined in its schema
+    bool IsKeyable(const google::protobuf::Descriptor & desc);
     
     // A simple ErrorCollector for debug, write to stderr
     class ErrorCollector : public compiler::MultiFileErrorCollector {

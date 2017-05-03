@@ -37,10 +37,10 @@ profanedb::protobuf::GetResp profanedb::storage::Db::Get(const profanedb::protob
 
 profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protobuf::PutReq & request)
 {
-    auto map = parser.NormalizeMessage(request.serializable());
+    auto map = normalizer.NormalizeMessage(request.serializable());
     
     for (auto const & obj: map) {
-        std::cout << obj.first << ":" << std::endl << obj.second.SerializeAsString() << std::endl;
+        std::cout << obj.first << ":" << std::endl << obj.second->SerializeAsString() << std::endl;
     }
 }
 

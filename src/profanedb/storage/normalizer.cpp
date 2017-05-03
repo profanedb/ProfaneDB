@@ -25,5 +25,26 @@ profanedb::storage::Normalizer::Normalizer(Parser & parser)
       new google::protobuf::MergedDescriptorDatabase(parser.rootDescriptorDb.get(), parser.normalizedDescriptorDb.get()))
   , normalizedPool(new google::protobuf::DescriptorPool(normalizedMergedDescriptorDb.get()))
 {
-    std::cout << normalizedPool->FindFileByName("test.proto")->DebugString() << std::endl;
+}
+
+map< std::string, std::shared_ptr<google::protobuf::Message> > profanedb::storage::Normalizer::NormalizeMessage(
+    const google::protobuf::Any & serializable)
+{
+    // Any messages have a type url beginning with `type.googleapis.com/`, this is stripped
+    std::string type = serializable.type_url();
+    auto definition = std::unique_ptr<const google::protobuf::Descriptor>(schemaPool->FindMessageTypeByName(type.substr(type.rfind('/')+1, std::string::npos)));
+    
+    // Having the definition our message factory can simply generate a container,
+    auto container = std::unique_ptr<google::protobuf::Message>(messageFactory.GetPrototype(definition.get())->New());
+    
+    // and convert the bytes coming from Any into it
+    serializable.UnpackTo(container.get());
+    
+    // The method getting a Message as paramater does the actual normalization of data
+    return this->NormalizeMessage(*container);
+}
+
+map< std::string, std::shared_ptr<google::protobuf::Message> > profanedb::storage::Normalizer::NormalizeMessage(
+    const google::protobuf::Message & message) const
+{
 }

@@ -17,11 +17,12 @@
  *
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef PROFANEDB_STORAGE_PARSER_H
+#define PROFANEDB_STORAGE_PARSER_H
 
 #include <iostream>
 #include <map>
+#include <string>
 
 #include <google/protobuf/compiler/importer.h>
 #include <google/protobuf/io/zero_copy_stream.h>
@@ -31,6 +32,8 @@
 
 #include <profanedb/protobuf/db.pb.h>
 #include <profanedb/protobuf/options.pb.h>
+
+#include "config.h"
 
 using namespace google::protobuf;
 
@@ -42,7 +45,7 @@ namespace storage {
 class Parser
 {
 public:
-    Parser();
+    Parser(const Config::ProfaneDB & profaneConfig);
     ~Parser();
 
     // Using the provided schema, get a map with all nested messages and their unique key
@@ -50,21 +53,6 @@ public:
     map<std::string, const Message &> NormalizeMessage(const Message & message);
 
 private:
-    io::ZeroCopyInputStream * inputStream;
-    compiler::DiskSourceTree sourceTree;
-    compiler::MultiFileErrorCollector * errCollector = new ErrorCollector();
-    compiler::SourceTreeDescriptorDatabase * descriptorDb;
-    DescriptorPool * pool;
-
-    DynamicMessageFactory messageFactory;
-
-    // Given a Field
-    std::string FieldToKey(const Message * container, const FieldDescriptor * fd);
-
-    // Given a descriptor, find information about the key and nested objects,
-    // return true if the message has a key
-    bool ParseMessageDescriptor(const Descriptor & descriptor);
-
     // A simple ErrorCollector for debug, write to stderr
     class ErrorCollector : public compiler::MultiFileErrorCollector {
     public:
@@ -72,8 +60,22 @@ private:
         void AddError(const string & filename, int line, int column, const string & message) override;
         void AddWarning(const string & filename, int line, int column, const string & message) override;
     };
+
+    ErrorCollector errCollector;
+    std::shared_ptr<compiler::SourceTreeDescriptorDatabase> descriptorDb;
+    std::shared_ptr<DescriptorPool> pool;
+    DynamicMessageFactory messageFactory;
+    
+    FileDescriptorProto fileDescProto;
+
+    // Given a Field
+    string FieldToKey(const Message & container, const FieldDescriptor & fd);
+
+    // Given a descriptor, find information about the key and nested objects,
+    // return true if the message has a key
+    bool ParseMessageDescriptor(const Descriptor & descriptor);
 };
 }
 }
 
-#endif // PARSER_H
+#endif // PROFANEDB_STORAGE_PARSER_H

@@ -17,13 +17,14 @@
  *
  */
 
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef PROFANEDB_STORAGE_SERVER_H
+#define PROFANEDB_STORAGE_SERVER_H
 
 #include <grpc++/grpc++.h>
 #include <grpc/support/log.h>
 
 #include <profanedb/storage/db.h>
+#include <profanedb/storage/config.h>
 
 #include <profanedb/protobuf/db.pb.h>
 #include <profanedb/protobuf/db.grpc.pb.h>
@@ -41,12 +42,16 @@ public:
     void Run();
     
 private:
+    profanedb::storage::Config config;
+    
     void HandleRpcs();
     
     std::unique_ptr<grpc::Server> server;
     
     class DbServiceImpl : public profanedb::protobuf::Db::Service {
     public:
+        DbServiceImpl(const profanedb::storage::Config & config);
+        
         grpc::Status Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp* response) override;
         
         grpc::Status Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response) override;
@@ -62,4 +67,4 @@ private:
 }
 }
 
-#endif // SERVER_H
+#endif // PROFANEDB_STORAGE_SERVER_H

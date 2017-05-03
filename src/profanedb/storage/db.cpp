@@ -19,15 +19,16 @@
 
 #include "db.h"
 
-profanedb::storage::Db::Db()
+profanedb::storage::Db::Db(profanedb::storage::Config config)
+  : config(config)
+  , parser(config.GetProfaneConfig())
 {
-    options.create_if_missing = true;
-    
-    rocksdb::DB::Open(options, "/tmp/profanedb", &db);
+    // rocksdb::DB::Open(options, name, &db);
 }
 
 profanedb::storage::Db::~Db()
 {
+    delete db;
 }
 
 profanedb::protobuf::GetResp profanedb::storage::Db::Get(const profanedb::protobuf::GetReq & request)

@@ -17,16 +17,17 @@
  *
  */
 
-#ifndef DB_H
-#define DB_H
+#ifndef PROFANEDB_STORAGE_DB_H
+#define PROFANEDB_STORAGE_DB_H
 
 #include <iostream>
-
-#include "parser.h"
+#include <string>
 
 #include <rocksdb/db.h>
 
 #include <profanedb/protobuf/db.pb.h>
+
+#include "parser.h"
 
 namespace profanedb {
 namespace storage {
@@ -35,7 +36,7 @@ namespace storage {
 class Db
 {
 public:
-    Db();
+    Db(Config config);
     ~Db();
    
     protobuf::GetResp Get(const protobuf::GetReq & request);
@@ -43,11 +44,11 @@ public:
     protobuf::DelResp Delete(const protobuf::DelReq & request);
 private:
     rocksdb::DB * db;
-    rocksdb::Options options;
     
+    Config config;
     Parser parser;
 };
 }
 }
 
-#endif // DB_H
+#endif // PROFANEDB_STORAGE_DB_H

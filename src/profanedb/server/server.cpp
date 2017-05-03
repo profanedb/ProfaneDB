@@ -20,6 +20,17 @@
 #include "server.h"
 
 profanedb::server::Server::Server()
+  : config(
+      profanedb::storage::Config::ProfaneDB(
+        boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/test"),
+        boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/src")
+      ),
+      profanedb::storage::Config::RocksDB(
+        rocksdb::Options(),
+        "/tmp/profanedb"
+      )
+    )
+  , service(config)
 {
 }
 
@@ -47,6 +58,11 @@ void profanedb::server::Server::Run()
 void profanedb::server::Server::HandleRpcs()
 {
     server->Wait();
+}
+
+profanedb::server::Server::DbServiceImpl::DbServiceImpl(const profanedb::storage::Config & config)
+  : db(config)
+{
 }
 
 grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp * response)

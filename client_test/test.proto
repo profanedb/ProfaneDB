@@ -10,9 +10,9 @@ message Test {
     int32 field_one_int = 1 [ (profanedb.protobuf.options).key = true ];
     string field_two_str = 2;
     bool field_three_bool = 3;
-    bytes field_four_bytes = 4;
     
     Nested field_five_nested = 5;
+    bytes field_four_bytes = 4;
 
     ExternalNested field_six_externalnested = 6;
 }

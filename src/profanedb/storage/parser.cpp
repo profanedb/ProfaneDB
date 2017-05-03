@@ -69,55 +69,61 @@ profanedb::storage::Parser::Parser(const Config::ProfaneDB & profaneConfig)
 }
 
 void profanedb::storage::Parser::ParseMessageDescriptor(
-    const google::protobuf::Descriptor & desc,
+    const google::protobuf::Descriptor & descriptor,
     google::protobuf::DescriptorProto & proto)
 {
     // Recurse into nested messages
-    for (int j = 0; j < desc.nested_type_count(); j++) {
+    for (int j = 0; j < descriptor.nested_type_count(); j++) {
         google::protobuf::DescriptorProto * nestedProto = proto.mutable_nested_type(j);
-        this->ParseMessageDescriptor(*desc.nested_type(j), *nestedProto);
+        this->ParseMessageDescriptor(*descriptor.nested_type(j), *nestedProto);
     }
+    
+    NormalizedDescriptor normalized(descriptor, proto);
+    
+    normalizedDescriptors.insert(
+        std::pair<std::string, NormalizedDescriptor> (descriptor.full_name(), normalized));
+}
 
-    for (int k = 0; k < desc.field_count(); k++) {
-        const FieldDescriptor * fd = desc.field(k);
+profanedb::storage::Parser::NormalizedDescriptor::NormalizedDescriptor(
+    const google::protobuf::Descriptor & descriptor,
+    google::protobuf::DescriptorProto & proto)
+{
+    for (int k = 0; k < descriptor.field_count(); k++) {
+        const FieldDescriptor * fd = descriptor.field(k);
         const Descriptor * nested = fd->message_type();
-        
+
         // If a nested message is keyable change its type to string to allow references, 
-        // TODO and the keyable messages is flagged for normalization
-        if (nested != NULL && this->IsKeyable(*nested)) {
+        // and keyable messages are flagged for normalization
+        if (nested != NULL && IsKeyable(*nested)) {
             proto.mutable_field(k)->set_type(FieldDescriptorProto_Type_TYPE_STRING);
-            // TODO Should mark nested keyable messages
-        
-        // TODO Keyable field is stored for quick retrieval during normalization
-        } else if (fd->options().GetExtension(profanedb::protobuf::options).key()) {
+            this->keyableMessageReferences.push_back(fd);
             
+        } else if (fd->options().GetExtension(profanedb::protobuf::options).key()) {
+            this->key = fd;
         }
     }
 }
 
-bool profanedb::storage::Parser::IsKeyable(const google::protobuf::Descriptor & desc)
+bool profanedb::storage::Parser::NormalizedDescriptor::IsKeyable(const google::protobuf::Descriptor& descriptor)
 {
-    for (int l = 0; l < desc.field_count(); l++) {
-        if (desc.field(l)->options().GetExtension(profanedb::protobuf::options).key())
+    for (int l = 0; l < descriptor.field_count(); l++) {
+        if (descriptor.field(l)->options().GetExtension(profanedb::protobuf::options).key())
             return true;
     }
-    
+
     return false;
 }
 
-// map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::NormalizeMessage(const google::protobuf::Any & serializable)
-// {
-//     // The Descriptor is manually extracted from the pool,
-//     // removing the prepending `type.googleapis.com/` in the Any message
-//     string type = serializable.type_url();
-//     const Descriptor * definition = schemaPool->FindMessageTypeByName(type.substr(type.rfind('/')+1, string::npos));
-//
-//     Message * container = messageFactory.GetPrototype(definition)->New();
-//     serializable.UnpackTo(container);
-//
-//     return NormalizeMessage(*container);
-// }
-//
+const google::protobuf::FieldDescriptor & profanedb::storage::Parser::NormalizedDescriptor::GetKey() const
+{
+    return *this->key;
+}
+
+const std::vector<const google::protobuf::FieldDescriptor *> & profanedb::storage::Parser::NormalizedDescriptor::GetKeyableReferences() const
+{
+    return this->keyableMessageReferences;
+}
+
 // map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::NormalizeMessage(const google::protobuf::Message & message)
 // {
 //     auto dependencies = new map< std::string, const google::protobuf::Message & >();
@@ -154,48 +160,6 @@ bool profanedb::storage::Parser::IsKeyable(const google::protobuf::Descriptor & 
 //     dependencies->insert( std::pair< string, const google::protobuf::Message & >(key, message) );
 //
 //     return *dependencies;
-// }
-
-// std::string profanedb::storage::Parser::FieldToKey(const google::protobuf::Message & container, const google::protobuf::FieldDescriptor & fd)
-// {
-//     const Reflection * reflection = container.GetReflection();
-//
-//     std::string key_value;
-//
-//     switch (fd.cpp_type()) {
-//         case FieldDescriptor::CPPTYPE_INT32:
-//             key_value = std::to_string(reflection->GetInt32(container, &fd));
-//             break;
-//         case FieldDescriptor::CPPTYPE_INT64:
-//             key_value = std::to_string(reflection->GetInt64(container, &fd));
-//             break;
-//         case FieldDescriptor::CPPTYPE_UINT32:
-//             key_value = std::to_string(reflection->GetUInt32(container, &fd));
-//             break;
-//         case FieldDescriptor::CPPTYPE_UINT64:
-//             key_value = std::to_string(reflection->GetUInt64(container, &fd));
-//             break;
-//         case FieldDescriptor::CPPTYPE_DOUBLE:
-//             key_value = std::to_string(reflection->GetDouble(container, &fd));
-//             break;
-//         case FieldDescriptor::CPPTYPE_FLOAT:
-//             key_value = std::to_string(reflection->GetFloat(container, &fd));
-//             break;
-//         case FieldDescriptor::CPPTYPE_BOOL:
-//             key_value = std::to_string(reflection->GetBool(container, &fd));
-//             break;
-//         case FieldDescriptor::CPPTYPE_ENUM:
-//             key_value = std::to_string(reflection->GetEnum(container, &fd)->index());
-//             break;
-//         case FieldDescriptor::CPPTYPE_STRING:
-//             key_value = reflection->GetString(container, &fd);
-//             break;
-//         case FieldDescriptor::CPPTYPE_MESSAGE:
-//             key_value = reflection->GetMessage(container, &fd, &messageFactory).SerializeAsString();
-//             break;
-//     }
-//
-//     return fd.full_name() + '$' + key_value;
 // }
 
 profanedb::storage::Parser::ErrorCollector::ErrorCollector()

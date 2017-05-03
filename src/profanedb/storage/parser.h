@@ -63,12 +63,9 @@ private:
    
     // Change nested message fields in proto if reference is to be set
     void ParseMessageDescriptor(
-        const google::protobuf::Descriptor & desc,
+        const google::protobuf::Descriptor & descriptor,
         google::protobuf::DescriptorProto & proto
     );
-    
-    // Check if a message has a key defined in its schema
-    bool IsKeyable(const google::protobuf::Descriptor & desc);
     
     // A simple ErrorCollector for debug, write to stderr
     class ErrorCollector : public compiler::MultiFileErrorCollector {
@@ -79,6 +76,25 @@ private:
     };
 
     ErrorCollector errCollector;
+    
+    class NormalizedDescriptor {
+    public:
+        NormalizedDescriptor(
+            const google::protobuf::Descriptor & descriptor,
+            google::protobuf::DescriptorProto & proto
+        );
+        
+        const google::protobuf::FieldDescriptor & GetKey() const;
+        const std::vector< const google::protobuf::FieldDescriptor * > & GetKeyableReferences() const;
+    private:
+        const google::protobuf::FieldDescriptor * key;
+        std::vector< const google::protobuf::FieldDescriptor * > keyableMessageReferences;
+    
+        // Check if a message has a key defined in its schema
+        static bool IsKeyable(const google::protobuf::Descriptor & descriptor);
+    };
+    
+    std::map<std::string, NormalizedDescriptor> normalizedDescriptors;
 };
 }
 }

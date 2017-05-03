@@ -41,14 +41,15 @@ public:
     Normalizer(Parser & parser);
     
     // This is just a layer on top of NormalizeMessage(Message) to parse an Any message
-    map< std::string, std::shared_ptr<google::protobuf::Message> > NormalizeMessage(
+    std::map<std::string, const google::protobuf::Message> NormalizeMessage(
         const google::protobuf::Any & serializable);
     
     // Unnest keyable messages and assign their key to their parent object
-    map< std::string, std::shared_ptr<google::protobuf::Message> > NormalizeMessage(
+    std::map<std::string, const google::protobuf::Message> NormalizeMessage(
         const google::protobuf::Message & message) const;
     
 private:
+    Parser & parser;
     // This holds the schema as defined by the user (needed to parse the incoming messages)
     std::shared_ptr<google::protobuf::DescriptorPool> schemaPool;
     
@@ -58,6 +59,8 @@ private:
     std::shared_ptr<google::protobuf::DescriptorPool> normalizedPool;
     
     google::protobuf::DynamicMessageFactory messageFactory;
+    
+    std::string FieldToKey(const google::protobuf::Message & container, const google::protobuf::FieldDescriptor & fd) const;
 };
 }
 }

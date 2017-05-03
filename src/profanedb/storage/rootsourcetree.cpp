@@ -17,41 +17,18 @@
  *
  */
 
-#ifndef PROFANEDB_STORAGE_DB_H
-#define PROFANEDB_STORAGE_DB_H
+#include "rootsourcetree.h"
 
-#include <iostream>
-#include <string>
+profanedb::storage::RootSourceTree::RootSourceTree(
+    std::initializer_list<boost::filesystem::path> mappings)
 
-#include <rocksdb/db.h>
-
-#include <profanedb/protobuf/db.pb.h>
-
-#include "config.h"
-#include "parser.h"
-#include "normalizer.h"
-
-namespace profanedb {
-namespace storage {
-
-// Db should be the main interface when embedding ProfaneDB
-class Db
+  : google::protobuf::compiler::DiskSourceTree()
 {
-public:
-    Db(Config config);
-    ~Db();
-   
-    protobuf::GetResp Get(const protobuf::GetReq & request);
-    protobuf::PutResp Put(const protobuf::PutReq & request);
-    protobuf::DelResp Delete(const protobuf::DelReq & request);
-private:
-    Config config;
-    Parser parser;
-    Normalizer normalizer;
+    for (const auto & path: mappings)
+        this->MapPath("", path.string());
     
-    std::unique_ptr<rocksdb::DB> db;
-};
-}
+    google::protobuf::io::ZeroCopyInputStream * inputStream = this->Open("");
+    if (inputStream == nullptr)
+        throw std::runtime_error(this->GetLastErrorMessage());
 }
 
-#endif // PROFANEDB_STORAGE_DB_H

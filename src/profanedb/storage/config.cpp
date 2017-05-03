@@ -44,25 +44,9 @@ profanedb::storage::Config::ProfaneDB::ProfaneDB(
     boost::filesystem::path include)
 
   : schemaDefinition(schema)
-  , sourceTree(new google::protobuf::compiler::DiskSourceTree)
+  , profaneDbOptions(options)
+  , includePath(include)
 {
-    sourceTree->MapPath("", include.string());
-    sourceTree->MapPath("", options.string());
-    sourceTree->MapPath("", schema.string());
-    
-    google::protobuf::io::ZeroCopyInputStream * inputStream = sourceTree->Open("");
-    if (inputStream == NULL)
-        throw std::runtime_error(sourceTree->GetLastErrorMessage());
-}
-
-std::shared_ptr<google::protobuf::compiler::SourceTree> profanedb::storage::Config::ProfaneDB::GetSourceTree() const
-{
-    return std::dynamic_pointer_cast<google::protobuf::compiler::SourceTree>(this->sourceTree);
-}
-
-const boost::filesystem::path & profanedb::storage::Config::ProfaneDB::GetSchemaDefinitionPath() const
-{
-    return this->schemaDefinition;
 }
 
 profanedb::storage::Config::RocksDB::RocksDB(rocksdb::Options options, std::string name)

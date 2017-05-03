@@ -20,78 +20,63 @@
 #include "parser.h"
 
 profanedb::storage::Parser::Parser(const Config::ProfaneDB & profaneConfig)
-  : descriptorDb(new compiler::SourceTreeDescriptorDatabase(profaneConfig.GetSourceTree().get()))
-  , pool(new DescriptorPool(descriptorDb.get()))
+  : rootDescriptorDb(
+      new google::protobuf::compiler::SourceTreeDescriptorDatabase(
+          new RootSourceTree {profaneConfig.includePath, profaneConfig.profaneDbOptions}
+      )
+    )
+  , schemaDescriptorDb(
+      new google::protobuf::compiler::SourceTreeDescriptorDatabase(
+          new RootSourceTree {profaneConfig.schemaDefinition}
+      )
+    )
+  , mergedSchemaDescriptorDb(
+      new google::protobuf::MergedDescriptorDatabase(rootDescriptorDb.get(), schemaDescriptorDb.get()))
+  , schemaPool(new DescriptorPool(mergedSchemaDescriptorDb.get()))
+  , normalizedDescriptorDb(new SimpleDescriptorDatabase)
 {
-    descriptorDb->RecordErrorsTo(&errCollector);
+    schemaDescriptorDb->RecordErrorsTo(&errCollector);
 
     // Load ProfaneDB options to be used during file import
-    pool->FindFileByName("profanedb/protobuf/options.proto");
+    schemaPool->FindFileByName("profanedb/protobuf/options.proto");
     
-    // Import all `.proto` files in kDbSchema into the pool,
+    // TODO Move the whole loading to functions
+    
+    // Import all `.proto` files from the schema definition into the pool,
     // so that FindMessageTypeByName can then be used
     for (auto const & file:
         boost::filesystem::recursive_directory_iterator(
-            profaneConfig.GetSchemaDefinitionPath(),
+            profaneConfig.schemaDefinition,
             boost::filesystem::symlink_option::recurse)) {
         
+        // Files are loaded by extension, so care should be taken to name them appropriately
         if (file.path().extension() == ".proto") {
-            // For the pool every file is relative to the mapping provided before (kDbSchema)
-            const FileDescriptor * fileD = pool->FindFileByName(
-                file.path().lexically_relative(profaneConfig.GetSchemaDefinitionPath()).string());
+            // For the pool every file is relative to the mapping provided before in config
+            const FileDescriptor * fileD = schemaPool->FindFileByName(
+                file.path().lexically_relative(profaneConfig.schemaDefinition).string());
+                
+            FileDescriptorProto * fileProto = new FileDescriptorProto;
+            fileD->CopyTo(fileProto);
             
             for (int i = 0; i < fileD->message_type_count(); i++) {
                 const Descriptor * message = fileD->message_type(i);
                 
-                DescriptorProto * descriptorProto;
-               
-                if (ParseMessageDescriptor(*message)) {
-                    descriptorProto = fileDescProto.add_message_type();
-                    message->CopyTo(descriptorProto);
+                for (int k = 0; k < message->field_count(); k++) {
+                    if (message->field(k)->options().GetExtension(profanedb::protobuf::options).key()) {
+                        fileProto->mutable_message_type(i)->mutable_field(k)->set_type(
+                            FieldDescriptorProto_Type_TYPE_STRING
+                          );
+                        break;
+                    }
                 }
             }
+            normalizedDescriptorDb->AddAndOwn(fileProto);
         }
     }
-    
-    // Now build a file with all generated messages in an empty pool
-    DescriptorPool newPool{};
-    *fileDescProto.mutable_name() = "profanedb_generated_schema";
-    std::cout << fileDescProto.DebugString() << std::endl;
-    newPool.BuildFile(fileDescProto);
 }
 
 profanedb::storage::Parser::~Parser()
 {
-}
-
-bool profanedb::storage::Parser::ParseMessageDescriptor(const google::protobuf::Descriptor & descriptor)
-{
-    // A DescriptorProto is needed to generate the message the way it will be serialized,
-    // with keys replacing
-    google::protobuf::DescriptorProto * descriptorProto;
-    
-    bool hasKey = false;
-    
-    for (int k = 0; k < descriptor.field_count(); k++) {
-        const FieldDescriptor * field = descriptor.field(k);
-        
-        // Recursively call this function to add all nested messages
-        const google::protobuf::Descriptor * nested = field->message_type();
-        if (nested != NULL) {
-            if (ParseMessageDescriptor(*nested)) {
-                // If the nested message has a primary key, set the field to string to hold a reference
-                descriptorProto->mutable_field(k)->set_type(FieldDescriptorProto_Type_TYPE_STRING);
-            }
-        }
-
-        profanedb::protobuf::FieldOptions options = field->options().GetExtension(profanedb::protobuf::options);
-
-        if (options.key()) {
-            hasKey = true;
-        }
-    }
-    
-    return hasKey;
 }
 
 map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::NormalizeMessage(const google::protobuf::Any & serializable)
@@ -99,7 +84,7 @@ map< std::string, const google::protobuf::Message & > profanedb::storage::Parser
     // The Descriptor is manually extracted from the pool,
     // removing the prepending `type.googleapis.com/` in the Any message
     string type = serializable.type_url();
-    const Descriptor * definition = pool->FindMessageTypeByName(type.substr(type.rfind('/')+1, string::npos));
+    const Descriptor * definition = schemaPool->FindMessageTypeByName(type.substr(type.rfind('/')+1, string::npos));
     
     Message * container = messageFactory.GetPrototype(definition)->New();
     serializable.UnpackTo(container);
@@ -145,11 +130,11 @@ map< std::string, const google::protobuf::Message & > profanedb::storage::Parser
     return *dependencies;
 }
 
-string profanedb::storage::Parser::FieldToKey(const google::protobuf::Message & container, const google::protobuf::FieldDescriptor & fd)
+std::string profanedb::storage::Parser::FieldToKey(const google::protobuf::Message & container, const google::protobuf::FieldDescriptor & fd)
 {
     const Reflection * reflection = container.GetReflection();
     
-    string key_value;
+    std::string key_value;
     
     switch (fd.cpp_type()) {
         case FieldDescriptor::CPPTYPE_INT32:

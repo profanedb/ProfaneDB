@@ -22,13 +22,13 @@
 profanedb::storage::Db::Db(profanedb::storage::Config config)
   : config(config)
   , parser(config.GetProfaneConfig())
+  , normalizer(parser)
 {
     // rocksdb::DB::Open(options, name, &db);
 }
 
 profanedb::storage::Db::~Db()
 {
-    delete db;
 }
 
 profanedb::protobuf::GetResp profanedb::storage::Db::Get(const profanedb::protobuf::GetReq & request)

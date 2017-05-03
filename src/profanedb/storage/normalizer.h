@@ -17,41 +17,30 @@
  *
  */
 
-#ifndef PROFANEDB_STORAGE_DB_H
-#define PROFANEDB_STORAGE_DB_H
+#ifndef PROFANEDB_STORAGE_NORMALIZER_H
+#define PROFANEDB_STORAGE_NORMALIZER_H
 
-#include <iostream>
-#include <string>
+#include <map>
 
-#include <rocksdb/db.h>
+#include <google/protobuf/descriptor_database.h>
 
-#include <profanedb/protobuf/db.pb.h>
-
-#include "config.h"
 #include "parser.h"
-#include "normalizer.h"
 
 namespace profanedb {
 namespace storage {
 
-// Db should be the main interface when embedding ProfaneDB
-class Db
+class Normalizer
 {
 public:
-    Db(Config config);
-    ~Db();
-   
-    protobuf::GetResp Get(const protobuf::GetReq & request);
-    protobuf::PutResp Put(const protobuf::PutReq & request);
-    protobuf::DelResp Delete(const protobuf::DelReq & request);
-private:
-    Config config;
-    Parser parser;
-    Normalizer normalizer;
+    Normalizer(Parser & parser);
     
-    std::unique_ptr<rocksdb::DB> db;
+private:
+    std::shared_ptr<google::protobuf::DescriptorPool> schemaPool;
+    
+    std::unique_ptr<google::protobuf::MergedDescriptorDatabase> normalizedMergedDescriptorDb;
+    std::shared_ptr<google::protobuf::DescriptorPool> normalizedPool;
 };
 }
 }
 
-#endif // PROFANEDB_STORAGE_DB_H
+#endif // PROFANEDB_STORAGE_NORMALIZER_H

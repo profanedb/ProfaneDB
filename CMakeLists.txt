@@ -5,7 +5,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g")
 set(PROTOBUF_IMPORT_DIRS "${CMAKE_SOURCE_DIR}/src")
 
-option(BUILD_LIBPROFANEDB "Build libprofanedb.so, to embed ProfaneDB" ON)
+option(BUILD_SHARED_LIBS "Build libprofanedb.so, to embed ProfaneDB" ON)
 option(BUILD_PROFANEDB_SERVER "Build ProfaneDB gRPC server" OFF)
 
 find_package(Threads REQUIRED)

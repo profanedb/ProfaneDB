@@ -43,14 +43,9 @@ public:
                   boost::filesystem::path options,
                   boost::filesystem::path include = boost::filesystem::path("/usr/include"));
         
-        const boost::filesystem::path & GetSchemaDefinitionPath() const;
-        std::shared_ptr<google::protobuf::compiler::SourceTree> GetSourceTree() const;
-        
-    private:
-        boost::filesystem::path schemaDefinition;
-        
-        // Setting the path updates the source tree
-        std::shared_ptr<google::protobuf::compiler::DiskSourceTree> sourceTree;
+        const boost::filesystem::path schemaDefinition;
+        const boost::filesystem::path profaneDbOptions;
+        const boost::filesystem::path includePath;
     };
     
     class RocksDB {

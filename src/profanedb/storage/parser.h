@@ -34,16 +34,19 @@
 #include <profanedb/protobuf/options.pb.h>
 
 #include "config.h"
+#include "rootsourcetree.h"
 
 using namespace google::protobuf;
 
 namespace profanedb {
 namespace storage {
-
+    
 // Given a Any message, Parser looks for the corresponding definition in .proto files,
 // and generates a map with keys of nested messages
 class Parser
 {
+friend class Normalizer;
+
 public:
     Parser(const Config::ProfaneDB & profaneConfig);
     ~Parser();
@@ -53,6 +56,19 @@ public:
     map<std::string, const Message &> NormalizeMessage(const Message & message);
 
 private:
+    std::unique_ptr<compiler::SourceTreeDescriptorDatabase> rootDescriptorDb;
+    std::unique_ptr<compiler::SourceTreeDescriptorDatabase> schemaDescriptorDb;
+    std::unique_ptr<MergedDescriptorDatabase> mergedSchemaDescriptorDb;
+    
+    std::shared_ptr<DescriptorPool> schemaPool;
+    
+    std::unique_ptr<SimpleDescriptorDatabase> normalizedDescriptorDb;
+    
+    DynamicMessageFactory messageFactory;
+    
+    // Given a Field
+    string FieldToKey(const Message & container, const FieldDescriptor & fd);
+    
     // A simple ErrorCollector for debug, write to stderr
     class ErrorCollector : public compiler::MultiFileErrorCollector {
     public:
@@ -62,18 +78,6 @@ private:
     };
 
     ErrorCollector errCollector;
-    std::shared_ptr<compiler::SourceTreeDescriptorDatabase> descriptorDb;
-    std::shared_ptr<DescriptorPool> pool;
-    DynamicMessageFactory messageFactory;
-    
-    FileDescriptorProto fileDescProto;
-
-    // Given a Field
-    string FieldToKey(const Message & container, const FieldDescriptor & fd);
-
-    // Given a descriptor, find information about the key and nested objects,
-    // return true if the message has a key
-    bool ParseMessageDescriptor(const Descriptor & descriptor);
 };
 }
 }

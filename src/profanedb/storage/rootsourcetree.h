@@ -1,5 +1,5 @@
 /*
- * ProfaneDB - A Protocol Buffer database.
+ * ProfaneDB - A Protocol Buffers database.
  * Copyright (C) 2017  "Giorgio Azzinnaro" <giorgio.azzinnaro@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify

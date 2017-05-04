@@ -45,15 +45,12 @@ std::map<std::string, const google::protobuf::Message &> profanedb::storage::Nor
     return this->NormalizeMessage(*container);
 }
 
-std::map<std::string, const google::protobuf::Message &> profanedb::storage::Normalizer::NormalizeMessage(
-    const google::protobuf::Message & message)
+std::map<std::string, const google::protobuf::Message &> profanedb::storage::Normalizer::NormalizeMessage(const google::protobuf::Message & message)
 {
     auto dependencies = std::map<std::string, const google::protobuf::Message &>();
     Parser::NormalizedDescriptor & normalizedDesc = parser.normalizedDescriptors.at(message.GetTypeName());
     
     google::protobuf::Message * normalizedMessage = messageFactory.GetPrototype(normalizedPool->FindMessageTypeByName(message.GetTypeName()))->New();
-    
-    // normalizedMessage->CopyFrom(*message); // This can't be done as nested keyable messages are now defined as string in normalizedMessage
     
     std::vector< const google::protobuf::FieldDescriptor * > setFields;
     message.GetReflection()->ListFields(message, &setFields);
@@ -71,58 +68,89 @@ std::map<std::string, const google::protobuf::Message &> profanedb::storage::Nor
             normalizedMessage->GetReflection()->SetString(
                 normalizedMessage,
                 referenceFieldDescriptor,
-                FieldToKey(nestedMessage, nestedNormalizedDesc.GetKey()));
+                this->FieldToKey(nestedMessage, nestedNormalizedDesc.GetKey()));
             // TODO If we made NormalizeMessage return the top level key in a clear way we'd avoid all this
-        } else {
-            // TODO Copy field as is from message
+        }
+        else {
+            this->CopyField(*fd, message, *normalizedMessage);
         }
     }
     
     dependencies.insert(std::pair<std::string, const google::protobuf::Message &>(
-        FieldToKey(message, normalizedDesc.GetKey()),
-        *normalizedMessage)); // FIXME In here goes the normalized message
+        this->FieldToKey(message, normalizedDesc.GetKey()),
+        *normalizedMessage));
     
     return dependencies;
 }
 
+// TODO Repeated
 std::string profanedb::storage::Normalizer::FieldToKey(const google::protobuf::Message & container, const google::protobuf::FieldDescriptor & fd) const
 {
-    const Reflection * reflection = container.GetReflection();
+    const google::protobuf::Reflection * reflection = container.GetReflection();
 
     std::string key_value;
 
     switch (fd.cpp_type()) {
-        case FieldDescriptor::CPPTYPE_INT32:
-            key_value = std::to_string(reflection->GetInt32(container, &fd));
+
+#define HANDLE_TYPE(CPPTYPE, METHOD)                                                \
+        case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                  \
+            key_value = std::to_string(reflection->Get##METHOD(container, &fd));    \
             break;
-        case FieldDescriptor::CPPTYPE_INT64:
-            key_value = std::to_string(reflection->GetInt64(container, &fd));
-            break;
-        case FieldDescriptor::CPPTYPE_UINT32:
-            key_value = std::to_string(reflection->GetUInt32(container, &fd));
-            break;
-        case FieldDescriptor::CPPTYPE_UINT64:
-            key_value = std::to_string(reflection->GetUInt64(container, &fd));
-            break;
-        case FieldDescriptor::CPPTYPE_DOUBLE:
-            key_value = std::to_string(reflection->GetDouble(container, &fd));
-            break;
-        case FieldDescriptor::CPPTYPE_FLOAT:
-            key_value = std::to_string(reflection->GetFloat(container, &fd));
-            break;
-        case FieldDescriptor::CPPTYPE_BOOL:
-            key_value = std::to_string(reflection->GetBool(container, &fd));
-            break;
-        case FieldDescriptor::CPPTYPE_ENUM:
+            
+        HANDLE_TYPE(INT32 , Int32 );
+        HANDLE_TYPE(INT64 , Int64 );
+        HANDLE_TYPE(UINT32, UInt32);
+        HANDLE_TYPE(UINT64, UInt64);
+        HANDLE_TYPE(DOUBLE, Double);
+        HANDLE_TYPE(FLOAT , Float );
+        HANDLE_TYPE(BOOL  , Bool  );
+#undef HANDLE_TYPE
+        
+        case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
             key_value = std::to_string(reflection->GetEnum(container, &fd)->index());
             break;
-        case FieldDescriptor::CPPTYPE_STRING:
+        case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
             key_value = reflection->GetString(container, &fd);
             break;
-        case FieldDescriptor::CPPTYPE_MESSAGE:
+        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
             key_value = reflection->GetMessage(container, &fd/*, &messageFactory*/).SerializeAsString();
             break;
     }
 
     return fd.full_name() + '$' + key_value;
+}
+
+// TODO Repeated
+void profanedb::storage::Normalizer::CopyField(
+    const google::protobuf::FieldDescriptor & fromField,
+    const google::protobuf::Message & from,
+    google::protobuf::Message & to)
+{
+    const google::protobuf::Reflection * fromReflection = from.GetReflection();
+    const google::protobuf::Reflection * toReflection = to.GetReflection();
+    const google::protobuf::FieldDescriptor * toField = to.GetDescriptor()->field(fromField.index());
+    
+    switch (fromField.cpp_type()) {
+#define HANDLE_TYPE(CPPTYPE, METHOD)                                                    \
+        case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                      \
+            toReflection->Set##METHOD(&to, toField,                                     \
+                                      fromReflection->Get##METHOD(from, &fromField));   \
+            break;
+            
+        HANDLE_TYPE(INT32 , Int32 );
+        HANDLE_TYPE(INT64 , Int64 );
+        HANDLE_TYPE(UINT32, UInt32);
+        HANDLE_TYPE(UINT64, UInt64);
+        HANDLE_TYPE(DOUBLE, Double);
+        HANDLE_TYPE(FLOAT , Float );
+        HANDLE_TYPE(BOOL  , Bool  );
+        HANDLE_TYPE(STRING, String);
+        HANDLE_TYPE(ENUM  , Enum );
+#undef HANDLE_TYPE
+        
+        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+            toReflection->MutableMessage(&to, toField)->MergeFrom(
+                fromReflection->GetMessage(from, &fromField));
+            break;
+    }
 }

@@ -126,44 +126,6 @@ const std::set<const google::protobuf::FieldDescriptor *> & profanedb::storage::
     return this->keyableMessageReferences;
 }
 
-// map< std::string, const google::protobuf::Message & > profanedb::storage::Parser::NormalizeMessage(const google::protobuf::Message & message)
-// {
-//     auto dependencies = new map< std::string, const google::protobuf::Message & >();
-//
-//     // TODO This only takes set fields into account. Maybe using Descriptor::field(0 <= i < field_count()) is better
-//     auto fields = new std::vector< const FieldDescriptor * >();
-//     message.GetReflection()->ListFields(message, fields);
-//
-//     DescriptorProto * descProto = new DescriptorProto();
-//     message.GetDescriptor()->CopyTo(descProto);
-//
-//     string key;
-//
-//     for (auto const & fd: *fields) {
-//         if (fd->message_type() != NULL) {
-//             auto nested = NormalizeMessage(message.GetReflection()->GetMessage(message, fd, &messageFactory));
-//
-//             // TODO If first nested message has primary key set a reference
-//             if (nested.size() > 0) {
-//
-//                 // The nested message might contain other messages, all of them are stored in the dependency map
-//                 dependencies->insert(nested.begin(), nested.end());
-//             }
-//         } else {
-//             auto options = fd->options().GetExtension(profanedb::protobuf::options);
-//
-//             // TODO This only uses a single key, one could set multiple keys
-//             if (options.key()) {
-//                 key = FieldToKey(message, *fd);
-//             }
-//         }
-//     }
-//
-//     dependencies->insert( std::pair< string, const google::protobuf::Message & >(key, message) );
-//
-//     return *dependencies;
-// }
-
 profanedb::storage::Parser::ErrorCollector::ErrorCollector()
 {
 }

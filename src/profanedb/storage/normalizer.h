@@ -61,6 +61,7 @@ private:
     google::protobuf::DynamicMessageFactory messageFactory;
     
     std::string FieldToKey(const google::protobuf::Message & container, const google::protobuf::FieldDescriptor & fd) const;
+    void CopyField(const google::protobuf::FieldDescriptor & fd, const google::protobuf::Message & from, google::protobuf::Message & to);
 };
 }
 }

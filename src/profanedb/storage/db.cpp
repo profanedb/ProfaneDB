@@ -24,7 +24,7 @@ profanedb::storage::Db::Db(profanedb::storage::Config config)
   , parser(config.GetProfaneConfig())
   , normalizer(parser)
 {
-    // rocksdb::DB::Open(options, name, &db);
+    // rocksdb::DB::Open(config.GetRocksConfig(), name, &db);
 }
 
 profanedb::storage::Db::~Db()
@@ -41,6 +41,7 @@ profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protob
     
     for (auto const & obj: map) {
         std::cout << obj.first << ":" << std::endl << obj.second.DebugString() << std::endl;
+        // db->Put(rocksdb::WriteOptions(), obj.first, obj.second.SerializeAsString());
     }
 }
 

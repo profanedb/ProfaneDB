@@ -28,7 +28,7 @@ profanedb::storage::Normalizer::Normalizer(Parser & parser)
 {
 }
 
-std::map<std::string, const google::protobuf::Message> profanedb::storage::Normalizer::NormalizeMessage(
+std::map<std::string, std::shared_ptr<const google::protobuf::Message>> profanedb::storage::Normalizer::NormalizeMessage(
     const google::protobuf::Any & serializable)
 {
     // Any messages have a type url beginning with `type.googleapis.com/`, this is stripped
@@ -36,23 +36,23 @@ std::map<std::string, const google::protobuf::Message> profanedb::storage::Norma
     auto definition = std::unique_ptr<const google::protobuf::Descriptor>(schemaPool->FindMessageTypeByName(type.substr(type.rfind('/')+1, std::string::npos)));
     
     // Having the definition our message factory can simply generate a container,
-    auto container = std::unique_ptr<google::protobuf::Message>(messageFactory.GetPrototype(definition.get())->New());
+    auto container = std::shared_ptr<google::protobuf::Message>(messageFactory.GetPrototype(definition.get())->New());
     
     // and convert the bytes coming from Any into it
     serializable.UnpackTo(container.get());
     
     // The method getting a Message as paramater does the actual normalization of data
-    return this->NormalizeMessage(*container);
+    return this->NormalizeMessage(container);
 }
 
-std::map<std::string, const google::protobuf::Message> profanedb::storage::Normalizer::NormalizeMessage(
-    const google::protobuf::Message & message) const
+std::map<std::string, std::shared_ptr<const google::protobuf::Message>> profanedb::storage::Normalizer::NormalizeMessage(
+    std::shared_ptr<const google::protobuf::Message> message) const
 {
-    auto dependencies = std::map<std::string, const google::protobuf::Message>();
-    Parser::NormalizedDescriptor & normalizedDesc = parser.normalizedDescriptors.at(message.GetDescriptor()->full_name());
+    auto dependencies = std::map<std::string, std::shared_ptr<const google::protobuf::Message>>();
+    Parser::NormalizedDescriptor & normalizedDesc = parser.normalizedDescriptors.at(message->GetDescriptor()->full_name());
     
-    dependencies.insert(std::pair<std::string, const google::protobuf::Message>(
-        FieldToKey(message, normalizedDesc.GetKey()),
+    dependencies.insert(std::pair<std::string, std::shared_ptr<const google::protobuf::Message>>(
+        FieldToKey(*message, normalizedDesc.GetKey()),
         message));
     
     return dependencies;

@@ -40,7 +40,7 @@ profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protob
     auto map = normalizer.NormalizeMessage(request.serializable());
     
     for (auto const & obj: map) {
-        std::cout << obj.first << ":" << std::endl << obj.second.DebugString() << std::endl;
+        std::cout << obj.first << ":" << std::endl << obj.second->DebugString() << std::endl;
     }
 }
 

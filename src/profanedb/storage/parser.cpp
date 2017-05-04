@@ -96,7 +96,9 @@ profanedb::storage::Parser::NormalizedDescriptor::NormalizedDescriptor(
         // and keyable messages are flagged for normalization
         if (nested != NULL && IsKeyable(*nested)) {
             proto.mutable_field(k)->set_type(FieldDescriptorProto_Type_TYPE_STRING);
-            this->keyableMessageReferences.push_back(fd);
+            proto.mutable_field(k)->clear_type_name();
+            
+            this->keyableMessageReferences.insert(fd);
             
         } else if (fd->options().GetExtension(profanedb::protobuf::options).key()) {
             this->key = fd;
@@ -119,7 +121,7 @@ const google::protobuf::FieldDescriptor & profanedb::storage::Parser::Normalized
     return *this->key;
 }
 
-const std::vector<const google::protobuf::FieldDescriptor *> & profanedb::storage::Parser::NormalizedDescriptor::GetKeyableReferences() const
+const std::set<const google::protobuf::FieldDescriptor *> & profanedb::storage::Parser::NormalizedDescriptor::GetKeyableReferences() const
 {
     return this->keyableMessageReferences;
 }

@@ -41,12 +41,12 @@ public:
     Normalizer(Parser & parser);
     
     // This is just a layer on top of NormalizeMessage(Message) to parse an Any message
-    std::map<std::string, std::shared_ptr<const google::protobuf::Message>> NormalizeMessage(
+    std::map<std::string, const google::protobuf::Message &> NormalizeMessage(
         const google::protobuf::Any & serializable);
     
     // Unnest keyable messages and assign their key to their parent object
-    std::map<std::string, std::shared_ptr<const google::protobuf::Message>> NormalizeMessage(
-        std::shared_ptr<const google::protobuf::Message> message) const;
+    std::map<std::string, const google::protobuf::Message &> NormalizeMessage(
+        const google::protobuf::Message & message);
     
 private:
     Parser & parser;

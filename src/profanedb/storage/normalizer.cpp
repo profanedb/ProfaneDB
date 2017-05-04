@@ -28,7 +28,7 @@ profanedb::storage::Normalizer::Normalizer(Parser & parser)
 {
 }
 
-std::map<std::string, std::shared_ptr<const google::protobuf::Message>> profanedb::storage::Normalizer::NormalizeMessage(
+std::map<std::string, const google::protobuf::Message &> profanedb::storage::Normalizer::NormalizeMessage(
     const google::protobuf::Any & serializable)
 {
     // Any messages have a type url beginning with `type.googleapis.com/`, this is stripped
@@ -42,18 +42,45 @@ std::map<std::string, std::shared_ptr<const google::protobuf::Message>> profaned
     serializable.UnpackTo(container.get());
     
     // The method getting a Message as paramater does the actual normalization of data
-    return this->NormalizeMessage(container);
+    return this->NormalizeMessage(*container);
 }
 
-std::map<std::string, std::shared_ptr<const google::protobuf::Message>> profanedb::storage::Normalizer::NormalizeMessage(
-    std::shared_ptr<const google::protobuf::Message> message) const
+std::map<std::string, const google::protobuf::Message &> profanedb::storage::Normalizer::NormalizeMessage(
+    const google::protobuf::Message & message)
 {
-    auto dependencies = std::map<std::string, std::shared_ptr<const google::protobuf::Message>>();
-    Parser::NormalizedDescriptor & normalizedDesc = parser.normalizedDescriptors.at(message->GetDescriptor()->full_name());
+    auto dependencies = std::map<std::string, const google::protobuf::Message &>();
+    Parser::NormalizedDescriptor & normalizedDesc = parser.normalizedDescriptors.at(message.GetTypeName());
     
-    dependencies.insert(std::pair<std::string, std::shared_ptr<const google::protobuf::Message>>(
-        FieldToKey(*message, normalizedDesc.GetKey()),
-        message));
+    google::protobuf::Message * normalizedMessage = messageFactory.GetPrototype(normalizedPool->FindMessageTypeByName(message.GetTypeName()))->New();
+    
+    // normalizedMessage->CopyFrom(*message); // This can't be done as nested keyable messages are now defined as string in normalizedMessage
+    
+    std::vector< const google::protobuf::FieldDescriptor * > setFields;
+    message.GetReflection()->ListFields(message, &setFields);
+    
+    for (const auto & fd: setFields) {
+        if (normalizedDesc.GetKeyableReferences().find(fd) != normalizedDesc.GetKeyableReferences().end()) {
+            const google::protobuf::Message & nestedMessage = message.GetReflection()->GetMessage(message, fd, &messageFactory);
+            
+            auto nestedDependencies = this->NormalizeMessage(nestedMessage);
+            dependencies.insert(nestedDependencies.begin(), nestedDependencies.end());
+            
+            const google::protobuf::FieldDescriptor * referenceFieldDescriptor = normalizedMessage->GetDescriptor()->field(fd->index());
+            
+            Parser::NormalizedDescriptor & nestedNormalizedDesc = parser.normalizedDescriptors.at(nestedMessage.GetTypeName());
+            normalizedMessage->GetReflection()->SetString(
+                normalizedMessage,
+                referenceFieldDescriptor,
+                FieldToKey(nestedMessage, nestedNormalizedDesc.GetKey()));
+            // TODO If we made NormalizeMessage return the top level key in a clear way we'd avoid all this
+        } else {
+            // TODO Copy field as is from message
+        }
+    }
+    
+    dependencies.insert(std::pair<std::string, const google::protobuf::Message &>(
+        FieldToKey(message, normalizedDesc.GetKey()),
+        *normalizedMessage)); // FIXME In here goes the normalized message
     
     return dependencies;
 }

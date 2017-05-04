@@ -85,10 +85,10 @@ private:
         );
         
         const google::protobuf::FieldDescriptor & GetKey() const;
-        const std::vector< const google::protobuf::FieldDescriptor * > & GetKeyableReferences() const;
+        const std::set< const google::protobuf::FieldDescriptor * > & GetKeyableReferences() const;
     private:
         const google::protobuf::FieldDescriptor * key;
-        std::vector< const google::protobuf::FieldDescriptor * > keyableMessageReferences;
+        std::set< const google::protobuf::FieldDescriptor * > keyableMessageReferences;
     
         // Check if a message has a key defined in its schema
         static bool IsKeyable(const google::protobuf::Descriptor & descriptor);

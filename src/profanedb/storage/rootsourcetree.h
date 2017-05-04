@@ -17,23 +17,24 @@
  *
  */
 
-syntax = "proto2";
+#ifndef PROFANEDB_STORAGE_ROOTSOURCETREE_H
+#define PROFANEDB_STORAGE_ROOTSOURCETREE_H
 
-package profanedb.protobuf;
+#include <exception>
 
-option go_package = "gitlab.com/profanedb/protobuf/options";
-option csharp_namespace = "ProfaneDB.Protobuf";
-option java_package = "com.profanedb.protobuf";
-option objc_class_prefix = "PDB";
+#include <boost/filesystem.hpp>
 
-import "google/protobuf/descriptor.proto";
+#include <google/protobuf/compiler/importer.h>
 
-// These options should be used during schema definition,
-// applying them to some of the fields in protobuf
-message FieldOptions {
-  optional bool key = 1;
+namespace profanedb {
+namespace storage {
+
+class RootSourceTree : public google::protobuf::compiler::DiskSourceTree
+{
+public:
+    RootSourceTree(std::initializer_list<boost::filesystem::path> mappings);
+};
+}
 }
 
-extend google.protobuf.FieldOptions {
-  optional FieldOptions options = 99999;
-}
+#endif // PROFANEDB_STORAGE_ROOTSOURCETREE_H

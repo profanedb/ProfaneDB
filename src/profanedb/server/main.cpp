@@ -1,14 +1,28 @@
-#include <iostream>
-#include <string>
-#include <google/protobuf/compiler/importer.h>
-#include <google/protobuf/io/zero_copy_stream.h>
+/*
+ * ProfaneDB - A Protocol Buffer database.
+ * Copyright (C) 2017  "Giorgio Azzinnaro" <giorgio.azzinnaro@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-#include <profanedb/protobuf/options.pb.h>
-#include <profanedb/server/server.h>
-
-using namespace google::protobuf;
+#include "server.h" 
 
 int main(int argc, char* argv[]) {
+    
     profanedb::server::Server server;
     server.Run();
+    
+    return 0;
 }

@@ -17,23 +17,41 @@
  *
  */
 
-syntax = "proto2";
+#ifndef PROFANEDB_STORAGE_DB_H
+#define PROFANEDB_STORAGE_DB_H
 
-package profanedb.protobuf;
+#include <iostream>
+#include <string>
 
-option go_package = "gitlab.com/profanedb/protobuf/options";
-option csharp_namespace = "ProfaneDB.Protobuf";
-option java_package = "com.profanedb.protobuf";
-option objc_class_prefix = "PDB";
+#include <rocksdb/db.h>
 
-import "google/protobuf/descriptor.proto";
+#include <profanedb/protobuf/db.pb.h>
 
-// These options should be used during schema definition,
-// applying them to some of the fields in protobuf
-message FieldOptions {
-  optional bool key = 1;
+#include "config.h"
+#include "parser.h"
+#include "normalizer.h"
+
+namespace profanedb {
+namespace storage {
+
+// Db should be the main interface when embedding ProfaneDB
+class Db
+{
+public:
+    Db(Config config);
+    ~Db();
+   
+    protobuf::GetResp Get(const protobuf::GetReq & request);
+    protobuf::PutResp Put(const protobuf::PutReq & request);
+    protobuf::DelResp Delete(const protobuf::DelReq & request);
+private:
+    Config config;
+    Parser parser;
+    Normalizer normalizer;
+    
+    std::unique_ptr<rocksdb::DB> db;
+};
+}
 }
 
-extend google.protobuf.FieldOptions {
-  optional FieldOptions options = 99999;
-}
+#endif // PROFANEDB_STORAGE_DB_H

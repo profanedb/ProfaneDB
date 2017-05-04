@@ -2,7 +2,7 @@ import grpc
 
 from profanedb.protobuf import db_pb2, db_pb2_grpc
 
-import test_pb2
+import test_pb2, nested_pb2
 
 from google.protobuf import any_pb2
 
@@ -15,12 +15,17 @@ def run():
         field_two_str = "my_string",
         field_three_bool = True,
         field_four_bytes = b'bytes',
-        
+
         field_five_nested =
             test_pb2.Nested(
                 nested_field_one_str = "nested string",
                 nested_field_two_int = 1902923490,
                 nested_field_three_double = 1728.543344
+            ),
+
+        field_six_externalnested =
+            nested_pb2.ExternalNested(
+                field_one_double = 123.456
             )
     )
 

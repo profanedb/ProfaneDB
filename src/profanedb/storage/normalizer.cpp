@@ -33,10 +33,10 @@ std::map<std::string, const google::protobuf::Message &> profanedb::storage::Nor
 {
     // Any messages have a type url beginning with `type.googleapis.com/`, this is stripped
     std::string type = serializable.type_url();
-    auto definition = std::unique_ptr<const google::protobuf::Descriptor>(schemaPool->FindMessageTypeByName(type.substr(type.rfind('/')+1, std::string::npos)));
+    const google::protobuf::Descriptor * definition = schemaPool->FindMessageTypeByName(type.substr(type.rfind('/')+1, std::string::npos));
     
     // Having the definition our message factory can simply generate a container,
-    auto container = std::shared_ptr<google::protobuf::Message>(messageFactory.GetPrototype(definition.get())->New());
+    auto container = std::shared_ptr<google::protobuf::Message>(messageFactory.GetPrototype(definition)->New());
     
     // and convert the bytes coming from Any into it
     serializable.UnpackTo(container.get());

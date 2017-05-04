@@ -33,10 +33,6 @@ class RootSourceTree : public google::protobuf::compiler::DiskSourceTree
 {
 public:
     RootSourceTree(std::initializer_list<boost::filesystem::path> mappings);
-
-// private:
-//     std::unique_ptr<google::protobuf::io::ZeroCopyInputStream> inputStream;
-
 };
 }
 }

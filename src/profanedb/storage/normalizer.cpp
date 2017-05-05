@@ -89,23 +89,51 @@ std::string profanedb::storage::Normalizer::FieldToKey(const google::protobuf::M
     const google::protobuf::Reflection * reflection = container.GetReflection();
 
     std::string key_value;
-
-    switch (fd.cpp_type()) {
-
-#define HANDLE_TYPE(CPPTYPE, METHOD)                                                \
-        case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                  \
-            key_value = std::to_string(reflection->Get##METHOD(container, &fd));    \
-            break;
-            
-        HANDLE_TYPE(INT32 , Int32 );
-        HANDLE_TYPE(INT64 , Int64 );
-        HANDLE_TYPE(UINT32, UInt32);
-        HANDLE_TYPE(UINT64, UInt64);
-        HANDLE_TYPE(DOUBLE, Double);
-        HANDLE_TYPE(FLOAT , Float );
-        HANDLE_TYPE(BOOL  , Bool  );
+    
+    if (fd.is_repeated()) {
+        for (int y = 0; y < reflection->FieldSize(container, &fd);  y++) {
+            switch (fd.cpp_type()) {
+#define HANDLE_TYPE(CPPTYPE,  METHOD)                                                                      \
+                case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                                 \
+                    key_value += "$" + std::to_string(reflection->GetRepeated##METHOD(container, &fd, y)); \
+                    break;
+                
+                HANDLE_TYPE(INT32 , Int32 );
+                HANDLE_TYPE(INT64 , Int64 );
+                HANDLE_TYPE(UINT32, UInt32);
+                HANDLE_TYPE(UINT64, UInt64);
+                HANDLE_TYPE(DOUBLE, Double);
+                HANDLE_TYPE(FLOAT , Float );
+                HANDLE_TYPE(BOOL  , Bool  );
 #undef HANDLE_TYPE
-        
+
+                case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+                key_value += "$" + std::to_string(reflection->GetRepeatedEnum(container, &fd, y)->index());
+                    break;
+                case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+                key_value += "$" + reflection->GetRepeatedString(container, &fd, y);
+                    break;
+                case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+                key_value += "$" + reflection->GetRepeatedMessage(container, &fd, y).SerializeAsString();
+                    break;
+            }
+        }
+    } else {
+        switch (fd.cpp_type()) {
+#define HANDLE_TYPE(CPPTYPE, METHOD)                                             \
+        case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:               \
+            key_value = std::to_string(reflection->Get##METHOD(container, &fd)); \
+            break;
+
+            HANDLE_TYPE(INT32 , Int32 );
+            HANDLE_TYPE(INT64 , Int64 );
+            HANDLE_TYPE(UINT32, UInt32);
+            HANDLE_TYPE(UINT64, UInt64);
+            HANDLE_TYPE(DOUBLE, Double);
+            HANDLE_TYPE(FLOAT , Float );
+            HANDLE_TYPE(BOOL  , Bool  );
+#undef HANDLE_TYPE
+
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
             key_value = std::to_string(reflection->GetEnum(container, &fd)->index());
             break;
@@ -115,6 +143,7 @@ std::string profanedb::storage::Normalizer::FieldToKey(const google::protobuf::M
         case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
             key_value = reflection->GetMessage(container, &fd/*, &messageFactory*/).SerializeAsString();
             break;
+        }
     }
 
     return fd.full_name() + '$' + key_value;
@@ -130,27 +159,56 @@ void profanedb::storage::Normalizer::CopyField(
     const google::protobuf::Reflection * toReflection = to.GetReflection();
     const google::protobuf::FieldDescriptor * toField = to.GetDescriptor()->field(fromField.index());
     
-    switch (fromField.cpp_type()) {
-#define HANDLE_TYPE(CPPTYPE, METHOD)                                                    \
-        case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                      \
-            toReflection->Set##METHOD(&to, toField,                                     \
-                                      fromReflection->Get##METHOD(from, &fromField));   \
-            break;
-            
-        HANDLE_TYPE(INT32 , Int32 );
-        HANDLE_TYPE(INT64 , Int64 );
-        HANDLE_TYPE(UINT32, UInt32);
-        HANDLE_TYPE(UINT64, UInt64);
-        HANDLE_TYPE(DOUBLE, Double);
-        HANDLE_TYPE(FLOAT , Float );
-        HANDLE_TYPE(BOOL  , Bool  );
-        HANDLE_TYPE(STRING, String);
-        HANDLE_TYPE(ENUM  , Enum );
+    if (fromField.is_repeated()) {
+        for (int y = 0; y < fromReflection->FieldSize(from, &fromField); y++) {
+            switch (fromField.cpp_type()) {
+#define HANDLE_TYPE(CPPTYPE, METHOD)                                               \
+                case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:         \
+                    toReflection->Add##METHOD(&to, toField,                        \
+                        fromReflection->GetRepeated##METHOD(from, &fromField, y)); \
+                    break;
+                    
+                HANDLE_TYPE(INT32 , Int32 );
+                HANDLE_TYPE(INT64 , Int64 );
+                HANDLE_TYPE(UINT32, UInt32);
+                HANDLE_TYPE(UINT64, UInt64);
+                HANDLE_TYPE(DOUBLE, Double);
+                HANDLE_TYPE(FLOAT , Float );
+                HANDLE_TYPE(BOOL  , Bool  );
+                HANDLE_TYPE(STRING, String);
+                HANDLE_TYPE(ENUM  , Enum  );
 #undef HANDLE_TYPE
-        
-        case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-            toReflection->MutableMessage(&to, toField)->MergeFrom(
-                fromReflection->GetMessage(from, &fromField));
-            break;
+                
+                case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+                    toReflection->AddMessage(&to, toField)->MergeFrom(
+                        fromReflection->GetRepeatedMessage(from, &fromField, y));
+                    break;
+            }
+        }
+    } else {
+        switch (fromField.cpp_type()) {
+#define HANDLE_TYPE(CPPTYPE, METHOD)                                   \
+            case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE: \
+                toReflection->Set##METHOD(&to, toField,                \
+                    fromReflection->Get##METHOD(from, &fromField));    \
+                break;
+                
+            HANDLE_TYPE(INT32 , Int32 );
+            HANDLE_TYPE(INT64 , Int64 );
+            HANDLE_TYPE(UINT32, UInt32);
+            HANDLE_TYPE(UINT64, UInt64);
+            HANDLE_TYPE(DOUBLE, Double);
+            HANDLE_TYPE(FLOAT , Float );
+            HANDLE_TYPE(BOOL  , Bool  );
+            HANDLE_TYPE(STRING, String);
+            HANDLE_TYPE(ENUM  , Enum  );
+#undef HANDLE_TYPE
+            
+            case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+                toReflection->MutableMessage(&to, toField)->MergeFrom(
+                    fromReflection->GetMessage(from, &fromField));
+                break;
+        }
     }
+
 }

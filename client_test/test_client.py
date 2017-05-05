@@ -26,6 +26,11 @@ def run():
         field_six_externalnested =
             nested_pb2.ExternalNested(
                 field_one_double = 123.456
+            ),
+
+        field_seven_repeated_keyable =
+            test_pb2.Nested.KeyableNestedInNested(
+                nested_in_nested_field_one_repeated_str = ["repeated", "string", "key"]
             )
     )
 

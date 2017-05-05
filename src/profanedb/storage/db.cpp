@@ -43,6 +43,8 @@ profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protob
         std::cout << obj.first << ":" << std::endl << obj.second.DebugString() << std::endl;
         // db->Put(rocksdb::WriteOptions(), obj.first, obj.second.SerializeAsString());
     }
+    
+    return *profanedb::protobuf::PutResp().New();
 }
 
 profanedb::protobuf::DelResp profanedb::storage::Db::Delete(const profanedb::protobuf::DelReq & request)

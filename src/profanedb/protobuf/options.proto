@@ -35,5 +35,5 @@ message FieldOptions {
 }
 
 extend google.protobuf.FieldOptions {
-  optional FieldOptions options = 99999;
+  optional FieldOptions options = 1036;
 }

@@ -119,9 +119,9 @@ std::string profanedb::storage::Normalizer::FieldToKey(const google::protobuf::M
         }
     } else {
         switch (fd.cpp_type()) {
-#define HANDLE_TYPE(CPPTYPE, METHOD)                                             \
-        case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:               \
-            key_value = std::to_string(reflection->Get##METHOD(container, &fd)); \
+#define HANDLE_TYPE(CPPTYPE, METHOD)                                                   \
+        case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:               	   \
+            key_value = "$" + std::to_string(reflection->Get##METHOD(container, &fd)); \
             break;
 
             HANDLE_TYPE(INT32 , Int32 );
@@ -134,13 +134,13 @@ std::string profanedb::storage::Normalizer::FieldToKey(const google::protobuf::M
 #undef HANDLE_TYPE
 
         case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
-            key_value = std::to_string(reflection->GetEnum(container, &fd)->index());
+            key_value = "$" + std::to_string(reflection->GetEnum(container, &fd)->index());
             break;
         case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
-            key_value = reflection->GetString(container, &fd);
+            key_value = "$" + reflection->GetString(container, &fd);
             break;
         case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-            key_value = reflection->GetMessage(container, &fd/*, &messageFactory*/).SerializeAsString();
+            key_value = "$" + reflection->GetMessage(container, &fd/*, &messageFactory*/).SerializeAsString();
             break;
         }
     }
@@ -148,7 +148,6 @@ std::string profanedb::storage::Normalizer::FieldToKey(const google::protobuf::M
     return fd.full_name() + key_value;
 }
 
-// TODO Repeated
 void profanedb::storage::Normalizer::CopyField(
     const google::protobuf::FieldDescriptor & fromField,
     const google::protobuf::Message & from,

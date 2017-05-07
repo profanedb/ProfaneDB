@@ -54,3 +54,13 @@ profanedb::storage::Config::RocksDB::RocksDB(rocksdb::Options options, std::stri
   , name(name)
 {
 }
+
+const rocksdb::Options profanedb::storage::Config::RocksDB::GetOptions() const
+{
+	return this->options;
+}
+
+const std::string profanedb::storage::Config::RocksDB::GetName() const
+{
+	return this->name;
+}

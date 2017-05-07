@@ -23,6 +23,8 @@
 #include <grpc++/grpc++.h>
 #include <grpc/support/log.h>
 
+#include <rocksdb/db.h>
+
 #include <profanedb/storage/db.h>
 #include <profanedb/storage/config.h>
 
@@ -42,6 +44,7 @@ public:
     void Run();
     
 private:
+    static rocksdb::Options RocksDBOptions();
     profanedb::storage::Config config;
     
     void HandleRpcs();

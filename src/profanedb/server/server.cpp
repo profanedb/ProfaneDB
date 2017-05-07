@@ -26,12 +26,20 @@ profanedb::server::Server::Server()
         boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/src")
       ),
       profanedb::storage::Config::RocksDB(
-        rocksdb::Options(),
+        Server::RocksDBOptions(),
         "/tmp/profanedb"
       )
     )
   , service(config)
 {
+}
+
+rocksdb::Options profanedb::server::Server::RocksDBOptions()
+{
+	rocksdb::Options options;
+	options.create_if_missing = true;
+
+	return options;
 }
 
 profanedb::server::Server::~Server()

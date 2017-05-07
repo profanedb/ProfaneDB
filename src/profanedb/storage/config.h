@@ -52,6 +52,9 @@ public:
     public:
         RocksDB(rocksdb::Options options, std::string name);
         
+        const rocksdb::Options GetOptions() const;
+        const std::string GetName() const;
+
     private:
         rocksdb::Options options;
         std::string name;

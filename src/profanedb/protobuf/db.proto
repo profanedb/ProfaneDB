@@ -37,9 +37,11 @@ service Db {
 }
 
 message GetReq {
+  string key = 1; // TODO How about getting multiple objects at one
 }
 
 message GetResp {
+  google.protobuf.Any message = 1;
 }
 
 message PutReq {
@@ -47,9 +49,11 @@ message PutReq {
 }
 
 message PutResp {
+  string key = 1; // TODO Maybe should be repeated for all stored keys?
 }
 
 message DelReq {
+  string key = 1;
 }
 
 message DelResp {

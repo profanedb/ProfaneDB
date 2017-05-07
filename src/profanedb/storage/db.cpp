@@ -24,11 +24,15 @@ profanedb::storage::Db::Db(profanedb::storage::Config config)
   , parser(config.GetProfaneConfig())
   , normalizer(parser)
 {
-    // rocksdb::DB::Open(config.GetRocksConfig(), name, &db);
+    rocksdb::DB::Open(
+    		config.GetRocksConfig().GetOptions(),
+			config.GetRocksConfig().GetName(),
+			&db);
 }
 
 profanedb::storage::Db::~Db()
 {
+	delete this->db;
 }
 
 profanedb::protobuf::GetResp profanedb::storage::Db::Get(const profanedb::protobuf::GetReq & request)
@@ -41,7 +45,7 @@ profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protob
     
     for (auto const & obj: map) {
         std::cout << obj.first << ":" << std::endl << obj.second.DebugString() << std::endl;
-        // db->Put(rocksdb::WriteOptions(), obj.first, obj.second.SerializeAsString());
+        db->Put(rocksdb::WriteOptions(), obj.first, obj.second.SerializeAsString());
     }
     
     return *profanedb::protobuf::PutResp().New();

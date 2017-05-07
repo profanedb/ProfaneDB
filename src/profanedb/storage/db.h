@@ -49,7 +49,7 @@ private:
     Parser parser;
     Normalizer normalizer;
     
-    std::unique_ptr<rocksdb::DB> db;
+    rocksdb::DB * db;
 };
 }
 }

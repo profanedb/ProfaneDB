@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='test.proto',
   package='test',
   syntax='proto3',
-  serialized_pb=_b('\n\ntest.proto\x12\x04test\x1a profanedb/protobuf/options.proto\x1a\x0cnested.proto\"\x9b\x02\n\x04Test\x12\x1d\n\rfield_one_int\x18\x01 \x01(\x05\x42\x06\xfa\xe9\x30\x02\x08\x01\x12\x15\n\rfield_two_str\x18\x02 \x01(\t\x12\x18\n\x10\x66ield_three_bool\x18\x03 \x01(\x08\x12\'\n\x11\x66ield_five_nested\x18\x05 \x01(\x0b\x32\x0c.test.Nested\x12\x18\n\x10\x66ield_four_bytes\x18\x04 \x01(\x0c\x12\x36\n\x18\x66ield_six_externalnested\x18\x06 \x01(\x0b\x32\x14.test.ExternalNested\x12H\n\x1c\x66ield_seven_repeated_keyable\x18\x07 \x01(\x0b\x32\".test.Nested.KeyableNestedInNested\"\xc1\x01\n\x06Nested\x12$\n\x14nested_field_one_str\x18\x01 \x01(\tB\x06\xfa\xe9\x30\x02\x08\x01\x12\x1c\n\x14nested_field_two_int\x18\x02 \x01(\x03\x12!\n\x19nested_field_three_double\x18\x03 \x01(\x01\x1aP\n\x15KeyableNestedInNested\x12\x37\n\'nested_in_nested_field_one_repeated_str\x18\x01 \x03(\tB\x06\xfa\xe9\x30\x02\x08\x01\x62\x06proto3')
+  serialized_pb=_b('\n\ntest.proto\x12\x04test\x1a profanedb/protobuf/options.proto\x1a\x0cnested.proto\"\x9a\x02\n\x04Test\x12\x1c\n\rfield_one_int\x18\x01 \x01(\x05\x42\x05\xe2@\x02\x08\x01\x12\x15\n\rfield_two_str\x18\x02 \x01(\t\x12\x18\n\x10\x66ield_three_bool\x18\x03 \x01(\x08\x12\'\n\x11\x66ield_five_nested\x18\x05 \x01(\x0b\x32\x0c.test.Nested\x12\x18\n\x10\x66ield_four_bytes\x18\x04 \x01(\x0c\x12\x36\n\x18\x66ield_six_externalnested\x18\x06 \x01(\x0b\x32\x14.test.ExternalNested\x12H\n\x1c\x66ield_seven_repeated_keyable\x18\x07 \x01(\x0b\x32\".test.Nested.KeyableNestedInNested\"\xbf\x01\n\x06Nested\x12#\n\x14nested_field_one_str\x18\x01 \x01(\tB\x05\xe2@\x02\x08\x01\x12\x1c\n\x14nested_field_two_int\x18\x02 \x01(\x03\x12!\n\x19nested_field_three_double\x18\x03 \x01(\x01\x1aO\n\x15KeyableNestedInNested\x12\x36\n\'nested_in_nested_field_one_repeated_str\x18\x01 \x03(\tB\x05\xe2@\x02\x08\x01\x62\x06proto3')
   ,
   dependencies=[profanedb_dot_protobuf_dot_options__pb2.DESCRIPTOR,nested__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -42,7 +42,7 @@ _TEST = _descriptor.Descriptor(
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))),
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
     _descriptor.FieldDescriptor(
       name='field_two_str', full_name='test.Test.field_two_str', index=1,
       number=2, type=9, cpp_type=9, label=1,
@@ -98,7 +98,7 @@ _TEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=69,
-  serialized_end=352,
+  serialized_end=351,
 )
 
 
@@ -115,7 +115,7 @@ _NESTED_KEYABLENESTEDINNESTED = _descriptor.Descriptor(
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))),
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
   ],
   extensions=[
   ],
@@ -128,8 +128,8 @@ _NESTED_KEYABLENESTEDINNESTED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=468,
-  serialized_end=548,
+  serialized_start=466,
+  serialized_end=545,
 )
 
 _NESTED = _descriptor.Descriptor(
@@ -145,7 +145,7 @@ _NESTED = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))),
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
     _descriptor.FieldDescriptor(
       name='nested_field_two_int', full_name='test.Nested.nested_field_two_int', index=1,
       number=2, type=3, cpp_type=2, label=1,
@@ -172,8 +172,8 @@ _NESTED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=355,
-  serialized_end=548,
+  serialized_start=354,
+  serialized_end=545,
 )
 
 _TEST.fields_by_name['field_five_nested'].message_type = _NESTED
@@ -207,11 +207,11 @@ _sym_db.RegisterMessage(Nested.KeyableNestedInNested)
 
 
 _TEST.fields_by_name['field_one_int'].has_options = True
-_TEST.fields_by_name['field_one_int']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))
+_TEST.fields_by_name['field_one_int']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
 _NESTED_KEYABLENESTEDINNESTED.fields_by_name['nested_in_nested_field_one_repeated_str'].has_options = True
-_NESTED_KEYABLENESTEDINNESTED.fields_by_name['nested_in_nested_field_one_repeated_str']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))
+_NESTED_KEYABLENESTEDINNESTED.fields_by_name['nested_in_nested_field_one_repeated_str']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
 _NESTED.fields_by_name['nested_field_one_str'].has_options = True
-_NESTED.fields_by_name['nested_field_one_str']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))
+_NESTED.fields_by_name['nested_field_one_str']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
 try:
   # THESE ELEMENTS WILL BE DEPRECATED.
   # Please use the generated *_pb2_grpc.py files instead.

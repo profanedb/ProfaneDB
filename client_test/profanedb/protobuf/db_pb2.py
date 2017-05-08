@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='profanedb/protobuf/db.proto',
   package='profanedb.protobuf',
   syntax='proto3',
-  serialized_pb=_b('\n\x1bprofanedb/protobuf/db.proto\x12\x12profanedb.protobuf\x1a\x19google/protobuf/any.proto\"\x08\n\x06GetReq\"\t\n\x07GetResp\"4\n\x06PutReq\x12*\n\x0cserializable\x18\x01 \x01(\x0b\x32\x14.google.protobuf.Any\"\t\n\x07PutResp\"\x08\n\x06\x44\x65lReq\"\t\n\x07\x44\x65lResp2\xc7\x01\n\x02\x44\x62\x12>\n\x03Get\x12\x1a.profanedb.protobuf.GetReq\x1a\x1b.profanedb.protobuf.GetResp\x12>\n\x03Put\x12\x1a.profanedb.protobuf.PutReq\x1a\x1b.profanedb.protobuf.PutResp\x12\x41\n\x06\x44\x65lete\x12\x1a.profanedb.protobuf.DelReq\x1a\x1b.profanedb.protobuf.DelRespBU\n\x16\x63om.profanedb.protobufZ gitlab.com/profanedb/protobuf/db\xa2\x02\x03PDB\xaa\x02\x12ProfaneDB.Protobufb\x06proto3')
+  serialized_pb=_b('\n\x1bprofanedb/protobuf/db.proto\x12\x12profanedb.protobuf\x1a\x19google/protobuf/any.proto\"\x15\n\x06GetReq\x12\x0b\n\x03key\x18\x01 \x01(\t\"0\n\x07GetResp\x12%\n\x07message\x18\x01 \x01(\x0b\x32\x14.google.protobuf.Any\"4\n\x06PutReq\x12*\n\x0cserializable\x18\x01 \x01(\x0b\x32\x14.google.protobuf.Any\"\x16\n\x07PutResp\x12\x0b\n\x03key\x18\x01 \x01(\t\"\x15\n\x06\x44\x65lReq\x12\x0b\n\x03key\x18\x01 \x01(\t\"\t\n\x07\x44\x65lResp2\xc7\x01\n\x02\x44\x62\x12>\n\x03Get\x12\x1a.profanedb.protobuf.GetReq\x1a\x1b.profanedb.protobuf.GetResp\x12>\n\x03Put\x12\x1a.profanedb.protobuf.PutReq\x1a\x1b.profanedb.protobuf.PutResp\x12\x41\n\x06\x44\x65lete\x12\x1a.profanedb.protobuf.DelReq\x1a\x1b.profanedb.protobuf.DelRespBU\n\x16\x63om.profanedb.protobufZ gitlab.com/profanedb/protobuf/db\xa2\x02\x03PDB\xaa\x02\x12ProfaneDB.Protobufb\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_any__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -35,6 +35,13 @@ _GETREQ = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='profanedb.protobuf.GetReq.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -48,7 +55,7 @@ _GETREQ = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=78,
-  serialized_end=86,
+  serialized_end=99,
 )
 
 
@@ -59,6 +66,13 @@ _GETRESP = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='message', full_name='profanedb.protobuf.GetResp.message', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -71,8 +85,8 @@ _GETRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=88,
-  serialized_end=97,
+  serialized_start=101,
+  serialized_end=149,
 )
 
 
@@ -102,8 +116,8 @@ _PUTREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=99,
-  serialized_end=151,
+  serialized_start=151,
+  serialized_end=203,
 )
 
 
@@ -114,6 +128,13 @@ _PUTRESP = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='profanedb.protobuf.PutResp.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -126,8 +147,8 @@ _PUTRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=153,
-  serialized_end=162,
+  serialized_start=205,
+  serialized_end=227,
 )
 
 
@@ -138,6 +159,13 @@ _DELREQ = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='profanedb.protobuf.DelReq.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -150,8 +178,8 @@ _DELREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=164,
-  serialized_end=172,
+  serialized_start=229,
+  serialized_end=250,
 )
 
 
@@ -174,10 +202,11 @@ _DELRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=174,
-  serialized_end=183,
+  serialized_start=252,
+  serialized_end=261,
 )
 
+_GETRESP.fields_by_name['message'].message_type = google_dot_protobuf_dot_any__pb2._ANY
 _PUTREQ.fields_by_name['serializable'].message_type = google_dot_protobuf_dot_any__pb2._ANY
 DESCRIPTOR.message_types_by_name['GetReq'] = _GETREQ
 DESCRIPTOR.message_types_by_name['GetResp'] = _GETRESP

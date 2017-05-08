@@ -40,6 +40,10 @@ def run():
     stub.Put(db_pb2.PutReq(
         serializable = serializable
     ))
+    
+    stub.Get(db_pb2.GetReq(
+        key = "test.Test.field_one_int$123"
+    ))
 
 if __name__ == '__main__':
     run()

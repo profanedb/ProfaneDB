@@ -19,7 +19,7 @@
 
 #include "db.h"
 
-profanedb::storage::Db::Db(profanedb::storage::Config config)
+profanedb::storage::Db::Db(Config config)
   : config(config)
   , parser(config.GetProfaneConfig())
   , normalizer(parser)
@@ -35,22 +35,32 @@ profanedb::storage::Db::~Db()
 	delete this->db;
 }
 
-profanedb::protobuf::GetResp profanedb::storage::Db::Get(const profanedb::protobuf::GetReq & request)
+profanedb::protobuf::GetResp profanedb::storage::Db::Get(const protobuf::GetReq & request)
 {
+	std::string type = request.key();
+	// Split at first dollar sign ($), here starts the actual key value
+	type = type.substr(0, type.find('$'));
+	// The last dot (.) separates the message type name from the field type name
+	type = type.substr(0, type.rfind('.'));
+
+	std::string * serialized = new std::string();
+	db->Get(rocksdb::ReadOptions(), request.key(), serialized);
+
+	return *protobuf::GetResp().New();
 }
 
-profanedb::protobuf::PutResp profanedb::storage::Db::Put(const profanedb::protobuf::PutReq & request)
+profanedb::protobuf::PutResp profanedb::storage::Db::Put(const protobuf::PutReq & request)
 {
     auto map = normalizer.NormalizeMessage(request.serializable());
     
     for (auto const & obj: map) {
-        std::cout << obj.first << ":" << std::endl << obj.second.DebugString() << std::endl;
+        std::cout << obj.first << std::endl;
         db->Put(rocksdb::WriteOptions(), obj.first, obj.second.SerializeAsString());
     }
     
-    return *profanedb::protobuf::PutResp().New();
+    return *protobuf::PutResp().New();
 }
 
-profanedb::protobuf::DelResp profanedb::storage::Db::Delete(const profanedb::protobuf::DelReq & request)
+profanedb::protobuf::DelResp profanedb::storage::Db::Delete(const protobuf::DelReq & request)
 {
 }

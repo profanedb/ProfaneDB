@@ -20,16 +20,16 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='profanedb/protobuf/options.proto',
   package='profanedb.protobuf',
   syntax='proto2',
-  serialized_pb=_b('\n profanedb/protobuf/options.proto\x12\x12profanedb.protobuf\x1a google/protobuf/descriptor.proto\"\x1b\n\x0c\x46ieldOptions\x12\x0b\n\x03key\x18\x01 \x01(\x08:R\n\x07options\x12\x1d.google.protobuf.FieldOptions\x18\x9f\x8d\x06 \x01(\x0b\x32 .profanedb.protobuf.FieldOptionsBZ\n\x16\x63om.profanedb.protobufZ%gitlab.com/profanedb/protobuf/options\xa2\x02\x03PDB\xaa\x02\x12ProfaneDB.Protobuf')
+  serialized_pb=_b('\n profanedb/protobuf/options.proto\x12\x12profanedb.protobuf\x1a google/protobuf/descriptor.proto\"\x1b\n\x0c\x46ieldOptions\x12\x0b\n\x03key\x18\x01 \x01(\x08:Q\n\x07options\x12\x1d.google.protobuf.FieldOptions\x18\x8c\x08 \x01(\x0b\x32 .profanedb.protobuf.FieldOptionsBZ\n\x16\x63om.profanedb.protobufZ%gitlab.com/profanedb/protobuf/options\xa2\x02\x03PDB\xaa\x02\x12ProfaneDB.Protobuf')
   ,
   dependencies=[google_dot_protobuf_dot_descriptor__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
-OPTIONS_FIELD_NUMBER = 99999
+OPTIONS_FIELD_NUMBER = 1036
 options = _descriptor.FieldDescriptor(
   name='options', full_name='profanedb.protobuf.options', index=0,
-  number=99999, type=11, cpp_type=10, label=1,
+  number=1036, type=11, cpp_type=10, label=1,
   has_default_value=False, default_value=None,
   message_type=None, enum_type=None, containing_type=None,
   is_extension=True, extension_scope=None,

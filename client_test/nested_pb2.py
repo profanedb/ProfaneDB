@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='nested.proto',
   package='test',
   syntax='proto3',
-  serialized_pb=_b('\n\x0cnested.proto\x12\x04test\x1a profanedb/protobuf/options.proto\"2\n\x0e\x45xternalNested\x12 \n\x10\x66ield_one_double\x18\x01 \x01(\x01\x42\x06\xfa\xe9\x30\x02\x08\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0cnested.proto\x12\x04test\x1a profanedb/protobuf/options.proto\"1\n\x0e\x45xternalNested\x12\x1f\n\x10\x66ield_one_double\x18\x01 \x01(\x01\x42\x05\xe2@\x02\x08\x01\x62\x06proto3')
   ,
   dependencies=[profanedb_dot_protobuf_dot_options__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -41,7 +41,7 @@ _EXTERNALNESTED = _descriptor.Descriptor(
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))),
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
   ],
   extensions=[
   ],
@@ -55,7 +55,7 @@ _EXTERNALNESTED = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=56,
-  serialized_end=106,
+  serialized_end=105,
 )
 
 DESCRIPTOR.message_types_by_name['ExternalNested'] = _EXTERNALNESTED
@@ -69,7 +69,7 @@ _sym_db.RegisterMessage(ExternalNested)
 
 
 _EXTERNALNESTED.fields_by_name['field_one_double'].has_options = True
-_EXTERNALNESTED.fields_by_name['field_one_double']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\372\3510\002\010\001'))
+_EXTERNALNESTED.fields_by_name['field_one_double']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
 try:
   # THESE ELEMENTS WILL BE DEPRECATED.
   # Please use the generated *_pb2_grpc.py files instead.

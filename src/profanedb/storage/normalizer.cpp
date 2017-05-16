@@ -83,6 +83,7 @@ std::map<std::string, const google::protobuf::Message &> profanedb::storage::Nor
     return dependencies;
 }
 
+// TODO A `Key` Message could be used here instead, with type(s) and value
 std::string profanedb::storage::Normalizer::FieldToKey(const google::protobuf::Message & container, const google::protobuf::FieldDescriptor & fd) const
 {
     const google::protobuf::Reflection * reflection = container.GetReflection();

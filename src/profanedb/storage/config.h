@@ -30,10 +30,9 @@
 
 #include <boost/filesystem.hpp>
 
-
 namespace profanedb {
 namespace storage {
-    
+
 class Config
 {
 public:

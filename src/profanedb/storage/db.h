@@ -31,6 +31,8 @@
 #include "parser.h"
 #include "normalizer.h"
 
+#include "rocks.h"
+
 namespace profanedb {
 namespace storage {
 
@@ -38,18 +40,17 @@ namespace storage {
 class Db
 {
 public:
-    Db(Config config);
+    Db(std::shared_ptr<Storage> storage);
     ~Db();
    
     protobuf::GetResp Get(const protobuf::GetReq & request);
     protobuf::PutResp Put(const protobuf::PutReq & request);
     protobuf::DelResp Delete(const protobuf::DelReq & request);
 private:
-    Config config;
     Parser parser;
     Normalizer normalizer;
     
-    rocksdb::DB * db;
+    std::shared_ptr<Storage> storage;
 };
 }
 }

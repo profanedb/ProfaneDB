@@ -24,10 +24,6 @@ profanedb::storage::Db::Db(Config config)
   , parser(config.GetProfaneConfig())
   , normalizer(parser)
 {
-    rocksdb::DB::Open(
-    		config.GetRocksConfig().GetOptions(),
-			config.GetRocksConfig().GetName(),
-			&db);
 }
 
 profanedb::storage::Db::~Db()

@@ -17,29 +17,28 @@
  *
  */
 
-syntax = "proto3";
+#include "rocks.h"
 
-package profanedb.protobuf;
-
-option go_package = "gitlab.com/profanedb/protobuf/db";
-option csharp_namespace = "ProfaneDB.Protobuf";
-option java_package = "com.profanedb.protobuf";
-option objc_class_prefix = "PDB";
-
-// A Key uniquely identifies a message stored in the database
-message Key {
-	string type = 1;
-	bytes value = 2;
+profanedb::storage::Rocks::Rocks(std::shared_ptr<rocksdb::DB> database)
+  : database(database)
+{
 }
 
-// A StorableMessage has a unique Key and a serialized representation of the object
-message StorableMessage {
-    Key key = 1;
-    bytes payload = 2;
+profanedb::storage::Rocks::~Rocks()
+{
 }
 
-// A Message might depend on other messages to be stored first
-message MessageTreeNode {
-    StorableMessage message = 1;
-    repeated MessageTreeNode children = 2;
+void profanedb::storage::Rocks::Store(const profanedb::protobuf::Key & key, const std::string & payload)
+{
+    database->Put(rocksdb::WriteOptions(),
+                  key.SerializeAsString(),
+                  payload);
+}
+
+std::string profanedb::storage::Rocks::Retrieve(const profanedb::protobuf::Key & key)
+{
+    std::string payload;
+    database->Get(rocksdb::ReadOptions(),
+                  key.SerializeAsString(),
+                  &payload);
 }

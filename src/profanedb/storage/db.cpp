@@ -37,14 +37,8 @@ profanedb::storage::Db::~Db()
 
 profanedb::protobuf::GetResp profanedb::storage::Db::Get(const protobuf::GetReq & request)
 {
-	std::string type = request.key();
-	// Split at first dollar sign ($), here starts the actual key value
-	type = type.substr(0, type.find('$'));
-	// The last dot (.) separates the message type name from the field type name
-	type = type.substr(0, type.rfind('.'));
-
 	std::string * serialized = new std::string();
-	db->Get(rocksdb::ReadOptions(), request.key(), serialized);
+	db->Get(rocksdb::ReadOptions(), request.key().SerializeAsString(), serialized);
 
 	return *protobuf::GetResp().New();
 }

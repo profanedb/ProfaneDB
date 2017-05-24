@@ -17,18 +17,32 @@
  *
  */
 
-#include "rootsourcetree.h"
+#include <profanedb/boot/schema.h>
+#include <profanedb/vault/storage.h>
 
-profanedb::storage::RootSourceTree::RootSourceTree(
-    std::initializer_list<boost::filesystem::path> mappings)
+#include <profanedb/protobuf/storage.pb.h>
 
-  : google::protobuf::compiler::DiskSourceTree()
+#ifndef PROFANEDB_DB_H
+#define PROFANEDB_DB_H
+
+namespace profanedb {
+
+// Db should be the main interface when embedding ProfaneDB
+template<typename Message>
+class Db
 {
-    for (const auto & path: mappings)
-        this->MapPath("", path.string());
-    
-    google::protobuf::io::ZeroCopyInputStream * inputStream = this->Open("");
-    if (inputStream == nullptr)
-        throw std::runtime_error(this->GetLastErrorMessage());
+public:
+    Db();
+    ~Db();
+
+    virtual const Message & Get(const protobuf::Key & key) const = 0;
+    virtual bool Put(const Message & message) = 0;
+    virtual bool Delete(const protobuf::Key & key) = 0;
+
+private:
+    std::shared_ptr< boot::Schema<Message> > schema;
+    std::shared_ptr<vault::Storage> storage;
+};
 }
 
+#endif // PROFANEDB_DB_H

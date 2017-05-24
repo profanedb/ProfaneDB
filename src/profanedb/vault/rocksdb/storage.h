@@ -1,6 +1,6 @@
 /*
- * ProfaneDB - A Protocol Buffers database.
- * Copyright (C) 2017  "Giorgio Azzinnaro" <giorgio.azzinnaro@gmail.com>
+ * <one line to give the program's name and a brief idea of what it does.>
+ * Copyright (C) 2017  <copyright holder> <email>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,32 @@
  *
  */
 
-#ifndef PROFANEDB_STORAGE_ROCKS_H
-#define PROFANEDB_STORAGE_ROCKS_H
-
-#include "storage.h"
+#ifndef PROFANEDB_VAULT_ROCKSDB_STORAGE_H
+#define PROFANEDB_VAULT_ROCKSDB_STORAGE_H
 
 #include <rocksdb/db.h>
 
-namespace profanedb {
-namespace storage {
+#include <profanedb/vault/storage.h>
 
-// Use RocksDB as storage layer
-class Rocks : profanedb::storage::Storage
+using rocksdb::DB;
+
+namespace profanedb {
+namespace vault {
+namespace rocksdb {
+
+class Storage : profanedb::vault::Storage
 {
 public:
-    Rocks(std::shared_ptr<rocksdb::DB> database);
-    ~Rocks();
-
-protected:
-    void Store(const profanedb::protobuf::Key & key, const std::string & payload) override;
-    std::string Retrieve(const profanedb::protobuf::Key & key) override;
+    Storage(std::shared_ptr<DB> rocksDb);
+    
+    virtual void Store(const profanedb::protobuf::StorableMessage & storable) override;
+    virtual profanedb::protobuf::StorableMessage Retrieve(const profanedb::protobuf::Key & key) const override;
     
 private:
-    std::shared_ptr<rocksdb::DB> database;
+    const std::shared_ptr<DB> rocksDb;
 };
 }
 }
+}
 
-#endif // PROFANEDB_STORAGE_ROCKS_H
+#endif // PROFANEDB_VAULT_ROCKSDB_STORAGE_H

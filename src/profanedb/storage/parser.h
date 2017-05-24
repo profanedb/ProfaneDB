@@ -33,9 +33,6 @@
 #include <profanedb/protobuf/db.pb.h>
 #include <profanedb/protobuf/options.pb.h>
 
-#include "config.h"
-#include "rootsourcetree.h"
-
 using namespace google::protobuf;
 
 namespace profanedb {
@@ -67,6 +64,16 @@ private:
         google::protobuf::DescriptorProto & proto
     );
     
+    // A simple ErrorCollector for debug, write to stderr
+    class ErrorCollector : public compiler::MultiFileErrorCollector {
+    public:
+        ErrorCollector();
+        void AddError(const string & filename, int line, int column, const string & message) override;
+        void AddWarning(const string & filename, int line, int column, const string & message) override;
+    };
+
+    ErrorCollector errCollector;
+    
     class NormalizedDescriptor {
     public:
         NormalizedDescriptor(
@@ -85,16 +92,6 @@ private:
     };
     
     std::map<std::string, NormalizedDescriptor> normalizedDescriptors;
-    
-    // A simple ErrorCollector for debug, write to stderr
-    class ErrorCollector : public compiler::MultiFileErrorCollector {
-    public:
-        ErrorCollector();
-        void AddError(const string & filename, int line, int column, const string & message) override;
-        void AddWarning(const string & filename, int line, int column, const string & message) override;
-    };
-
-    ErrorCollector errCollector;
 };
 }
 }

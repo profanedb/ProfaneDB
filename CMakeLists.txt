@@ -21,10 +21,4 @@ endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-add_subdirectory(src/profanedb/protobuf) # Generated Protobuf (& gRPC if neeeded) code
-add_subdirectory(src/profanedb/storage) # libprofanedb shared lib, and common interface
-
-# Nothing should depend on code in here, so it can be skipped entirely
-if(BUILD_PROFANEDB_SERVER)
-    add_subdirectory(src/profanedb/server)
-endif()
+add_subdirectory(src/profanedb)

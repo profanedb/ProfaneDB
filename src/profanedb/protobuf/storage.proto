@@ -28,8 +28,9 @@ option objc_class_prefix = "PDB";
 
 // A Key uniquely identifies a message stored in the database
 message Key {
-	string type = 1;
-	bytes value = 2;
+	string message_type = 1; // A identifier for the message
+	string field = 2; // The field within the message
+	bytes value = 3; // The value serialized in such way that it doesn't create collisions
 }
 
 // A StorableMessage has a unique Key and a serialized representation of the object

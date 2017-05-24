@@ -17,27 +17,14 @@
  *
  */
 
-#include "storage.h"
+#include "db.h"
 
-void profanedb::storage::Storage::Put(const profanedb::protobuf::MessageTreeNode & messageTree)
+template<typename Message>
+profanedb::storage::Db<Message>::Db()
 {
-    for (auto const & child: messageTree.children()) {
-        Put(child);
-    }
-    
-    const profanedb::protobuf::StorableMessage & current = messageTree.message();
-    
-    this->Store(current.key(), current.payload());
 }
 
-const profanedb::protobuf::MessageTreeNode profanedb::storage::Storage::Get(const profanedb::protobuf::Key & key) const
+template<typename Message>
+profanedb::storage::Db<Message>::~Db()
 {
-    profanedb::protobuf::MessageTreeNode messageTree;
-    *messageTree.mutable_message()->mutable_key() = key;
-    *messageTree.mutable_message()->mutable_payload() = this->Retrieve(key);
-    
-    // TODO Parse message and foreach nested
-    // messageTree.add_children( Retrieve(nestedKey) )
-    
-    return messageTree;
 }

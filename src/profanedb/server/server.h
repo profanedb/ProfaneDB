@@ -23,10 +23,7 @@
 #include <grpc++/grpc++.h>
 #include <grpc/support/log.h>
 
-#include <rocksdb/db.h>
-
-#include <profanedb/storage/db.h>
-#include <profanedb/storage/config.h>
+#include <profanedb/db.h>
 
 #include <profanedb/protobuf/db.pb.h>
 #include <profanedb/protobuf/db.grpc.pb.h>
@@ -44,16 +41,13 @@ public:
     void Run();
     
 private:
-    static rocksdb::Options RocksDBOptions();
-    profanedb::storage::Config config;
-    
     void HandleRpcs();
     
     std::unique_ptr<grpc::Server> server;
     
     class DbServiceImpl : public profanedb::protobuf::Db::Service {
     public:
-        DbServiceImpl(const profanedb::storage::Config & config);
+        DbServiceImpl(profanedb::Db<google::protobuf::Message> & profanedb);
         
         grpc::Status Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp* response) override;
         
@@ -62,7 +56,7 @@ private:
         grpc::Status Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response) override;
         
     private:
-        profanedb::storage::Db db;
+        profanedb::Db<google::protobuf::Message> & profanedb;
     };
     DbServiceImpl service;
 };

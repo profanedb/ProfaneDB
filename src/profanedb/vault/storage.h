@@ -17,42 +17,25 @@
  *
  */
 
-#ifndef PROFANEDB_STORAGE_DB_H
-#define PROFANEDB_STORAGE_DB_H
+#ifndef PROFANEDB_VAULT_STORAGE_H
+#define PROFANEDB_VAULT_STORAGE_H
 
-#include <iostream>
-#include <string>
-
-#include <rocksdb/db.h>
-
-#include <profanedb/protobuf/db.pb.h>
-
-#include "config.h"
-#include "parser.h"
-#include "normalizer.h"
-
-#include "rocks.h"
+#include <profanedb/protobuf/storage.pb.h>
 
 namespace profanedb {
-namespace storage {
+namespace vault {
 
-// Db should be the main interface when embedding ProfaneDB
-class Db
-{
+// Storage takes care of saving and retrieving the data from the actual DB
+class Storage {
 public:
-    Db(std::shared_ptr<Storage> storage);
-    ~Db();
-   
-    protobuf::GetResp Get(const protobuf::GetReq & request);
-    protobuf::PutResp Put(const protobuf::PutReq & request);
-    protobuf::DelResp Delete(const protobuf::DelReq & request);
-private:
-    Parser parser;
-    Normalizer normalizer;
+    virtual ~Storage() = 0;
     
-    std::shared_ptr<Storage> storage;
+    virtual void Store(const protobuf::StorableMessage & storable) = 0;
+    virtual protobuf::StorableMessage Retrieve(const protobuf::Key & key) const = 0;
 };
 }
 }
 
-#endif // PROFANEDB_STORAGE_DB_H
+#endif // PROFANEDB_VAULT_STORAGE_H
+
+

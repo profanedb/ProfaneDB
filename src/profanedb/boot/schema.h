@@ -17,30 +17,33 @@
  *
  */
 
-#ifndef PROFANEDB_STORAGE_STORAGE_H
-#define PROFANEDB_STORAGE_STORAGE_H
-
-#include <google/protobuf/message.h>
+#ifndef PROFANEDB_BOOT_SCHEMA_H
+#define PROFANEDB_BOOT_SCHEMA_H
 
 #include <profanedb/protobuf/storage.pb.h>
 
 namespace profanedb {
-namespace storage {
+namespace boot {
 
-// Handles storage and retrieval of objects,
-// subclass to implement a storage layer
-class Storage {
+// A Schema defines a Key for each message,
+// a Key is a unique identifier for that given message.
+// This data might be retrieved directly from the message,
+// or the Schema might need to parse some definition to know what to do
+template <typename Message>
+class Schema {
 public:
-	virtual ~Storage() = 0;
+    virtual ~Schema() = 0;
     
-    void Put(const profanedb::protobuf::MessageTreeNode & messageTree);
-    const profanedb::protobuf::MessageTreeNode Get(const profanedb::protobuf::Key & key) const;
+    // Check whether a Message has a key, therefore can be stored
+    virtual bool IsKeyable(const Message & message) const = 0;
     
-protected:
-    virtual void Store(const profanedb::protobuf::Key & key, const std::string & payload) = 0;
-    virtual const std::string Retrieve(const profanedb::protobuf::Key & key) const = 0;
+    // Extract a Key from a Message
+    virtual protobuf::Key GetKey(const Message & message) const = 0;
+    
+    // Retrieve nested messages from a message
+    virtual std::vector<const Message *> GetNestedMessages(const Message & message) const = 0;
 };
 }
 }
 
-#endif /* PROFANEDB_STORAGE_STORAGE_H */
+#endif // PROFANEDB_BOOT_SCHEMA_H

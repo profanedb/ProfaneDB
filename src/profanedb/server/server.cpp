@@ -20,26 +20,7 @@
 #include "server.h"
 
 profanedb::server::Server::Server()
-  : config(
-      profanedb::storage::Config::ProfaneDB(
-        boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/test"),
-        boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/src")
-      ),
-      profanedb::storage::Config::RocksDB(
-        Server::RocksDBOptions(),
-        "/tmp/profanedb"
-      )
-    )
-  , service(config)
 {
-}
-
-rocksdb::Options profanedb::server::Server::RocksDBOptions()
-{
-	rocksdb::Options options;
-	options.create_if_missing = true;
-
-	return options;
 }
 
 profanedb::server::Server::~Server()
@@ -68,28 +49,28 @@ void profanedb::server::Server::HandleRpcs()
     server->Wait();
 }
 
-profanedb::server::Server::DbServiceImpl::DbServiceImpl(const profanedb::storage::Config & config)
-  : db(config)
+profanedb::server::Server::DbServiceImpl::DbServiceImpl(profanedb::Db<google::protobuf::Message> & profanedb)
+  : profanedb(profanedb)
 {
 }
 
 grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp * response)
 {
-    db.Get(*request);
+    response->mutable_message()->PackFrom(this->profanedb.Get(request->key()));
     
     return grpc::Status::OK;
 }
 
 grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response)
 {
-    db.Put(*request);
+    // TODO Unpack
+    this->profanedb.Put(request->serializable());
     
     return grpc::Status::OK;
 }
 
 grpc::Status profanedb::server::Server::DbServiceImpl::Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response)
 {
-    db.Delete(*request);
     
     return grpc::Status::OK;
 }

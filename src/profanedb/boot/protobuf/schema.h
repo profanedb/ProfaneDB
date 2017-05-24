@@ -31,11 +31,6 @@ namespace profanedb {
 namespace boot {
 namespace protobuf {    
 
-using google::protobuf::Message;
-using google::protobuf::Reflection;
-using google::protobuf::Descriptor;
-using google::protobuf::FieldDescriptor;
-
 // Redundant here, might be relevant for other kind of "Message" classes,
 // to copy and paste from profanedb::boot::Schema interface
 // Can be changed if collisions occur
@@ -59,7 +54,7 @@ public:
     virtual std::vector<const Message *> GetNestedMessages(const Message & message) const override;
     
 private:
-    static profanedb::protobuf::Key FieldToKey(const Message & message, const FieldDescriptor * fd);
+    static profanedb::protobuf::Key FieldToKey(const Message & message, const google::protobuf::FieldDescriptor * fd);
 };
 }
 }

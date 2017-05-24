@@ -17,40 +17,25 @@
  *
  */
 
-#include "db.h"
+#ifndef PROFANEDB_FORMAT_MARSHALLER_H
+#define PROFANEDB_FORMAT_MARSHALLER_H
+
+#include <profanedb/protobuf/storage.pb.h>
+
+namespace profanedb {
+namespace format {
 
 template<typename Message>
-profanedb::Db<Message>::Db(
-    std::shared_ptr< profanedb::boot::Schema<Message> > schema,
-    std::shared_ptr<profanedb::vault::Storage> storage)
-  : schema(schema)
-  , storage(storage)
+class Marshaller
 {
-}
-
-template<typename Message>
-profanedb::Db<Message>::~Db()
-{
-}
-
-template<typename Message>
-const Message & profanedb::Db<Message>::Get(const protobuf::Key & key) const
-{
-    this->storage->Retrieve(key);
+public:
+    virtual ~Marshaller() = 0;
     
-    // Unmarshal message
-    // For each nested key retrieve and set message
-    // TODO Storable to Message and return
+    virtual profanedb::protobuf::MessageTreeNode Marshal(const Message & message) = 0;
+    virtual const Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) = 0;
+};
+}
 }
 
-template<typename Message>
-bool profanedb::Db<Message>::Put(const Message & message)
-{
-    // TODO Message to Storable
-    // storage->Store()
-}
+#endif // PROFANEDB_FORMAT_MARSHALLER_H
 
-template<typename Message>
-bool profanedb::Db<Message>::Delete(const protobuf::Key & key)
-{
-}

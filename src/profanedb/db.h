@@ -17,6 +17,8 @@
  *
  */
 
+#include <memory>
+
 #include <profanedb/boot/schema.h>
 #include <profanedb/vault/storage.h>
 

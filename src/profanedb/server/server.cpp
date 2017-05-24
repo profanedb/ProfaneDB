@@ -64,7 +64,7 @@ grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext *
 grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response)
 {
     // TODO Unpack
-    this->profanedb.Put(request->serializable());
+    // this->profanedb.Put(request->serializable());
     
     return grpc::Status::OK;
 }

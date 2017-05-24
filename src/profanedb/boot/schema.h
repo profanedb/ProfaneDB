@@ -38,7 +38,7 @@ public:
     virtual bool IsKeyable(const Message & message) const = 0;
     
     // Extract a Key from a Message
-    virtual protobuf::Key GetKey(const Message & message) const = 0;
+    virtual profanedb::protobuf::Key GetKey(const Message & message) const = 0;
     
     // Retrieve nested messages from a message
     virtual std::vector<const Message *> GetNestedMessages(const Message & message) const = 0;

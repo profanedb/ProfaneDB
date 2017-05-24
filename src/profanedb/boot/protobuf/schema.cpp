@@ -19,6 +19,13 @@
 
 #include "schema.h"
 
+using google::protobuf::Message;
+using google::protobuf::Reflection;
+using google::protobuf::Descriptor;
+using google::protobuf::FieldDescriptor;
+
+using profanedb::protobuf::Key;
+
 profanedb::boot::protobuf::Schema::Schema()
 {
 }
@@ -27,7 +34,7 @@ profanedb::boot::protobuf::Schema::~Schema()
 {
 }
 
-bool profanedb::boot::protobuf::Schema::IsKeyable(const google::protobuf::Message & message) const
+bool profanedb::boot::protobuf::Schema::IsKeyable(const Message & message) const
 {
     const Descriptor * descriptor = message.GetDescriptor();
     
@@ -38,7 +45,7 @@ bool profanedb::boot::protobuf::Schema::IsKeyable(const google::protobuf::Messag
     return false;
 }
 
-profanedb::protobuf::Key profanedb::boot::protobuf::Schema::GetKey(const google::protobuf::Message & message) const
+Key profanedb::boot::protobuf::Schema::GetKey(const Message & message) const
 {
     const Descriptor * descriptor = message.GetDescriptor();
     
@@ -52,9 +59,9 @@ profanedb::protobuf::Key profanedb::boot::protobuf::Schema::GetKey(const google:
 }
 
 std::vector<const google::protobuf::Message *> profanedb::boot::protobuf::Schema::GetNestedMessages(
-    const google::protobuf::Message & message) const
+    const Message & message) const
 {
-    std::vector<const google::protobuf::Message *> nested;
+    std::vector<const Message *> nested;
     
     const Reflection * reflection = message.GetReflection();
     const Descriptor * descriptor = message.GetDescriptor();
@@ -68,21 +75,21 @@ std::vector<const google::protobuf::Message *> profanedb::boot::protobuf::Schema
     return nested;
 }
 
-profanedb::protobuf::Key profanedb::boot::protobuf::Schema::FieldToKey(
+Key profanedb::boot::protobuf::Schema::FieldToKey(
     const Message & message,
-    const google::protobuf::FieldDescriptor * fd)
+    const FieldDescriptor * fd)
 {
-    profanedb::protobuf::Key key;
+    Key key;
     *key.mutable_message_type() = message.GetTypeName();
     *key.mutable_field() = fd->name();
     
-    const google::protobuf::Reflection * reflection = message.GetReflection();
+    const Reflection * reflection = message.GetReflection();
     
     if (fd->is_repeated()) {
         for (int y = 0; y < reflection->FieldSize(message, fd);  y++) {
             switch (fd->cpp_type()) {
                 #define HANDLE_TYPE(CPPTYPE,  METHOD)                                                              \
-                case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:                                         \
+                case FieldDescriptor::CPPTYPE_##CPPTYPE:                                                           \
                     *key.mutable_value() += "$" + std::to_string(reflection->GetRepeated##METHOD(message, fd, y)); \
                     break;
                     
@@ -95,13 +102,13 @@ profanedb::protobuf::Key profanedb::boot::protobuf::Schema::FieldToKey(
                     HANDLE_TYPE(BOOL  , Bool  );
                     #undef HANDLE_TYPE
                     
-                case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+                case FieldDescriptor::CPPTYPE_ENUM:
                     *key.mutable_value() += "$" + std::to_string(reflection->GetRepeatedEnum(message, fd, y)->index());
                     break;
-                case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+                case FieldDescriptor::CPPTYPE_STRING:
                     *key.mutable_value() += "$" + reflection->GetRepeatedString(message, fd, y);
                     break;
-                case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+                case FieldDescriptor::CPPTYPE_MESSAGE:
                     *key.mutable_value() += "$" + reflection->GetRepeatedMessage(message, fd, y).SerializeAsString();
                     break;
             }
@@ -109,7 +116,7 @@ profanedb::protobuf::Key profanedb::boot::protobuf::Schema::FieldToKey(
     } else {
         switch (fd->cpp_type()) {
             #define HANDLE_TYPE(CPPTYPE, METHOD)                                             \
-            case google::protobuf::FieldDescriptor::CPPTYPE_##CPPTYPE:               	     \
+            case FieldDescriptor::CPPTYPE_##CPPTYPE:                                         \
                 *key.mutable_value() = std::to_string(reflection->Get##METHOD(message, fd)); \
                 break;
                 
@@ -122,13 +129,13 @@ profanedb::protobuf::Key profanedb::boot::protobuf::Schema::FieldToKey(
                 HANDLE_TYPE(BOOL  , Bool  );
                 #undef HANDLE_TYPE
                 
-            case google::protobuf::FieldDescriptor::CPPTYPE_ENUM:
+            case FieldDescriptor::CPPTYPE_ENUM:
                 *key.mutable_value() = std::to_string(reflection->GetEnum(message, fd)->index());
                 break;
-            case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+            case FieldDescriptor::CPPTYPE_STRING:
                 *key.mutable_value() = reflection->GetString(message, fd);
                 break;
-            case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
+            case FieldDescriptor::CPPTYPE_MESSAGE:
                 *key.mutable_value() = reflection->GetMessage(message, fd).SerializeAsString();
                 break;
         }

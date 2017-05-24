@@ -1,0 +1,2 @@
+add_library(profanedb_format protobuf/marshaller.cpp)
+target_link_libraries(profanedb_format profanedb_protobuf)

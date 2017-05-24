@@ -20,11 +20,29 @@
 #include "db.h"
 
 template<typename Message>
-profanedb::storage::Db<Message>::Db()
+profanedb::Db<Message>::Db(
+    std::shared_ptr< profanedb::boot::Schema<Message> > schema,
+    std::shared_ptr<profanedb::vault::Storage> storage)
+  : schema(schema)
+  , storage(storage)
 {
 }
 
 template<typename Message>
-profanedb::storage::Db<Message>::~Db()
+profanedb::Db<Message>::~Db()
+{
+}
+
+template<typename Message>
+const Message & profanedb::Db<Message>::Get(const protobuf::Key & key) const
+{
+  this->schema->
+}
+
+bool profanedb::Db<Message>::Put(const Message & message)
+{
+}
+
+bool profanedb::Db<Message>::Delete(const protobuf::Key & key)
 {
 }

@@ -32,12 +32,14 @@ template<typename Message>
 class Db
 {
 public:
-    Db();
+    Db(
+        std::shared_ptr< boot::Schema<Message> > schema,
+        std::shared_ptr<vault::Storage> storage);
     ~Db();
 
-    virtual const Message & Get(const protobuf::Key & key) const = 0;
-    virtual bool Put(const Message & message) = 0;
-    virtual bool Delete(const protobuf::Key & key) = 0;
+    virtual const Message & Get(const protobuf::Key & key) const;
+    virtual bool Put(const Message & message);
+    virtual bool Delete(const protobuf::Key & key);
 
 private:
     std::shared_ptr< boot::Schema<Message> > schema;

@@ -1,6 +1,6 @@
 add_subdirectory(protobuf) # Generated Protobuf (& gRPC if neeeded) code
 
-add_subdirectory(boot)
+add_subdirectory(format)
 add_subdirectory(vault)
 
 add_library(profanedb db.cpp)

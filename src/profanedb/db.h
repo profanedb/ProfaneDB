@@ -17,15 +17,15 @@
  *
  */
 
+#ifndef PROFANEDB_DB_H
+#define PROFANEDB_DB_H
+
 #include <memory>
 
-#include <profanedb/boot/schema.h>
+#include <profanedb/format/marshaller.h>
 #include <profanedb/vault/storage.h>
 
 #include <profanedb/protobuf/storage.pb.h>
-
-#ifndef PROFANEDB_DB_H
-#define PROFANEDB_DB_H
 
 namespace profanedb {
 
@@ -35,7 +35,7 @@ class Db
 {
 public:
     Db(
-        std::shared_ptr< boot::Schema<Message> > schema,
+        std::shared_ptr< format::Marshaller<Message> > marshaller,
         std::shared_ptr<vault::Storage> storage);
     ~Db();
 
@@ -44,7 +44,7 @@ public:
     virtual bool Delete(const protobuf::Key & key);
 
 private:
-    std::shared_ptr< boot::Schema<Message> > schema;
+    std::shared_ptr< format::Marshaller<Message> > marshaller;
     std::shared_ptr<vault::Storage> storage;
 };
 }

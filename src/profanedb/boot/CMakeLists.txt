@@ -1,2 +1,0 @@
-add_library(profanedb_boot protobuf/schema.cpp)
-target_link_libraries(profanedb_boot profanedb_protobuf)

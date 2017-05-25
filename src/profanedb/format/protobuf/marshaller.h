@@ -1,6 +1,6 @@
 /*
- * <one line to give the program's name and a brief idea of what it does.>
- * Copyright (C) 2017  <copyright holder> <email>
+ * ProfaneDB - A Protocol Buffers database.
+ * Copyright (C) 2017  "Giorgio Azzinnaro" <giorgio.azzinnaro@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,24 +37,24 @@ class Marshaller : profanedb::format::Marshaller<google::protobuf::Message>
 {
 public:
     Marshaller(
-        google::protobuf::DescriptorPool & schemaPool,
-        google::protobuf::DescriptorPool & normalizedPool,
+        const google::protobuf::DescriptorPool & schemaPool,
+        const google::protobuf::DescriptorPool & normalizedPool,
         const profanedb::vault::Storage & storage
     );
     ~Marshaller();
     
-    virtual MessageTreeNode Marshal(const google::protobuf::Message & message) override;
-    virtual const google::protobuf::Message & Unmarshal(const StorableMessage & storable) override;
+    virtual profanedb::protobuf::MessageTreeNode Marshal(const google::protobuf::Message & message) override;
+    virtual const google::protobuf::Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) override;
     
 private:
     // TODO schemaPool, normalizedPool and CopyField are strictly related, should have their class
     
     // schemaPool keeps track of the original messages
-    google::protobuf::DescriptorPool & schemaPool;
+    const google::protobuf::DescriptorPool & schemaPool;
     
     // For each keyable message in schema, there is a normalized version
     // which has Key in place of nested keyable messages
-    google::protobuf::DescriptorPool & normalizedPool;
+    const google::protobuf::DescriptorPool & normalizedPool;
     
     // Because a StorableMessage only holds references to its children objects,
     // Storage is used to recursively retrieve them.

@@ -21,9 +21,9 @@
 
 template<typename Message>
 profanedb::Db<Message>::Db(
-    std::shared_ptr< profanedb::boot::Schema<Message> > schema,
+    std::shared_ptr< format::Marshaller<Message> > marshaller,
     std::shared_ptr<profanedb::vault::Storage> storage)
-  : schema(schema)
+  : marshaller(marshaller)
   , storage(storage)
 {
 }
@@ -36,21 +36,20 @@ profanedb::Db<Message>::~Db()
 template<typename Message>
 const Message & profanedb::Db<Message>::Get(const protobuf::Key & key) const
 {
-    this->storage->Retrieve(key);
-    
-    // Unmarshal message
-    // For each nested key retrieve and set message
-    // TODO Storable to Message and return
+    return this->marshaller->Unmarshal(this->storage->Retrieve(key));
 }
 
 template<typename Message>
 bool profanedb::Db<Message>::Put(const Message & message)
 {
-    // TODO Message to Storable
-    // storage->Store()
+	this->storage->Store(this->marshaller->Marshal(message));
+
+	// TODO Check exceptions
+	return true;
 }
 
 template<typename Message>
 bool profanedb::Db<Message>::Delete(const protobuf::Key & key)
 {
+	// TODO in Storage
 }

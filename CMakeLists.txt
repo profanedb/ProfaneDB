@@ -9,6 +9,7 @@ set(PROTOBUF_IMPORT_DIRS "${CMAKE_SOURCE_DIR}/src")
 option(BUILD_SHARED_LIBS "Build libprofanedb.so, to embed ProfaneDB" ON)
 option(BUILD_PROFANEDB_SERVER "Build ProfaneDB gRPC server" OFF)
 
+# TODO Making stuff modular, each module will get its dir and dependencies
 find_package(Threads REQUIRED)
 find_package(Protobuf REQUIRED) # Protobuf does the serialisation for the DB
 find_package(RocksDB REQUIRED) # RocksDB is used as storage

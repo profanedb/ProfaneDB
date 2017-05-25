@@ -4,7 +4,7 @@ add_subdirectory(format)
 add_subdirectory(vault)
 
 add_library(profanedb db.cpp)
-target_link_libraries(profanedb profanedb_protobuf)
+target_link_libraries(profanedb profanedb_format profanedb_vault profanedb_protobuf)
 
 # Nothing should depend on code in here, so it can be skipped entirely
 if(BUILD_PROFANEDB_SERVER)

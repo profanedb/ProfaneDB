@@ -24,8 +24,8 @@ using boost::filesystem::recursive_directory_iterator;
 using boost::filesystem::symlink_option;
 
 using google::protobuf::io::ZeroCopyInputStream;
-using google::protobuf::MergedDescriptorDatabase;
 using google::protobuf::compiler::SourceTreeDescriptorDatabase;
+using google::protobuf::MergedDescriptorDatabase;
 using google::protobuf::FileDescriptor;
 using google::protobuf::FileDescriptorProto;
 using google::protobuf::Descriptor;

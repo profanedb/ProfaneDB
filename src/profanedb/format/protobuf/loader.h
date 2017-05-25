@@ -23,6 +23,7 @@
 #include <profanedb/protobuf/options.pb.h>
 #include <profanedb/protobuf/storage.pb.h>
 
+#include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/compiler/importer.h>
 
@@ -32,6 +33,8 @@ namespace profanedb {
 namespace format {
 namespace protobuf {
 
+// Loader is a utility class to populate a schemaPool and normalizedPool
+// which profanedb::format::protobuf::Marshaller requires
 class Loader
 {
 public:
@@ -78,7 +81,11 @@ private:
     
     google::protobuf::SimpleDescriptorDatabase normalizedDescriptorDb;
     
+    // schemaPool keeps track of the original messages
     google::protobuf::DescriptorPool schemaPool;
+    
+    // For each keyable message in schema, there is a normalized version
+    // which has Key in place of nested keyable messages
     google::protobuf::DescriptorPool normalizedPool;
 };
 }

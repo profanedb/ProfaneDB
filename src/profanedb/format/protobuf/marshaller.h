@@ -20,14 +20,16 @@
 #ifndef PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
 #define PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
 
+#include <profanedb/protobuf/options.pb.h>
+#include <profanedb/vault/storage.h>
+
 #include <google/protobuf/message.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/dynamic_message.h>
 
-#include <profanedb/protobuf/options.pb.h>
-#include <profanedb/vault/storage.h>
-
 #include <profanedb/format/marshaller.h>
+
+#include "loader.h"
 
 namespace profanedb {
 namespace format {
@@ -37,8 +39,7 @@ class Marshaller : profanedb::format::Marshaller<google::protobuf::Message>
 {
 public:
     Marshaller(
-        const google::protobuf::DescriptorPool & schemaPool,
-        const google::protobuf::DescriptorPool & normalizedPool,
+        const Loader & loader,
         const profanedb::vault::Storage & storage
     );
     ~Marshaller();
@@ -47,14 +48,8 @@ public:
     virtual const google::protobuf::Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) override;
     
 private:
-    // TODO schemaPool, normalizedPool and CopyField are strictly related, should have their class
-    
-    // schemaPool keeps track of the original messages
-    const google::protobuf::DescriptorPool & schemaPool;
-    
-    // For each keyable message in schema, there is a normalized version
-    // which has Key in place of nested keyable messages
-    const google::protobuf::DescriptorPool & normalizedPool;
+    // Loader contains the schemaPool and normalizedPool
+    const Loader & loader;
     
     // Because a StorableMessage only holds references to its children objects,
     // Storage is used to recursively retrieve them.

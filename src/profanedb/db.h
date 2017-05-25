@@ -22,10 +22,10 @@
 
 #include <memory>
 
+#include <profanedb/protobuf/storage.pb.h>
+
 #include <profanedb/format/marshaller.h>
 #include <profanedb/vault/storage.h>
-
-#include <profanedb/protobuf/storage.pb.h>
 
 namespace profanedb {
 

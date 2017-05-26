@@ -20,13 +20,17 @@
 #ifndef PROFANEDB_STORAGE_SERVER_H
 #define PROFANEDB_STORAGE_SERVER_H
 
+#include <profanedb/protobuf/db.pb.h>
+#include <profanedb/protobuf/db.grpc.pb.h>
+
 #include <grpc++/grpc++.h>
 #include <grpc/support/log.h>
 
-#include <profanedb/db.h>
+#include <boost/di.hpp>
 
-#include <profanedb/protobuf/db.pb.h>
-#include <profanedb/protobuf/db.grpc.pb.h>
+#include <profanedb/format/protobuf/marshaller.h>
+#include <profanedb/vault/rocksdb/storage.h>
+#include <profanedb/db.h>
 
 namespace profanedb {
 namespace server {
@@ -58,7 +62,7 @@ private:
     private:
         profanedb::Db<google::protobuf::Message> & profanedb;
     };
-    DbServiceImpl service;
+    std::unique_ptr<DbServiceImpl> service;
 };
 
 }

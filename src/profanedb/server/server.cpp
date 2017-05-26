@@ -19,8 +19,24 @@
 
 #include "server.h"
 
+using profanedb::format::protobuf::Loader;
+using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
+using RocksStorage = profanedb::vault::rocksdb::Storage;
+
+using google::protobuf::Message;
+
+using grpc::ServerBuilder;
+
+using rocksdb::DB;
+
 profanedb::server::Server::Server()
 {
+    boost::di::bind<profanedb::format::Marshaller<Message>>().to<ProtobufMarshaller>();
+    boost::di::bind<profanedb::vault::Storage>().to<RocksStorage>();
+    
+    auto injector = boost::di::make_injector();
+//     service = std::make_unique<DbServiceImpl>(new DbServiceImpl(
+//         injector.create< profanedb::Db<google::protobuf::Message> >());
 }
 
 profanedb::server::Server::~Server()
@@ -32,10 +48,10 @@ void profanedb::server::Server::Run()
 {
     std::string address("0.0.0.0:50051");
 
-    grpc::ServerBuilder builder;
+    ServerBuilder builder;
     
     builder.AddListeningPort(address, grpc::InsecureServerCredentials());
-    builder.RegisterService(&service);
+    builder.RegisterService(service.get());
     
     server = builder.BuildAndStart();
     
@@ -49,7 +65,7 @@ void profanedb::server::Server::HandleRpcs()
     server->Wait();
 }
 
-profanedb::server::Server::DbServiceImpl::DbServiceImpl(profanedb::Db<google::protobuf::Message> & profanedb)
+profanedb::server::Server::DbServiceImpl::DbServiceImpl(profanedb::Db<Message> & profanedb)
   : profanedb(profanedb)
 {
 }

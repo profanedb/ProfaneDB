@@ -43,6 +43,8 @@ public:
     // Paths are available for Loader to populate its Pool;
     class RootSourceTree : public google::protobuf::compiler::DiskSourceTree {
         friend Loader;
+        
+    public:
         RootSourceTree(std::initializer_list<boost::filesystem::path> paths);
         
     private:

@@ -26,38 +26,21 @@ option csharp_namespace = "ProfaneDB.Protobuf";
 option java_package = "com.profanedb.protobuf";
 option objc_class_prefix = "PDB";
 
-import "google/protobuf/any.proto";
-
-// FIXME Can't use profanedb/protobuf/storage.proto because generation happens directly in this folder
-import "storage.proto";
-
-service Db {
-  rpc Get (GetReq) returns (GetResp);
-
-  rpc Put (PutReq) returns (PutResp);
-
-  rpc Delete (DelReq) returns (DelResp);
+// A Key uniquely identifies a message stored in the database
+message Key {
+	string message_type = 1; // A identifier for the message
+	string field = 2; // The field within the message
+	bytes value = 3; // The value serialized in such way that it doesn't create collisions
 }
 
-message GetReq {
-  Key key = 1; // TODO How about getting multiple objects at once
+// A StorableMessage has a unique Key and a serialized representation of the object
+message StorableMessage {
+    Key key = 1;
+    bytes payload = 2;
 }
 
-message GetResp {
-  google.protobuf.Any message = 1;
-}
-
-message PutReq {
-  google.protobuf.Any serializable = 1;
-}
-
-message PutResp {
-  Key key = 1; // TODO Maybe should be repeated for all stored keys?
-}
-
-message DelReq {
-  Key key = 1;
-}
-
-message DelResp {
+// A Message might depend on other messages to be stored first
+message MessageTreeNode {
+    StorableMessage message = 1;
+    repeated MessageTreeNode children = 2;
 }

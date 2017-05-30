@@ -17,18 +17,23 @@
  *
  */
 
-#include "rootsourcetree.h"
+#ifndef PROFANEDB_VAULT_STORAGE_H
+#define PROFANEDB_VAULT_STORAGE_H
 
-profanedb::storage::RootSourceTree::RootSourceTree(
-    std::initializer_list<boost::filesystem::path> mappings)
+#include <profanedb/protobuf/storage.pb.h>
 
-  : google::protobuf::compiler::DiskSourceTree()
-{
-    for (const auto & path: mappings)
-        this->MapPath("", path.string());
-    
-    google::protobuf::io::ZeroCopyInputStream * inputStream = this->Open("");
-    if (inputStream == nullptr)
-        throw std::runtime_error(this->GetLastErrorMessage());
+namespace profanedb {
+namespace vault {
+
+// Storage takes care of saving and retrieving the data from the actual DB
+class Storage {
+public:
+    virtual void Store(const protobuf::StorableMessage & storable) = 0;
+    virtual protobuf::StorableMessage Retrieve(const protobuf::Key & key) const = 0;
+};
 }
+}
+
+#endif // PROFANEDB_VAULT_STORAGE_H
+
 

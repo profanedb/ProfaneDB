@@ -17,41 +17,23 @@
  *
  */
 
-#ifndef PROFANEDB_STORAGE_DB_H
-#define PROFANEDB_STORAGE_DB_H
+#ifndef PROFANEDB_FORMAT_MARSHALLER_H
+#define PROFANEDB_FORMAT_MARSHALLER_H
 
-#include <iostream>
-#include <string>
-
-#include <rocksdb/db.h>
-
-#include <profanedb/protobuf/db.pb.h>
-
-#include "config.h"
-#include "parser.h"
-#include "normalizer.h"
+#include <profanedb/protobuf/storage.pb.h>
 
 namespace profanedb {
-namespace storage {
+namespace format {
 
-// Db should be the main interface when embedding ProfaneDB
-class Db
+template<typename Message>
+class Marshaller
 {
 public:
-    Db(Config config);
-    ~Db();
-   
-    protobuf::GetResp Get(const protobuf::GetReq & request);
-    protobuf::PutResp Put(const protobuf::PutReq & request);
-    protobuf::DelResp Delete(const protobuf::DelReq & request);
-private:
-    Config config;
-    Parser parser;
-    Normalizer normalizer;
-    
-    rocksdb::DB * db;
+    virtual profanedb::protobuf::MessageTreeNode Marshal(const Message & message) = 0;
+    virtual const Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) = 0;
 };
 }
 }
 
-#endif // PROFANEDB_STORAGE_DB_H
+#endif // PROFANEDB_FORMAT_MARSHALLER_H
+

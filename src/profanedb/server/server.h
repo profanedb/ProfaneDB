@@ -27,15 +27,19 @@
 #include <grpc/support/log.h>
 
 #include <boost/di.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 #include <profanedb/format/protobuf/marshaller.h>
 #include <profanedb/vault/rocksdb/storage.h>
-#include <profanedb/db.h>
+
+#include <profanedb/db.hpp>
 
 namespace profanedb {
 namespace server {
 
-// This is a thin layer to use ProfaneDB with gRPC
+// This is a layer to use ProfaneDB with gRPC and Protobuf objects
 class Server
 {
 public:
@@ -51,7 +55,7 @@ private:
     
     class DbServiceImpl : public profanedb::protobuf::Db::Service {
     public:
-        DbServiceImpl(profanedb::Db<google::protobuf::Message> & profanedb);
+        DbServiceImpl(std::unique_ptr< profanedb::Db<google::protobuf::Message> > profane);
         
         grpc::Status Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp* response) override;
         
@@ -60,7 +64,7 @@ private:
         grpc::Status Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response) override;
         
     private:
-        profanedb::Db<google::protobuf::Message> & profanedb;
+        std::unique_ptr< profanedb::Db<google::protobuf::Message> > profane;
     };
     std::unique_ptr<DbServiceImpl> service;
 };

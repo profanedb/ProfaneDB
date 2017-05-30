@@ -34,18 +34,34 @@ template<typename Message>
 class Db
 {
 public:
-    Db(
-        std::shared_ptr< format::Marshaller<Message> > marshaller,
-        std::shared_ptr<vault::Storage> storage);
-    ~Db();
+    Db(std::shared_ptr<vault::Storage> storage,
+       std::shared_ptr< format::Marshaller<Message> > marshaller)
+      : storage(storage)
+      , marshaller(marshaller)
+    {
+    }
 
-    virtual const Message & Get(const protobuf::Key & key) const;
-    virtual bool Put(const Message & message);
-    virtual bool Delete(const protobuf::Key & key);
+    const Message & Get(const protobuf::Key & key) const
+    {
+        return this->marshaller->Unmarshal(this->storage->Retrieve(key));
+    }
+    
+    bool Put(const Message & message)
+    {
+        this->storage->Store(this->marshaller->Marshal(message));
+        
+        // TODO Check exceptions
+        return true;
+    }
+    
+    bool Delete(const protobuf::Key & key)
+    {
+        // TODO
+    }
 
 private:
-    std::shared_ptr< format::Marshaller<Message> > marshaller;
     std::shared_ptr<vault::Storage> storage;
+    std::shared_ptr< format::Marshaller<Message> > marshaller;
 };
 }
 

@@ -29,8 +29,6 @@ template<typename Message>
 class Marshaller
 {
 public:
-    virtual ~Marshaller() = 0;
-    
     virtual profanedb::protobuf::MessageTreeNode Marshal(const Message & message) = 0;
     virtual const Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) = 0;
 };

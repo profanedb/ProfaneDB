@@ -20,23 +20,46 @@
 #include "server.h"
 
 using profanedb::format::protobuf::Loader;
+using profanedb::format::Marshaller;
 using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
+using profanedb::vault::Storage;
 using RocksStorage = profanedb::vault::rocksdb::Storage;
 
 using google::protobuf::Message;
 
 using grpc::ServerBuilder;
 
-using rocksdb::DB;
-
 profanedb::server::Server::Server()
 {
-    boost::di::bind<profanedb::format::Marshaller<Message>>().to<ProtobufMarshaller>();
-    boost::di::bind<profanedb::vault::Storage>().to<RocksStorage>();
+    // TODO Config
+    boost::log::core::get()->set_filter(
+        boost::log::trivial::severity >= boost::log::trivial::debug
+    );
     
-    auto injector = boost::di::make_injector();
-//     service = std::make_unique<DbServiceImpl>(new DbServiceImpl(
-//         injector.create< profanedb::Db<google::protobuf::Message> >());
+    // TODO Config
+    rocksdb::Options rocksOptions;
+    rocksOptions.create_if_missing = true;
+    
+    rocksdb::DB *rocks;
+    rocksdb::DB::Open(rocksOptions, "/tmp/profane", &rocks);
+    
+    auto storage = std::make_shared<RocksStorage>(std::unique_ptr<rocksdb::DB>(rocks));
+    
+    // TODO Should be from config
+    auto includeSourceTree = new Loader::RootSourceTree{
+        "/usr/include", "/home/giorgio/Documents/ProfaneDB/src"};
+    
+    // TODO Config
+    auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/test"};
+    
+    auto loader = std::make_shared<Loader>(
+        std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),
+        std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
+    
+    auto marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
+    
+    service = std::make_unique<DbServiceImpl>(
+        std::make_unique< profanedb::Db<Message> >(storage, marshaller));
 }
 
 profanedb::server::Server::~Server()
@@ -55,7 +78,7 @@ void profanedb::server::Server::Run()
     
     server = builder.BuildAndStart();
     
-    std::cout << "Server listening on " << address << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Server listening on " << address << std::endl;
     
     HandleRpcs();
 }
@@ -65,20 +88,24 @@ void profanedb::server::Server::HandleRpcs()
     server->Wait();
 }
 
-profanedb::server::Server::DbServiceImpl::DbServiceImpl(profanedb::Db<Message> & profanedb)
-  : profanedb(profanedb)
+profanedb::server::Server::DbServiceImpl::DbServiceImpl(std::unique_ptr< profanedb::Db<Message> > profane)
+  : profane(std::move(profane))
 {
 }
 
 grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp * response)
 {
-    response->mutable_message()->PackFrom(this->profanedb.Get(request->key()));
+    BOOST_LOG_TRIVIAL(debug) << "GET request from " << context->peer();
+    
+    response->mutable_message()->PackFrom(this->profane->Get(request->key()));
     
     return grpc::Status::OK;
 }
 
 grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response)
 {
+    BOOST_LOG_TRIVIAL(debug) << "PUT request from " << context->peer();
+    
     // TODO Unpack
     // this->profanedb.Put(request->serializable());
     
@@ -87,6 +114,7 @@ grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext *
 
 grpc::Status profanedb::server::Server::DbServiceImpl::Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response)
 {
+    BOOST_LOG_TRIVIAL(debug) << "DELETE request from " << context->peer();
     
     return grpc::Status::OK;
 }

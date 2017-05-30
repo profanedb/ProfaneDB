@@ -32,14 +32,10 @@ using profanedb::protobuf::StorableMessage;
 using profanedb::protobuf::Key;
 
 profanedb::format::protobuf::Marshaller::Marshaller(
-    const Loader & loader,
-    const Storage & storage)
+    std::shared_ptr<Storage> storage,
+    std::shared_ptr<Loader> loader)
   : loader(loader)
   , storage(storage)
-{
-}
-
-profanedb::format::protobuf::Marshaller::~Marshaller()
 {
 }
 
@@ -51,7 +47,7 @@ MessageTreeNode profanedb::format::protobuf::Marshaller::Marshal(const Message &
     // replacing references to other objects with their keys.
     // It will then be serialized and set as storable message payload in messageTree;
     Message * normalizedMessage = 
-        this->messageFactory.GetPrototype(loader.GetNormalizedPool().FindMessageTypeByName(message.GetTypeName()))->New();
+        this->messageFactory.GetPrototype(loader->GetNormalizedPool().FindMessageTypeByName(message.GetTypeName()))->New();
     
     // Only fields which are set in the message are processed
     std::vector< const FieldDescriptor * > setFields;
@@ -104,11 +100,11 @@ const Message & profanedb::format::protobuf::Marshaller::Unmarshal(const Storabl
 {
     // An empty normalized message is generated using the Key
     Message * normalizedMessage = this->messageFactory.GetPrototype(
-        loader.GetNormalizedPool().FindMessageTypeByName(storable.key().message_type()))->New();
+        loader->GetNormalizedPool().FindMessageTypeByName(storable.key().message_type()))->New();
     
     // The original message is also retrieved
     Message * originalMessage = this->messageFactory.GetPrototype(
-        loader.GetSchemaPool().FindMessageTypeByName(storable.key().message_type()))->New();
+        loader->GetSchemaPool().FindMessageTypeByName(storable.key().message_type()))->New();
     
     // StorableMessage payload contains the serialized normalized message,
     // as previously stored into the DB
@@ -129,7 +125,7 @@ const Message & profanedb::format::protobuf::Marshaller::Unmarshal(const Storabl
             nestedKey.MergeFrom(normalizedMessage->GetReflection()->GetMessage(*normalizedMessage, normalizedField));
             
             // Retrieve the nested message from storage and unmarshal it as well
-            const Message & nestedMessage = this->Unmarshal(this->storage.Retrieve(nestedKey));
+            const Message & nestedMessage = this->Unmarshal(this->storage->Retrieve(nestedKey));
             
             // We need the original descriptor field to set the message
             const FieldDescriptor * originalField = originalMessage->GetDescriptor()->field(normalizedField->index());

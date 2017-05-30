@@ -20,6 +20,8 @@
 #ifndef PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
 #define PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
 
+#include <memory>
+
 #include <profanedb/protobuf/options.pb.h>
 #include <profanedb/vault/storage.h>
 
@@ -35,25 +37,24 @@ namespace profanedb {
 namespace format {
 namespace protobuf {
 
-class Marshaller : profanedb::format::Marshaller<google::protobuf::Message>
+class Marshaller : public profanedb::format::Marshaller<google::protobuf::Message>
 {
 public:
     Marshaller(
-        const Loader & loader,
-        const profanedb::vault::Storage & storage
+        std::shared_ptr<profanedb::vault::Storage> storage,
+        std::shared_ptr<Loader> loader
     );
-    ~Marshaller();
     
     virtual profanedb::protobuf::MessageTreeNode Marshal(const google::protobuf::Message & message) override;
     virtual const google::protobuf::Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) override;
     
 private:
     // Loader contains the schemaPool and normalizedPool
-    const Loader & loader;
+    const std::shared_ptr<Loader> loader;
     
     // Because a StorableMessage only holds references to its children objects,
     // Storage is used to recursively retrieve them.
-    const profanedb::vault::Storage & storage;
+    const std::shared_ptr<profanedb::vault::Storage> storage;
     
     google::protobuf::DynamicMessageFactory messageFactory;
     

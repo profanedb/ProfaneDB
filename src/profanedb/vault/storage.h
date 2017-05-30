@@ -28,8 +28,6 @@ namespace vault {
 // Storage takes care of saving and retrieving the data from the actual DB
 class Storage {
 public:
-    virtual ~Storage() = 0;
-    
     virtual void Store(const protobuf::StorableMessage & storable) = 0;
     virtual protobuf::StorableMessage Retrieve(const protobuf::Key & key) const = 0;
 };

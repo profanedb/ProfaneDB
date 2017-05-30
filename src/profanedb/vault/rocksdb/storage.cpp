@@ -19,8 +19,8 @@
 
 #include "storage.h"
 
-profanedb::vault::rocksdb::Storage::Storage(std::shared_ptr<DB> rocksDb)
-  : rocksDb(rocksDb)
+profanedb::vault::rocksdb::Storage::Storage(std::unique_ptr<DB> rocksDb)
+  : rocksDb(std::move(rocksDb))
 {
 }
 

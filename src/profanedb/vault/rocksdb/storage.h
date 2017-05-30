@@ -30,16 +30,16 @@ namespace profanedb {
 namespace vault {
 namespace rocksdb {
 
-class Storage : profanedb::vault::Storage
+class Storage : public profanedb::vault::Storage
 {
 public:
-    Storage(std::shared_ptr<DB> rocksDb);
+    Storage(std::unique_ptr<DB> rocksDb);
     
     virtual void Store(const profanedb::protobuf::StorableMessage & storable) override;
     virtual profanedb::protobuf::StorableMessage Retrieve(const profanedb::protobuf::Key & key) const override;
     
 private:
-    const std::shared_ptr<DB> rocksDb;
+    const std::unique_ptr<DB> rocksDb;
 };
 }
 }

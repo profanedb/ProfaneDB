@@ -28,8 +28,7 @@ option objc_class_prefix = "PDB";
 
 import "google/protobuf/any.proto";
 
-// FIXME Can't use profanedb/protobuf/storage.proto because generation happens directly in this folder
-import "storage.proto";
+import "profanedb/protobuf/storage.proto";
 
 service Db {
   rpc Get (GetReq) returns (GetResp);

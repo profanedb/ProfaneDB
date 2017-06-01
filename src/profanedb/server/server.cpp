@@ -47,10 +47,10 @@ profanedb::server::Server::Server()
     
     // TODO Should be from config
     auto includeSourceTree = new Loader::RootSourceTree{
-        "/usr/include", "/home/giorgio/Documents/ProfaneDB/src"};
+        "/usr/include", "/home/giorgio/Documents/ProfaneDB/ProfaneDB/src"};
     
     // TODO Config
-    auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/test"};
+    auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/ProfaneDB/test/profanedb/test/protobuf/schema"};
     
     auto loader = std::make_shared<Loader>(
         std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),

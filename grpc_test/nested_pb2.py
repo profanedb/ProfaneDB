@@ -18,9 +18,9 @@ from profanedb.protobuf import options_pb2 as profanedb_dot_protobuf_dot_options
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='nested.proto',
-  package='test',
+  package='schema',
   syntax='proto3',
-  serialized_pb=_b('\n\x0cnested.proto\x12\x04test\x1a profanedb/protobuf/options.proto\"1\n\x0e\x45xternalNested\x12\x1f\n\x10\x66ield_one_double\x18\x01 \x01(\x01\x42\x05\xe2@\x02\x08\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x0cnested.proto\x12\x06schema\x1a profanedb/protobuf/options.proto\"1\n\x0e\x45xternalNested\x12\x1f\n\x10\x66ield_one_double\x18\x01 \x01(\x01\x42\x05\xe2@\x02\x08\x01\x62\x06proto3')
   ,
   dependencies=[profanedb_dot_protobuf_dot_options__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -30,13 +30,13 @@ _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 _EXTERNALNESTED = _descriptor.Descriptor(
   name='ExternalNested',
-  full_name='test.ExternalNested',
+  full_name='schema.ExternalNested',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='field_one_double', full_name='test.ExternalNested.field_one_double', index=0,
+      name='field_one_double', full_name='schema.ExternalNested.field_one_double', index=0,
       number=1, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -54,8 +54,8 @@ _EXTERNALNESTED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=56,
-  serialized_end=105,
+  serialized_start=58,
+  serialized_end=107,
 )
 
 DESCRIPTOR.message_types_by_name['ExternalNested'] = _EXTERNALNESTED
@@ -63,7 +63,7 @@ DESCRIPTOR.message_types_by_name['ExternalNested'] = _EXTERNALNESTED
 ExternalNested = _reflection.GeneratedProtocolMessageType('ExternalNested', (_message.Message,), dict(
   DESCRIPTOR = _EXTERNALNESTED,
   __module__ = 'nested_pb2'
-  # @@protoc_insertion_point(class_scope:test.ExternalNested)
+  # @@protoc_insertion_point(class_scope:schema.ExternalNested)
   ))
 _sym_db.RegisterMessage(ExternalNested)
 

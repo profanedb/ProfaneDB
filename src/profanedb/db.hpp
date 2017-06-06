@@ -48,7 +48,10 @@ public:
     
     bool Put(const Message & message)
     {
-        this->storage->Store(this->marshaller->Marshal(message));
+        const protobuf::MessageTreeNode & messageTree = this->marshaller->Marshal(message);
+        
+        // TODO Iterate over MessageTreeNode and store all
+        this->storage->Store(messageTree.message());
         
         // TODO Check exceptions
         return true;

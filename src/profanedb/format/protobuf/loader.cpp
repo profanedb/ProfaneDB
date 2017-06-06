@@ -32,13 +32,21 @@ using google::protobuf::Descriptor;
 using google::protobuf::DescriptorProto;
 using google::protobuf::FieldDescriptor;
 using google::protobuf::FieldDescriptorProto_Type;
+using google::protobuf::DescriptorPool;
 
 using profanedb::protobuf::Key;
 
 profanedb::format::protobuf::Loader::RootSourceTree::RootSourceTree(std::initializer_list<path> paths)
+  : paths(paths)
 {
-    for (const auto & path: paths)
+    if (paths.size() == 0)
+        throw std::runtime_error("Mapping is empty");
+    
+    for (const auto & path: paths) {
         this->MapPath("", path.string());
+        
+        BOOST_LOG_TRIVIAL(debug) << "Mapping " << path.string();
+    }
     
     ZeroCopyInputStream * inputStream = this->Open("");
     if (inputStream == nullptr)
@@ -62,14 +70,22 @@ profanedb::format::protobuf::Loader::Loader(
     // Just in case schema is defined in more than one place
     for (const auto & path: schemaSourceTree->paths) {
         
+        BOOST_LOG_TRIVIAL(debug) << "Loading schema at " << path.string();
+        
         // Iterate through all files in that mapped path
         for (const auto & file: recursive_directory_iterator(path, symlink_option::recurse)) {
             
             // Only consider files ending in .proto
             // TODO This might be configured differently
             if (file.path().extension() == ".proto") {
+                
                 // The file is now retrieved, and its path for Protobuf must be relative to the mapping
-                this->ParseFile(schemaPool.FindFileByName(file.path().lexically_relative(path).string()));
+                // it's parsed, normalized (nested keyable messages are removed)
+                FileDescriptorProto normalizedProto = this->ParseFile(schemaPool.FindFileByName(file.path().lexically_relative(path).string()));
+                
+                BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto.name();
+                // The normalizedDescriptorDb keeps these new Descriptors
+                this->normalizedDescriptorDb.AddAndOwn(&normalizedProto);
             }
         }
     }
@@ -78,13 +94,16 @@ profanedb::format::protobuf::Loader::Loader(
 FileDescriptorProto profanedb::format::protobuf::Loader::ParseFile(
     const FileDescriptor * fileDescriptor)
 {
+    BOOST_LOG_TRIVIAL(debug) << "Parsing file " << fileDescriptor->name();
+    // BOOST_LOG_TRIVIAL(trace) << fileDescriptor->DebugString(); // Redundant, is done for each message later
+
     // A FileDescriptorProto is needed to edit messages and populate the normalized descriptor database
     FileDescriptorProto normFileDescProto;
     fileDescriptor->CopyTo(&normFileDescProto);
     
     // For each message in the file...
     for (int i = 0; i < fileDescriptor->message_type_count(); i++) {
-        // ... parse it, make nested messages Key objects
+        // ... parse it, make nested messages of type profanedb.protobuf.Key
         *normFileDescProto.mutable_message_type(i) = this->ParseAndNormalizeDescriptor(fileDescriptor->message_type(i));
     }
     
@@ -94,6 +113,9 @@ FileDescriptorProto profanedb::format::protobuf::Loader::ParseFile(
 DescriptorProto profanedb::format::protobuf::Loader::ParseAndNormalizeDescriptor(
     const Descriptor * descriptor)
 {
+    BOOST_LOG_TRIVIAL(debug) << "Parsing descriptor " << descriptor->full_name();
+    BOOST_LOG_TRIVIAL(trace) << descriptor->DebugString();
+    
     DescriptorProto normDescProto;
     descriptor->CopyTo(&normDescProto);
     
@@ -117,6 +139,10 @@ DescriptorProto profanedb::format::protobuf::Loader::ParseAndNormalizeDescriptor
             normDescProto.mutable_field(k)->set_type(
                 FieldDescriptorProto_Type::FieldDescriptorProto_Type_TYPE_MESSAGE); // Redundant, is message already
             normDescProto.mutable_field(k)->set_type_name(Key::descriptor()->full_name()); // TODO Should include Key in normalizedPool
+            
+            BOOST_LOG_TRIVIAL(trace) << "Message " << descriptor->name()
+                                     << " has keyable nested message " << field->name()
+                                     << " of type " << nestedMessage->name();
         }
     }
     
@@ -133,13 +159,12 @@ bool profanedb::format::protobuf::Loader::IsKeyable(const Descriptor * descripto
     return false;
 }
 
-const google::protobuf::DescriptorPool & profanedb::format::protobuf::Loader::GetSchemaPool() const
+const DescriptorPool & profanedb::format::protobuf::Loader::GetSchemaPool() const
 {
     return this->schemaPool;
 }
 
-const google::protobuf::DescriptorPool & profanedb::format::protobuf::Loader::GetNormalizedPool() const
+const DescriptorPool & profanedb::format::protobuf::Loader::GetNormalizedPool() const
 {
     return this->normalizedPool;
 }
-

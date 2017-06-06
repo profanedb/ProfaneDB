@@ -28,6 +28,7 @@
 #include <google/protobuf/compiler/importer.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/log/trivial.hpp>
 
 namespace profanedb {
 namespace format {

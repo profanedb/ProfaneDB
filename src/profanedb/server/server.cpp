@@ -25,15 +25,22 @@ using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
 using profanedb::vault::Storage;
 using RocksStorage = profanedb::vault::rocksdb::Storage;
 
+using namespace profanedb::protobuf;
+
 using google::protobuf::Message;
 
 using grpc::ServerBuilder;
+using grpc::ServerContext;
+using grpc::Status;
 
-profanedb::server::Server::Server()
+namespace profanedb {
+namespace server {
+
+Server::Server()
 {
     // TODO Config
     boost::log::core::get()->set_filter(
-        boost::log::trivial::severity >= boost::log::trivial::debug
+        boost::log::trivial::severity >= boost::log::trivial::trace
     );
     
     // TODO Config
@@ -58,16 +65,15 @@ profanedb::server::Server::Server()
     
     auto marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
     
-    service = std::make_unique<DbServiceImpl>(
-        std::make_unique< profanedb::Db<Message> >(storage, marshaller));
+    service = std::make_unique<DbServiceImpl>(storage, marshaller);
 }
 
-profanedb::server::Server::~Server()
+Server::~Server()
 {
     server->Shutdown();
 }
 
-void profanedb::server::Server::Run()
+void Server::Run()
 {
     std::string address("0.0.0.0:50051");
 
@@ -83,38 +89,53 @@ void profanedb::server::Server::Run()
     HandleRpcs();
 }
 
-void profanedb::server::Server::HandleRpcs()
+void Server::HandleRpcs()
 {
     server->Wait();
 }
 
-profanedb::server::Server::DbServiceImpl::DbServiceImpl(std::unique_ptr< profanedb::Db<Message> > profane)
-  : profane(std::move(profane))
+Server::DbServiceImpl::DbServiceImpl(
+    std::shared_ptr<RocksStorage> storage,
+    std::shared_ptr<ProtobufMarshaller> marshaller)
+  : rocksdbStorage(storage)
+  , protobufMarshaller(marshaller)
+  , profane(std::make_unique< profanedb::Db<Message> >(storage, marshaller))
 {
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp * response)
+Status Server::DbServiceImpl::Get(ServerContext * context, const GetReq * request, GetResp * response)
 {
     BOOST_LOG_TRIVIAL(debug) << "GET request from " << context->peer();
     
     response->mutable_message()->PackFrom(this->profane->Get(request->key()));
     
-    return grpc::Status::OK;
+    return Status::OK;
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response)
+Status Server::DbServiceImpl::Put(ServerContext * context, const PutReq * request, PutResp * response)
 {
     BOOST_LOG_TRIVIAL(debug) << "PUT request from " << context->peer();
     
-    // TODO Unpack
-    // this->profanedb.Put(request->serializable());
+    // Because the incoming request brings a google::protobuf::Any message,
+    // we must dynamically create the actual message according to its type
+    // (which comes with `type.googleapis.com/` prepended)
+    std::string type = request->serializable().type_url();
+    Message * unpackedMessage =
+      this->protobufMarshaller->CreateMessage(ProtobufMarshaller::SCHEMA, type.substr(type.rfind('/')+1, std::string::npos));
+
+    request->serializable().UnpackTo(unpackedMessage);
+
+    this->profane->Put(*unpackedMessage);
     
-    return grpc::Status::OK;
+    return Status::OK;
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response)
+Status Server::DbServiceImpl::Delete(ServerContext * context, const DelReq * request, DelResp * response)
 {
     BOOST_LOG_TRIVIAL(debug) << "DELETE request from " << context->peer();
     
-    return grpc::Status::OK;
+    return Status::OK;
+}
+
+}
 }

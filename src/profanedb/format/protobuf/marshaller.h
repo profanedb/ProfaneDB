@@ -42,11 +42,16 @@ class Marshaller : public profanedb::format::Marshaller<google::protobuf::Messag
 public:
     Marshaller(
         std::shared_ptr<profanedb::vault::Storage> storage,
-        std::shared_ptr<Loader> loader
-    );
+        std::shared_ptr<Loader> loader);
     
     virtual profanedb::protobuf::MessageTreeNode Marshal(const google::protobuf::Message & message) override;
     virtual const google::protobuf::Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) override;
+    
+    enum MessagePool {
+        SCHEMA,
+        NORMALIZED
+    };
+    google::protobuf::Message * CreateMessage(MessagePool pool, std::string type);
     
 private:
     // Loader contains the schemaPool and normalizedPool

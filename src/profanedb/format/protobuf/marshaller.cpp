@@ -31,7 +31,11 @@ using profanedb::protobuf::MessageTreeNode;
 using profanedb::protobuf::StorableMessage;
 using profanedb::protobuf::Key;
 
-profanedb::format::protobuf::Marshaller::Marshaller(
+namespace profanedb {
+namespace format {
+namespace protobuf {
+
+Marshaller::Marshaller(
     std::shared_ptr<Storage> storage,
     std::shared_ptr<Loader> loader)
   : loader(loader)
@@ -39,15 +43,14 @@ profanedb::format::protobuf::Marshaller::Marshaller(
 {
 }
 
-MessageTreeNode profanedb::format::protobuf::Marshaller::Marshal(const Message & message)
+MessageTreeNode Marshaller::Marshal(const Message & message)
 {
     MessageTreeNode messageTree;
     
     // The normalized message will be filled with data coming from input message,
     // replacing references to other objects with their keys.
     // It will then be serialized and set as storable message payload in messageTree;
-    Message * normalizedMessage = 
-        this->messageFactory.GetPrototype(loader->GetNormalizedPool().FindMessageTypeByName(message.GetTypeName()))->New();
+    Message * normalizedMessage = this->CreateMessage(NORMALIZED, message.GetTypeName());
     
     // Only fields which are set in the message are processed
     std::vector< const FieldDescriptor * > setFields;
@@ -96,15 +99,13 @@ MessageTreeNode profanedb::format::protobuf::Marshaller::Marshal(const Message &
     return messageTree;
 }
 
-const Message & profanedb::format::protobuf::Marshaller::Unmarshal(const StorableMessage & storable)
+const Message & Marshaller::Unmarshal(const StorableMessage & storable)
 {
     // An empty normalized message is generated using the Key
-    Message * normalizedMessage = this->messageFactory.GetPrototype(
-        loader->GetNormalizedPool().FindMessageTypeByName(storable.key().message_type()))->New();
-    
+    Message * normalizedMessage = this->CreateMessage(NORMALIZED, storable.key().message_type());
+
     // The original message is also retrieved
-    Message * originalMessage = this->messageFactory.GetPrototype(
-        loader->GetSchemaPool().FindMessageTypeByName(storable.key().message_type()))->New();
+    Message * originalMessage = this->CreateMessage(SCHEMA, storable.key().message_type());
     
     // StorableMessage payload contains the serialized normalized message,
     // as previously stored into the DB
@@ -146,7 +147,19 @@ const Message & profanedb::format::protobuf::Marshaller::Unmarshal(const Storabl
     return *originalMessage;
 }
 
-void profanedb::format::protobuf::Marshaller::CopyField(
+Message * Marshaller::CreateMessage(Marshaller::MessagePool pool, std::string type)
+{
+    // DescriptorPool is either from Schema or Normalized
+    const DescriptorPool & descriptorPool =
+        (pool == SCHEMA)
+        ? loader->GetSchemaPool()
+        : loader->GetNormalizedPool();
+        
+    // TODO Check whether type exists
+    return this->messageFactory.GetPrototype(descriptorPool.FindMessageTypeByName(type))->New();
+}
+
+void Marshaller::CopyField(
     const FieldDescriptor * fromField,
     const Message & from,
     Message * to)
@@ -208,7 +221,7 @@ void profanedb::format::protobuf::Marshaller::CopyField(
     }
 }
 
-Key profanedb::format::protobuf::Marshaller::FieldToKey(
+Key Marshaller::FieldToKey(
     const Message & message,
     const FieldDescriptor * fd)
 {
@@ -275,4 +288,8 @@ Key profanedb::format::protobuf::Marshaller::FieldToKey(
     }
     
     return key;
+}
+
+}
+}
 }

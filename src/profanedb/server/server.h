@@ -55,15 +55,29 @@ private:
     
     class DbServiceImpl : public profanedb::protobuf::Db::Service {
     public:
-        DbServiceImpl(std::unique_ptr< profanedb::Db<google::protobuf::Message> > profane);
+        DbServiceImpl(
+            std::shared_ptr<profanedb::vault::rocksdb::Storage> storage,
+            std::shared_ptr<profanedb::format::protobuf::Marshaller> marshaller);
         
-        grpc::Status Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp* response) override;
+        grpc::Status Get(
+            grpc::ServerContext * context,
+            const profanedb::protobuf::GetReq * request,
+            profanedb::protobuf::GetResp* response) override;
         
-        grpc::Status Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response) override;
+        grpc::Status Put(
+            grpc::ServerContext * context,
+            const profanedb::protobuf::PutReq * request,
+            profanedb::protobuf::PutResp * response) override;
         
-        grpc::Status Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response) override;
+        grpc::Status Delete(
+            grpc::ServerContext * context,
+            const profanedb::protobuf::DelReq * request,
+            profanedb::protobuf::DelResp * response) override;
         
     private:
+        std::shared_ptr<profanedb::vault::rocksdb::Storage> rocksdbStorage;
+        std::shared_ptr<profanedb::format::protobuf::Marshaller> protobufMarshaller;
+        
         std::unique_ptr< profanedb::Db<google::protobuf::Message> > profane;
     };
     std::unique_ptr<DbServiceImpl> service;

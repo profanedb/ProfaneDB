@@ -221,6 +221,7 @@ void Marshaller::CopyField(
     }
 }
 
+// TODO Should serialize differently... int(123) shouldn't become string("123")
 Key Marshaller::FieldToKey(
     const Message & message,
     const FieldDescriptor * fd)

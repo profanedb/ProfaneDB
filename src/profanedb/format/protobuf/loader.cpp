@@ -65,7 +65,11 @@ profanedb::format::protobuf::Loader::Loader(
 {
     // profanedb.protobuf.options.key is defined in here
     // It is used to mark the primary key on Messages
-    schemaPool.FindFileByName("profanedb/protobuf/options.proto");
+    const FileDescriptor * optionsFile = schemaPool.FindFileByName("profanedb/protobuf/options.proto");
+    FileDescriptorProto optionsProto;
+    optionsFile->CopyTo(&optionsProto);
+    this->normalizedDescriptorDb.AddAndOwn(&optionsProto);
+    BOOST_LOG_TRIVIAL(debug) << "Loading profanedb/protobuf/options.proto and copying to normalized descriptor db";
     
     // Just in case schema is defined in more than one place
     for (const auto & path: schemaSourceTree->paths) {
@@ -114,7 +118,7 @@ DescriptorProto profanedb::format::protobuf::Loader::ParseAndNormalizeDescriptor
     const Descriptor * descriptor)
 {
     BOOST_LOG_TRIVIAL(debug) << "Parsing descriptor " << descriptor->full_name();
-    BOOST_LOG_TRIVIAL(trace) << descriptor->DebugString();
+    BOOST_LOG_TRIVIAL(trace) << std::endl << descriptor->DebugString();
     
     DescriptorProto normDescProto;
     descriptor->CopyTo(&normDescProto);

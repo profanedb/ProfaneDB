@@ -124,6 +124,7 @@ Status Server::DbServiceImpl::Put(ServerContext * context, const PutReq * reques
       this->protobufMarshaller->CreateMessage(ProtobufMarshaller::SCHEMA, type.substr(type.rfind('/')+1, std::string::npos));
 
     request->serializable().UnpackTo(unpackedMessage);
+    BOOST_LOG_TRIVIAL(trace) << "Unpacked message" << std::endl << unpackedMessage->DebugString();
 
     this->profane->Put(*unpackedMessage);
     

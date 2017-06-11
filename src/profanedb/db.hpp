@@ -27,6 +27,8 @@
 #include <profanedb/format/marshaller.h>
 #include <profanedb/vault/storage.h>
 
+#include <boost/log/trivial.hpp>
+
 namespace profanedb {
 
 // Db should be the main interface when embedding ProfaneDB
@@ -43,15 +45,19 @@ public:
 
     const Message & Get(const protobuf::Key & key) const
     {
+        BOOST_LOG_TRIVIAL(debug) << "Retrieving " << key.message_type();
+        
         return this->marshaller->Unmarshal(this->storage->Retrieve(key));
     }
     
     bool Put(const Message & message)
     {
+        BOOST_LOG_TRIVIAL(debug) << "Marshalling message for storage";
         const protobuf::MessageTreeNode & messageTree = this->marshaller->Marshal(message);
         
-        // TODO Iterate over MessageTreeNode and store all
-        this->storage->Store(messageTree.message());
+        BOOST_LOG_TRIVIAL(debug) << "Storing " << messageTree.message().key().message_type();
+        
+        this->StoreMessageTree(messageTree);
         
         // TODO Check exceptions
         return true;
@@ -59,7 +65,20 @@ public:
     
     bool Delete(const protobuf::Key & key)
     {
+        BOOST_LOG_TRIVIAL(debug) << "Deleting " << key.message_type();
         // TODO
+    }
+
+protected:
+    // Store a message tree recursively
+    void StoreMessageTree(const protobuf::MessageTreeNode & messageTree)
+    {
+        // Traverse all children messages...
+        for (const auto & child: messageTree.children())
+            this->StoreMessageTree(child);
+        
+        // ... and store from the last nested ones to the root
+        this->storage->Store(messageTree.message());
     }
 
 private:

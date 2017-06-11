@@ -43,7 +43,7 @@ public:
     // mapping all the paths provided to the root ("/") path for easier import.
     // Paths are available for Loader to populate its Pool;
     class RootSourceTree : public google::protobuf::compiler::DiskSourceTree {
-        friend Loader;
+        friend class Loader;
         
     public:
         RootSourceTree(std::initializer_list<boost::filesystem::path> paths);
@@ -76,6 +76,23 @@ private:
     // Check whether a Descriptor has a field with key option set
     bool IsKeyable(const google::protobuf::Descriptor * descriptor) const;
     
+    class BoostLogErrorCollector
+        : public google::protobuf::DescriptorPool::ErrorCollector {
+      virtual void AddError(const std::string & filename,
+                            const std::string & element_name,
+                            const google::protobuf::Message * descriptor,
+                            google::protobuf::DescriptorPool::ErrorCollector::ErrorLocation location,
+                            const std::string & message) override;
+
+      virtual void AddWarning(const std::string & filename,
+                              const std::string & element_name,
+                              const google::protobuf::Message * descriptor,
+                              google::protobuf::DescriptorPool::ErrorCollector::ErrorLocation location,
+                              const std::string & message) override;
+    };
+//    google::protobuf::DescriptorPool::ErrorCollector & errorCollector;
+    BoostLogErrorCollector errorCollector;
+
     std::unique_ptr<RootSourceTree> includeSourceTree;
     std::unique_ptr<RootSourceTree> schemaSourceTree;
     

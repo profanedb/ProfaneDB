@@ -33,10 +33,15 @@ using google::protobuf::DescriptorProto;
 using google::protobuf::FieldDescriptor;
 using google::protobuf::FieldDescriptorProto_Type;
 using google::protobuf::DescriptorPool;
+using google::protobuf::Message;
 
 using profanedb::protobuf::Key;
 
-profanedb::format::protobuf::Loader::RootSourceTree::RootSourceTree(std::initializer_list<path> paths)
+namespace profanedb {
+namespace format {
+namespace protobuf {
+
+Loader::RootSourceTree::RootSourceTree(std::initializer_list<path> paths)
   : paths(paths)
 {
     if (paths.size() == 0)
@@ -53,24 +58,16 @@ profanedb::format::protobuf::Loader::RootSourceTree::RootSourceTree(std::initial
         throw std::runtime_error(this->GetLastErrorMessage());
 }
 
-profanedb::format::protobuf::Loader::Loader(
+Loader::Loader(
     std::unique_ptr<RootSourceTree> include,
     std::unique_ptr<RootSourceTree> schema)
   : includeSourceTree(std::move(include))
   , schemaSourceTree(std::move(schema))
   , includeDb(includeSourceTree.get())
   , schemaDb(schemaSourceTree.get())
-  , schemaPool(new MergedDescriptorDatabase(&includeDb, &schemaDb))
-  , normalizedPool(&normalizedDescriptorDb)
+  , schemaPool(new MergedDescriptorDatabase(&includeDb, &schemaDb), &errorCollector)
+  , normalizedPool(new MergedDescriptorDatabase(&includeDb, &normalizedDescriptorDb), &errorCollector)
 {
-    // profanedb.protobuf.options.key is defined in here
-    // It is used to mark the primary key on Messages
-    const FileDescriptor * optionsFile = schemaPool.FindFileByName("profanedb/protobuf/options.proto");
-    FileDescriptorProto optionsProto;
-    optionsFile->CopyTo(&optionsProto);
-    this->normalizedDescriptorDb.AddAndOwn(&optionsProto);
-    BOOST_LOG_TRIVIAL(debug) << "Loading profanedb/protobuf/options.proto and copying to normalized descriptor db";
-    
     // Just in case schema is defined in more than one place
     for (const auto & path: schemaSourceTree->paths) {
         
@@ -89,13 +86,13 @@ profanedb::format::protobuf::Loader::Loader(
                 
                 BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto.name();
                 // The normalizedDescriptorDb keeps these new Descriptors
-                this->normalizedDescriptorDb.AddAndOwn(&normalizedProto);
+                normalizedDescriptorDb.AddAndOwn(&normalizedProto);
             }
         }
     }
 }
 
-FileDescriptorProto profanedb::format::protobuf::Loader::ParseFile(
+FileDescriptorProto Loader::ParseFile(
     const FileDescriptor * fileDescriptor)
 {
     BOOST_LOG_TRIVIAL(debug) << "Parsing file " << fileDescriptor->name();
@@ -114,7 +111,7 @@ FileDescriptorProto profanedb::format::protobuf::Loader::ParseFile(
     return normFileDescProto;
 }
 
-DescriptorProto profanedb::format::protobuf::Loader::ParseAndNormalizeDescriptor(
+DescriptorProto Loader::ParseAndNormalizeDescriptor(
     const Descriptor * descriptor)
 {
     BOOST_LOG_TRIVIAL(debug) << "Parsing descriptor " << descriptor->full_name();
@@ -153,7 +150,7 @@ DescriptorProto profanedb::format::protobuf::Loader::ParseAndNormalizeDescriptor
     return normDescProto;
 }
 
-bool profanedb::format::protobuf::Loader::IsKeyable(const Descriptor * descriptor) const
+bool Loader::IsKeyable(const Descriptor * descriptor) const
 {
     for (int i = 0; i < descriptor->field_count(); i++) {
         // If any field in message has profanedb::protobuf::options::key set
@@ -163,12 +160,36 @@ bool profanedb::format::protobuf::Loader::IsKeyable(const Descriptor * descripto
     return false;
 }
 
-const DescriptorPool & profanedb::format::protobuf::Loader::GetSchemaPool() const
+const DescriptorPool & Loader::GetSchemaPool() const
 {
     return this->schemaPool;
 }
 
-const DescriptorPool & profanedb::format::protobuf::Loader::GetNormalizedPool() const
+const DescriptorPool & Loader::GetNormalizedPool() const
 {
     return this->normalizedPool;
+}
+
+void Loader::BoostLogErrorCollector::AddError(
+    const std::string & filename,
+    const std::string & element_name,
+    const Message * descriptor,
+    DescriptorPool::ErrorCollector::ErrorLocation location,
+    const std::string & message)
+{
+    BOOST_LOG_TRIVIAL(error) << message;
+}
+
+void Loader::BoostLogErrorCollector::AddWarning(
+    const std::string & filename,
+    const std::string & element_name,
+    const Message * descriptor,
+    DescriptorPool::ErrorCollector::ErrorLocation location,
+    const std::string & message)
+{
+    BOOST_LOG_TRIVIAL(warning) << message;
+}
+
+}
+}
 }

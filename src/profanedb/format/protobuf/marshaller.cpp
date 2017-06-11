@@ -149,14 +149,24 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
 
 Message * Marshaller::CreateMessage(Marshaller::MessagePool pool, std::string type)
 {
+    BOOST_LOG_TRIVIAL(debug) << "Creating prototype message "
+                             << type
+                             << " from "
+                             << ((pool == SCHEMA) ? "SCHEMA" : "NORMALIZED")
+                             << " pool";
+
     // DescriptorPool is either from Schema or Normalized
     const DescriptorPool & descriptorPool =
         (pool == SCHEMA)
         ? loader->GetSchemaPool()
         : loader->GetNormalizedPool();
+
+    const Descriptor * descriptor = descriptorPool.FindMessageTypeByName(type);
+
+    if (descriptor == nullptr)
+        throw std::runtime_error(type + " doesn't exist");
         
-    // TODO Check whether type exists
-    return this->messageFactory.GetPrototype(descriptorPool.FindMessageTypeByName(type))->New();
+    return this->messageFactory.GetPrototype(descriptor)->New();
 }
 
 void Marshaller::CopyField(

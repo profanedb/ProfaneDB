@@ -29,6 +29,8 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/dynamic_message.h>
 
+#include <boost/log/trivial.hpp>
+
 #include <profanedb/format/marshaller.h>
 
 #include "loader.h"

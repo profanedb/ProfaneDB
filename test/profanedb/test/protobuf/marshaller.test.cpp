@@ -31,9 +31,9 @@ struct Format
         auto storage = std::make_shared<RocksStorage>(std::unique_ptr<rocksdb::DB>(rocks));
         
         auto includeSourceTree = new Loader::RootSourceTree{
-            "/usr/include", "/home/giorgio/Documents/ProfaneDB/ProfaneDBLib/src"};
+            "/usr/include", "/home/giorgio/Documents/ProfaneDB/ProfaneDB/src"};
             
-        auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/ProfaneDBLib/test/profanedb/test/protobuf/schema"};
+        auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/ProfaneDB/test/profanedb/test/protobuf/schema"};
             
         auto loader = std::make_shared<Loader>(
             std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),

@@ -59,14 +59,14 @@ public:
     Loader(
         std::unique_ptr<RootSourceTree> include,
         std::unique_ptr<RootSourceTree> schema);
-    
-    const google::protobuf::DescriptorPool & GetSchemaPool() const;
-    const google::protobuf::DescriptorPool & GetNormalizedPool() const;
 
     enum PoolType {
       SCHEMA,
       NORMALIZED
     };
+
+    // Get either Schema or Normalized pool
+    const google::protobuf::DescriptorPool & GetPool(PoolType poolType) const;
 
     // Retrieve a Descriptor either from Schema or Normalized pool
     const google::protobuf::Descriptor * GetDescriptor(

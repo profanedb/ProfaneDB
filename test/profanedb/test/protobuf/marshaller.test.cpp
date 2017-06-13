@@ -18,7 +18,8 @@ using google::protobuf::Message;
 
 struct Format
 {
-    std::shared_ptr<Marshaller<Message>> marshaller;
+    std::shared_ptr<Loader> loader;
+    std::shared_ptr<ProtobufMarshaller> marshaller;
     
     Format()
     {
@@ -35,15 +36,20 @@ struct Format
             
         auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/ProfaneDB/test/profanedb/test/protobuf/schema"};
             
-        auto loader = std::make_shared<Loader>(
+        this->loader = std::make_shared<Loader>(
             std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),
-                                                   std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
+            std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
             
         this->marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
     }
 };
 
-BOOST_FIXTURE_TEST_CASE(first, Format)
+BOOST_FIXTURE_TEST_CASE(load, Format)
+{
+    loader->GetPool(Loader::SCHEMA).FindFileByName("test.proto");
+}
+
+BOOST_FIXTURE_TEST_CASE(marshal, Format)
 {
     schema::Test message;
     

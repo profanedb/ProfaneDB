@@ -68,6 +68,15 @@ Loader::Loader(
   , schemaPool(new MergedDescriptorDatabase(&includeDb, &schemaDb), &errorCollector)
   , normalizedPool(new MergedDescriptorDatabase(&includeDb, &normalizedDescriptorDb), &errorCollector)
 {
+     // profanedb.protobuf.options.key is defined in here
+     // It is used to mark the primary key on Messages
+     const FileDescriptor * optionsFile = schemaPool.FindFileByName("profanedb/protobuf/options.proto");
+     FileDescriptorProto optionsProto;
+     optionsFile->CopyTo(&optionsProto);
+     normalizedDescriptorDb.AddAndOwn(&optionsProto);
+
+     BOOST_LOG_TRIVIAL(debug) << "Loading profanedb/protobuf/options.proto and copying to normalized descriptor db";
+
     // Just in case schema is defined in more than one place
     for (const auto & path: schemaSourceTree->paths) {
         
@@ -82,11 +91,13 @@ Loader::Loader(
                 
                 // The file is now retrieved, and its path for Protobuf must be relative to the mapping
                 // it's parsed, normalized (nested keyable messages are removed)
-                FileDescriptorProto normalizedProto = this->ParseFile(schemaPool.FindFileByName(file.path().lexically_relative(path).string()));
+                FileDescriptorProto normalizedProto = this->ParseFile(
+                      schemaPool.FindFileByName(file.path().lexically_relative(path).string()));
                 
                 BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto.name();
                 // The normalizedDescriptorDb keeps these new Descriptors
                 normalizedDescriptorDb.AddAndOwn(&normalizedProto);
+                normalizedPool.FindFileByName(normalizedProto.name());
             }
         }
     }
@@ -160,22 +171,13 @@ bool Loader::IsKeyable(const Descriptor * descriptor) const
     return false;
 }
 
-const DescriptorPool & Loader::GetSchemaPool() const
+const DescriptorPool & Loader::GetPool(PoolType poolType) const
 {
-    return this->schemaPool;
-}
-
-const DescriptorPool & Loader::GetNormalizedPool() const
-{
-    return this->normalizedPool;
+    return (poolType == SCHEMA) ? this->schemaPool : this->normalizedPool;
 }
 
 const Descriptor * Loader::GetDescriptor(PoolType poolType, std::string typeName) const
 {
-    const DescriptorPool & pool = ((poolType == SCHEMA)
-                                   ? this->schemaPool
-                                   : this->normalizedPool);
-
     BOOST_LOG_TRIVIAL(debug) << "Getting descriptor "
                              << typeName
                              << " from "
@@ -184,7 +186,7 @@ const Descriptor * Loader::GetDescriptor(PoolType poolType, std::string typeName
                                 : "NORMALIZED")
                              << " pool";
 
-    const Descriptor * descriptor = pool.FindMessageTypeByName(typeName);
+    const Descriptor * descriptor = this->GetPool(poolType).FindMessageTypeByName(typeName);
 
     if (descriptor == NULL)
         throw std::runtime_error(typeName + " doesn't exist");

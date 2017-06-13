@@ -49,12 +49,6 @@ public:
     virtual profanedb::protobuf::MessageTreeNode Marshal(const google::protobuf::Message & message) override;
     virtual const google::protobuf::Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) override;
     
-    enum MessagePool {
-        SCHEMA,
-        NORMALIZED
-    };
-    google::protobuf::Message * CreateMessage(MessagePool pool, std::string type);
-    
 private:
     // Loader contains the schemaPool and normalizedPool
     const std::shared_ptr<Loader> loader;
@@ -62,8 +56,6 @@ private:
     // Because a StorableMessage only holds references to its children objects,
     // Storage is used to recursively retrieve them.
     const std::shared_ptr<profanedb::vault::Storage> storage;
-    
-    google::protobuf::DynamicMessageFactory messageFactory;
     
     // Copy a field from a message to another.
     // Differs from MergeFrom because it doesn't check whether Descriptors match.

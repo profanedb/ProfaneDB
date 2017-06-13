@@ -24,8 +24,9 @@
 #include <profanedb/protobuf/storage.pb.h>
 
 #include <google/protobuf/io/zero_copy_stream.h>
-#include <google/protobuf/descriptor.h>
 #include <google/protobuf/compiler/importer.h>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/dynamic_message.h>
 
 #include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
@@ -61,6 +62,20 @@ public:
     
     const google::protobuf::DescriptorPool & GetSchemaPool() const;
     const google::protobuf::DescriptorPool & GetNormalizedPool() const;
+
+    enum PoolType {
+      SCHEMA,
+      NORMALIZED
+    };
+
+    // Retrieve a Descriptor either from Schema or Normalized pool
+    const google::protobuf::Descriptor * GetDescriptor(
+        PoolType poolType,
+        std::string typeName) const;
+
+    // Create a prototype Message from defined pool
+    // (Should use `CreateMessage()->New() to get an empty Message from the prototype)
+    const google::protobuf::Message * CreateMessage(PoolType poolType, std::string typeName);
     
 private:
     // Given a Protobuf FileDescriptor from the pool, parse all of its messages,
@@ -90,7 +105,6 @@ private:
                               google::protobuf::DescriptorPool::ErrorCollector::ErrorLocation location,
                               const std::string & message) override;
     };
-//    google::protobuf::DescriptorPool::ErrorCollector & errorCollector;
     BoostLogErrorCollector errorCollector;
 
     std::unique_ptr<RootSourceTree> includeSourceTree;
@@ -107,6 +121,9 @@ private:
     // For each keyable message in schema, there is a normalized version
     // which has Key in place of nested keyable messages
     google::protobuf::DescriptorPool normalizedPool;
+
+    // The message factory is used to create new messages from the pools
+    google::protobuf::DynamicMessageFactory messageFactory;
 };
 }
 }

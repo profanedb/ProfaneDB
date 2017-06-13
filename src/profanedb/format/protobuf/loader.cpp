@@ -170,6 +170,38 @@ const DescriptorPool & Loader::GetNormalizedPool() const
     return this->normalizedPool;
 }
 
+const Descriptor * Loader::GetDescriptor(PoolType poolType, std::string typeName) const
+{
+    const DescriptorPool & pool = ((poolType == SCHEMA)
+                                   ? this->schemaPool
+                                   : this->normalizedPool);
+
+    BOOST_LOG_TRIVIAL(debug) << "Getting descriptor "
+                             << typeName
+                             << " from "
+                             << ((poolType == SCHEMA)
+                                ? "SCHEMA"
+                                : "NORMALIZED")
+                             << " pool";
+
+    const Descriptor * descriptor = pool.FindMessageTypeByName(typeName);
+
+    if (descriptor == NULL)
+        throw std::runtime_error(typeName + " doesn't exist");
+
+    BOOST_LOG_TRIVIAL(trace) << std::endl << descriptor->DebugString();
+
+    return descriptor;
+}
+
+const Message * Loader::CreateMessage(PoolType poolType, std::string typeName)
+{
+    BOOST_LOG_TRIVIAL(debug) << "Creating message " << typeName;
+
+    return this->messageFactory.GetPrototype(
+          this->GetDescriptor(poolType, typeName));
+}
+
 void Loader::BoostLogErrorCollector::AddError(
     const std::string & filename,
     const std::string & element_name,

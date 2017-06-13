@@ -70,10 +70,10 @@ Loader::Loader(
 {
      // profanedb.protobuf.options.key is defined in here
      // It is used to mark the primary key on Messages
-     const FileDescriptor * optionsFile = schemaPool.FindFileByName("profanedb/protobuf/options.proto");
-     FileDescriptorProto optionsProto;
-     optionsFile->CopyTo(&optionsProto);
-     normalizedDescriptorDb.AddAndOwn(&optionsProto);
+//      const FileDescriptor * optionsFile = schemaPool.FindFileByName("profanedb/protobuf/options.proto");
+//      FileDescriptorProto optionsProto;
+//      optionsFile->CopyTo(&optionsProto);
+//      normalizedDescriptorDb.AddAndOwn(&optionsProto);
 
      BOOST_LOG_TRIVIAL(debug) << "Loading profanedb/protobuf/options.proto and copying to normalized descriptor db";
 
@@ -97,6 +97,7 @@ Loader::Loader(
                 BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto.name();
                 // The normalizedDescriptorDb keeps these new Descriptors
                 normalizedDescriptorDb.AddAndOwn(&normalizedProto);
+                
                 normalizedPool.FindFileByName(normalizedProto.name());
             }
         }

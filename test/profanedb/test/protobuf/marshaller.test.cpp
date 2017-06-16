@@ -41,13 +41,10 @@ struct Format
             std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
             
         this->marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
+        
+        std::cout << loader->GetPool(Loader::SCHEMA).FindMessageTypeByName("schema.Test")->DebugString();
     }
 };
-
-BOOST_FIXTURE_TEST_CASE(load, Format)
-{
-    loader->GetPool(Loader::SCHEMA).FindFileByName("test.proto");
-}
 
 BOOST_FIXTURE_TEST_CASE(marshal, Format)
 {

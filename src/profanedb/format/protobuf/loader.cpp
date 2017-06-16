@@ -75,7 +75,7 @@ Loader::Loader(
 //      optionsFile->CopyTo(&optionsProto);
 //      normalizedDescriptorDb.AddAndOwn(&optionsProto);
 
-     BOOST_LOG_TRIVIAL(debug) << "Loading profanedb/protobuf/options.proto and copying to normalized descriptor db";
+//      BOOST_LOG_TRIVIAL(debug) << "Loading profanedb/protobuf/options.proto and copying to normalized descriptor db";
 
     // Just in case schema is defined in more than one place
     for (const auto & path: schemaSourceTree->paths) {
@@ -98,6 +98,9 @@ Loader::Loader(
                 // The normalizedDescriptorDb keeps these new Descriptors
                 normalizedDescriptorDb.AddAndOwn(&normalizedProto);
                 
+                FileDescriptorProto * proto = new FileDescriptorProto();
+                normalizedDescriptorDb.FindFileByName(normalizedProto.name(), proto);
+                // HACK DEBUG 
                 normalizedPool.FindFileByName(normalizedProto.name());
             }
         }

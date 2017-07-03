@@ -91,53 +91,53 @@ Loader::Loader(
                 
                 // The file is now retrieved, and its path for Protobuf must be relative to the mapping
                 // it's parsed, normalized (nested keyable messages are removed)
-                FileDescriptorProto normalizedProto = this->ParseFile(
+                FileDescriptorProto * normalizedProto = this->ParseFile(
                       schemaPool.FindFileByName(file.path().lexically_relative(path).string()));
                 
-                BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto.name();
+                BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto->name();
+                BOOST_LOG_TRIVIAL(trace) << std::endl << normalizedProto->DebugString();
                 // The normalizedDescriptorDb keeps these new Descriptors
-                normalizedDescriptorDb.AddAndOwn(&normalizedProto);
-                
-                FileDescriptorProto * proto = new FileDescriptorProto();
-                normalizedDescriptorDb.FindFileByName(normalizedProto.name(), proto);
-                // HACK DEBUG 
-                normalizedPool.FindFileByName(normalizedProto.name());
+                normalizedDescriptorDb.AddAndOwn(normalizedProto);
             }
         }
     }
 }
 
-FileDescriptorProto Loader::ParseFile(
+FileDescriptorProto * Loader::ParseFile(
     const FileDescriptor * fileDescriptor)
 {
     BOOST_LOG_TRIVIAL(debug) << "Parsing file " << fileDescriptor->name();
     // BOOST_LOG_TRIVIAL(trace) << fileDescriptor->DebugString(); // Redundant, is done for each message later
 
     // A FileDescriptorProto is needed to edit messages and populate the normalized descriptor database
-    FileDescriptorProto normFileDescProto;
-    fileDescriptor->CopyTo(&normFileDescProto);
+    FileDescriptorProto * normFileDescProto = new FileDescriptorProto;
+    fileDescriptor->CopyTo(normFileDescProto);
+                
+    // storage.proto dependency must be added
+    // as profanedb.protobuf.Key is used in normalized messages
+    *normFileDescProto->add_dependency() = "profanedb/protobuf/storage.proto";
     
     // For each message in the file...
     for (int i = 0; i < fileDescriptor->message_type_count(); i++) {
         // ... parse it, make nested messages of type profanedb.protobuf.Key
-        *normFileDescProto.mutable_message_type(i) = this->ParseAndNormalizeDescriptor(fileDescriptor->message_type(i));
+        *normFileDescProto->mutable_message_type(i) = *this->ParseAndNormalizeDescriptor(fileDescriptor->message_type(i));
     }
     
     return normFileDescProto;
 }
 
-DescriptorProto Loader::ParseAndNormalizeDescriptor(
+DescriptorProto * Loader::ParseAndNormalizeDescriptor(
     const Descriptor * descriptor)
 {
     BOOST_LOG_TRIVIAL(debug) << "Parsing descriptor " << descriptor->full_name();
     BOOST_LOG_TRIVIAL(trace) << std::endl << descriptor->DebugString();
     
-    DescriptorProto normDescProto;
-    descriptor->CopyTo(&normDescProto);
+    DescriptorProto * normDescProto = new DescriptorProto;
+    descriptor->CopyTo(normDescProto);
     
     // Recurse for all messages DEFINED within this message
     for (int j = 0; j < descriptor->nested_type_count(); j++) {
-        *normDescProto.mutable_nested_type(j) = this->ParseAndNormalizeDescriptor(descriptor->nested_type(j));
+        *normDescProto->mutable_nested_type(j) = *this->ParseAndNormalizeDescriptor(descriptor->nested_type(j));
     }
         
     // Now the actual Descriptor normalization
@@ -149,12 +149,12 @@ DescriptorProto Loader::ParseAndNormalizeDescriptor(
         
         // If this field is effectively a message,
         // and that Message is keyable...
-        if(nestedMessage != nullptr && this->IsKeyable(nestedMessage)) {
+        if(nestedMessage != NULL && this->IsKeyable(nestedMessage)) {
             // ... make the field in the normalized descriptor a Key object
             // TODO Maybe we could use an option here as well
-            normDescProto.mutable_field(k)->set_type(
+            normDescProto->mutable_field(k)->set_type(
                 FieldDescriptorProto_Type::FieldDescriptorProto_Type_TYPE_MESSAGE); // Redundant, is message already
-            normDescProto.mutable_field(k)->set_type_name(Key::descriptor()->full_name()); // TODO Should include Key in normalizedPool
+            normDescProto->mutable_field(k)->set_type_name(Key::descriptor()->full_name()); // TODO Should include Key in normalizedPool
             
             BOOST_LOG_TRIVIAL(trace) << "Message " << descriptor->name()
                                      << " has keyable nested message " << field->name()

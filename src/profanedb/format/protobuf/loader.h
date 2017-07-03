@@ -81,11 +81,11 @@ private:
     // Given a Protobuf FileDescriptor from the pool, parse all of its messages,
     // find the keyable messages, and return a FileDescriptorProto,
     // ready to be put in the normalizedDescriptorDb
-    google::protobuf::FileDescriptorProto ParseFile(
+    google::protobuf::FileDescriptorProto * ParseFile(
         const google::protobuf::FileDescriptor * fileDescriptor);
     
     // Parse a Descriptor and its nested messages
-    google::protobuf::DescriptorProto ParseAndNormalizeDescriptor(
+    google::protobuf::DescriptorProto * ParseAndNormalizeDescriptor(
         const google::protobuf::Descriptor * descriptor);
     
     // Check whether a Descriptor has a field with key option set

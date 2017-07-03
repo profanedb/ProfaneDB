@@ -142,7 +142,8 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
                 ->MutableMessage(originalMessage, originalField)
                 ->MergeFrom(nestedMessage);
         }
-        else {
+        else { // if field is not a reference
+            
             // Just like in Marshal, other fields are simply copied over,
             // as normalized and original descriptors look the same except for nested keyable messages
             this->CopyField(normalizedField, *normalizedMessage, originalMessage);

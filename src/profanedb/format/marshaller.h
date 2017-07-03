@@ -36,4 +36,3 @@ public:
 }
 
 #endif // PROFANEDB_FORMAT_MARSHALLER_H
-

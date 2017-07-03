@@ -2,6 +2,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <profanedb/test/protobuf/schema/test.pb.h>
+#include <profanedb/protobuf/storage.pb.h>
 
 #include <profanedb/format/protobuf/marshaller.h>
 #include <profanedb/vault/rocksdb/storage.h>
@@ -10,6 +11,7 @@ using profanedb::format::protobuf::Loader;
 using profanedb::format::Marshaller;
 using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
 using profanedb::vault::Storage;
+using profanedb::protobuf::MessageTreeNode;
 
 // FIXME Should mock this
 using RocksStorage = profanedb::vault::rocksdb::Storage;
@@ -41,16 +43,14 @@ struct Format
             std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
             
         this->marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
-        
-        std::cout << loader->GetPool(Loader::SCHEMA).FindMessageTypeByName("schema.Test")->DebugString();
     }
 };
 
 BOOST_FIXTURE_TEST_CASE(marshal, Format)
 {
     schema::Test message;
-    
     BOOST_TEST_MESSAGE(message.DebugString());
     
-    marshaller->Marshal(message);
+    MessageTreeNode tree = marshaller->Marshal(message);
+    BOOST_TEST_MESSAGE(tree.DebugString());
 }

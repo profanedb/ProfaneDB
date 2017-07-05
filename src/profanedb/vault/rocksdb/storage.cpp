@@ -19,21 +19,28 @@
 
 #include "storage.h"
 
-profanedb::vault::rocksdb::Storage::Storage(std::unique_ptr<DB> rocksDb)
+using profanedb::protobuf::StorableMessage;
+using profanedb::protobuf::Key;
+
+namespace profanedb {
+namespace vault {
+namespace rocksdb {
+
+Storage::Storage(std::unique_ptr<DB> rocksDb)
   : rocksDb(std::move(rocksDb))
 {
 }
 
-void profanedb::vault::rocksdb::Storage::Store(const profanedb::protobuf::StorableMessage & storable)
+void Storage::Store(const StorableMessage & storable)
 {
     this->rocksDb->Put(::rocksdb::WriteOptions(),
                        storable.key().SerializeAsString(),
                        storable.payload());
 }
 
-profanedb::protobuf::StorableMessage profanedb::vault::rocksdb::Storage::Retrieve(const profanedb::protobuf::Key & key) const
+StorableMessage Storage::Retrieve(const Key & key) const
 {
-    protobuf::StorableMessage stored;
+    StorableMessage stored;
     
     *stored.mutable_key() = key;
     
@@ -42,4 +49,8 @@ profanedb::protobuf::StorableMessage profanedb::vault::rocksdb::Storage::Retriev
                        stored.mutable_payload());
     
     return stored;
+}
+
+}
+}
 }

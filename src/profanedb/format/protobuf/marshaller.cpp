@@ -50,7 +50,9 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
     // The normalized message will be filled with data coming from input message,
     // replacing references to other objects with their keys.
     // It will then be serialized and set as storable message payload in messageTree;
-    Message * normalizedMessage = this->CreateMessage(NORMALIZED, message.GetTypeName());
+    Message * normalizedMessage
+        = this->loader->CreateMessage(Loader::NORMALIZED,
+                                      message.GetTypeName())->New();
     
     // Only fields which are set in the message are processed
     std::vector< const FieldDescriptor * > setFields;
@@ -102,10 +104,14 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
 const Message & Marshaller::Unmarshal(const StorableMessage & storable)
 {
     // An empty normalized message is generated using the Key
-    Message * normalizedMessage = this->CreateMessage(NORMALIZED, storable.key().message_type());
+    Message * normalizedMessage
+        = this->loader->CreateMessage(Loader::NORMALIZED,
+                                      storable.key().message_type())->New();
 
     // The original message is also retrieved
-    Message * originalMessage = this->CreateMessage(SCHEMA, storable.key().message_type());
+    Message * originalMessage
+        = this->loader->CreateMessage(Loader::SCHEMA,
+                                      storable.key().message_type())->New();
     
     // StorableMessage payload contains the serialized normalized message,
     // as previously stored into the DB
@@ -136,7 +142,8 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
                 ->MutableMessage(originalMessage, originalField)
                 ->MergeFrom(nestedMessage);
         }
-        else {
+        else { // if field is not a reference
+            
             // Just like in Marshal, other fields are simply copied over,
             // as normalized and original descriptors look the same except for nested keyable messages
             this->CopyField(normalizedField, *normalizedMessage, originalMessage);
@@ -145,18 +152,6 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
         
     
     return *originalMessage;
-}
-
-Message * Marshaller::CreateMessage(Marshaller::MessagePool pool, std::string type)
-{
-    // DescriptorPool is either from Schema or Normalized
-    const DescriptorPool & descriptorPool =
-        (pool == SCHEMA)
-        ? loader->GetSchemaPool()
-        : loader->GetNormalizedPool();
-        
-    // TODO Check whether type exists
-    return this->messageFactory.GetPrototype(descriptorPool.FindMessageTypeByName(type))->New();
 }
 
 void Marshaller::CopyField(

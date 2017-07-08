@@ -29,7 +29,15 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
+namespace google {
+namespace protobuf {
+class Any;
+class AnyDefaultTypeInternal;
+extern AnyDefaultTypeInternal _Any_default_instance_;
+}  // namespace protobuf
+}  // namespace google
 namespace profanedb {
 namespace protobuf {
 class Key;
@@ -245,20 +253,6 @@ class StorableMessage : public ::google::protobuf::Message /* @@protoc_insertion
 
   // accessors -------------------------------------------------------
 
-  // bytes payload = 2;
-  void clear_payload();
-  static const int kPayloadFieldNumber = 2;
-  const ::std::string& payload() const;
-  void set_payload(const ::std::string& value);
-  #if LANG_CXX11
-  void set_payload(::std::string&& value);
-  #endif
-  void set_payload(const char* value);
-  void set_payload(const void* value, size_t size);
-  ::std::string* mutable_payload();
-  ::std::string* release_payload();
-  void set_allocated_payload(::std::string* payload);
-
   // .profanedb.protobuf.Key key = 1;
   bool has_key() const;
   void clear_key();
@@ -268,12 +262,21 @@ class StorableMessage : public ::google::protobuf::Message /* @@protoc_insertion
   ::profanedb::protobuf::Key* release_key();
   void set_allocated_key(::profanedb::protobuf::Key* key);
 
+  // .google.protobuf.Any payload = 2;
+  bool has_payload() const;
+  void clear_payload();
+  static const int kPayloadFieldNumber = 2;
+  const ::google::protobuf::Any& payload() const;
+  ::google::protobuf::Any* mutable_payload();
+  ::google::protobuf::Any* release_payload();
+  void set_allocated_payload(::google::protobuf::Any* payload);
+
   // @@protoc_insertion_point(class_scope:profanedb.protobuf.StorableMessage)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr payload_;
   ::profanedb::protobuf::Key* key_;
+  ::google::protobuf::Any* payload_;
   mutable int _cached_size_;
   friend struct protobuf_profanedb_2fprotobuf_2fstorage_2eproto::TableStruct;
 };
@@ -583,56 +586,42 @@ inline void StorableMessage::set_allocated_key(::profanedb::protobuf::Key* key) 
   // @@protoc_insertion_point(field_set_allocated:profanedb.protobuf.StorableMessage.key)
 }
 
-// bytes payload = 2;
+// .google.protobuf.Any payload = 2;
+inline bool StorableMessage::has_payload() const {
+  return this != internal_default_instance() && payload_ != NULL;
+}
 inline void StorableMessage::clear_payload() {
-  payload_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == NULL && payload_ != NULL) delete payload_;
+  payload_ = NULL;
 }
-inline const ::std::string& StorableMessage::payload() const {
+inline const ::google::protobuf::Any& StorableMessage::payload() const {
   // @@protoc_insertion_point(field_get:profanedb.protobuf.StorableMessage.payload)
-  return payload_.GetNoArena();
+  return payload_ != NULL ? *payload_
+                         : *::google::protobuf::Any::internal_default_instance();
 }
-inline void StorableMessage::set_payload(const ::std::string& value) {
+inline ::google::protobuf::Any* StorableMessage::mutable_payload() {
   
-  payload_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:profanedb.protobuf.StorableMessage.payload)
-}
-#if LANG_CXX11
-inline void StorableMessage::set_payload(::std::string&& value) {
-  
-  payload_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:profanedb.protobuf.StorableMessage.payload)
-}
-#endif
-inline void StorableMessage::set_payload(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  payload_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:profanedb.protobuf.StorableMessage.payload)
-}
-inline void StorableMessage::set_payload(const void* value, size_t size) {
-  
-  payload_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:profanedb.protobuf.StorableMessage.payload)
-}
-inline ::std::string* StorableMessage::mutable_payload() {
-  
+  if (payload_ == NULL) {
+    payload_ = new ::google::protobuf::Any;
+  }
   // @@protoc_insertion_point(field_mutable:profanedb.protobuf.StorableMessage.payload)
-  return payload_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return payload_;
 }
-inline ::std::string* StorableMessage::release_payload() {
+inline ::google::protobuf::Any* StorableMessage::release_payload() {
   // @@protoc_insertion_point(field_release:profanedb.protobuf.StorableMessage.payload)
   
-  return payload_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::google::protobuf::Any* temp = payload_;
+  payload_ = NULL;
+  return temp;
 }
-inline void StorableMessage::set_allocated_payload(::std::string* payload) {
-  if (payload != NULL) {
+inline void StorableMessage::set_allocated_payload(::google::protobuf::Any* payload) {
+  delete payload_;
+  payload_ = payload;
+  if (payload) {
     
   } else {
     
   }
-  payload_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), payload);
   // @@protoc_insertion_point(field_set_allocated:profanedb.protobuf.StorableMessage.payload)
 }
 

@@ -124,11 +124,14 @@ void TableStruct::InitDefaultsImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::internal::InitProtobufDefaults();
+  ::google::protobuf::protobuf_google_2fprotobuf_2fany_2eproto::InitDefaults();
   _Key_default_instance_.DefaultConstruct();
   _StorableMessage_default_instance_.DefaultConstruct();
   _MessageTreeNode_default_instance_.DefaultConstruct();
   _StorableMessage_default_instance_.get_mutable()->key_ = const_cast< ::profanedb::protobuf::Key*>(
       ::profanedb::protobuf::Key::internal_default_instance());
+  _StorableMessage_default_instance_.get_mutable()->payload_ = const_cast< ::google::protobuf::Any*>(
+      ::google::protobuf::Any::internal_default_instance());
   _MessageTreeNode_default_instance_.get_mutable()->message_ = const_cast< ::profanedb::protobuf::StorableMessage*>(
       ::profanedb::protobuf::StorableMessage::internal_default_instance());
 }
@@ -141,21 +144,23 @@ void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] = {
       "\n profanedb/protobuf/storage.proto\022\022prof"
-      "anedb.protobuf\"9\n\003Key\022\024\n\014message_type\030\001 "
-      "\001(\t\022\r\n\005field\030\002 \001(\t\022\r\n\005value\030\003 \001(\014\"H\n\017Sto"
-      "rableMessage\022$\n\003key\030\001 \001(\0132\027.profanedb.pr"
-      "otobuf.Key\022\017\n\007payload\030\002 \001(\014\"~\n\017MessageTr"
-      "eeNode\0224\n\007message\030\001 \001(\0132#.profanedb.prot"
-      "obuf.StorableMessage\0225\n\010children\030\002 \003(\0132#"
-      ".profanedb.protobuf.MessageTreeNodeBU\n\026c"
-      "om.profanedb.protobufZ gitlab.com/profan"
-      "edb/protobuf/db\242\002\003PDB\252\002\022ProfaneDB.Protob"
-      "ufb\006proto3"
+      "anedb.protobuf\032\031google/protobuf/any.prot"
+      "o\"9\n\003Key\022\024\n\014message_type\030\001 \001(\t\022\r\n\005field\030"
+      "\002 \001(\t\022\r\n\005value\030\003 \001(\014\"^\n\017StorableMessage\022"
+      "$\n\003key\030\001 \001(\0132\027.profanedb.protobuf.Key\022%\n"
+      "\007payload\030\002 \001(\0132\024.google.protobuf.Any\"~\n\017"
+      "MessageTreeNode\0224\n\007message\030\001 \001(\0132#.profa"
+      "nedb.protobuf.StorableMessage\0225\n\010childre"
+      "n\030\002 \003(\0132#.profanedb.protobuf.MessageTree"
+      "NodeBU\n\026com.profanedb.protobufZ gitlab.c"
+      "om/profanedb/protobuf/db\242\002\003PDB\252\002\022Profane"
+      "DB.Protobufb\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 410);
+      descriptor, 459);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "profanedb/protobuf/storage.proto", &protobuf_RegisterTypes);
+  ::google::protobuf::protobuf_google_2fprotobuf_2fany_2eproto::AddDescriptors();
   ::google::protobuf::internal::OnShutdown(&TableStruct::Shutdown);
 }
 
@@ -692,21 +697,22 @@ StorableMessage::StorableMessage(const StorableMessage& from)
       _internal_metadata_(NULL),
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  payload_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.payload().size() > 0) {
-    payload_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.payload_);
-  }
   if (from.has_key()) {
     key_ = new ::profanedb::protobuf::Key(*from.key_);
   } else {
     key_ = NULL;
   }
+  if (from.has_payload()) {
+    payload_ = new ::google::protobuf::Any(*from.payload_);
+  } else {
+    payload_ = NULL;
+  }
   // @@protoc_insertion_point(copy_constructor:profanedb.protobuf.StorableMessage)
 }
 
 void StorableMessage::SharedCtor() {
-  payload_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  key_ = NULL;
+  ::memset(&key_, 0, reinterpret_cast<char*>(&payload_) -
+    reinterpret_cast<char*>(&key_) + sizeof(payload_));
   _cached_size_ = 0;
 }
 
@@ -716,9 +722,11 @@ StorableMessage::~StorableMessage() {
 }
 
 void StorableMessage::SharedDtor() {
-  payload_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) {
     delete key_;
+  }
+  if (this != internal_default_instance()) {
+    delete payload_;
   }
 }
 
@@ -747,11 +755,14 @@ StorableMessage* StorableMessage::New(::google::protobuf::Arena* arena) const {
 
 void StorableMessage::Clear() {
 // @@protoc_insertion_point(message_clear_start:profanedb.protobuf.StorableMessage)
-  payload_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == NULL && key_ != NULL) {
     delete key_;
   }
   key_ = NULL;
+  if (GetArenaNoVirtual() == NULL && payload_ != NULL) {
+    delete payload_;
+  }
+  payload_ = NULL;
 }
 
 bool StorableMessage::MergePartialFromCodedStream(
@@ -776,12 +787,12 @@ bool StorableMessage::MergePartialFromCodedStream(
         break;
       }
 
-      // bytes payload = 2;
+      // .google.protobuf.Any payload = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
-                input, this->mutable_payload()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_payload()));
         } else {
           goto handle_unusual;
         }
@@ -821,10 +832,10 @@ void StorableMessage::SerializeWithCachedSizes(
       1, *this->key_, output);
   }
 
-  // bytes payload = 2;
-  if (this->payload().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBytesMaybeAliased(
-      2, this->payload(), output);
+  // .google.protobuf.Any payload = 2;
+  if (this->has_payload()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, *this->payload_, output);
   }
 
   // @@protoc_insertion_point(serialize_end:profanedb.protobuf.StorableMessage)
@@ -843,11 +854,11 @@ void StorableMessage::SerializeWithCachedSizes(
         1, *this->key_, deterministic, target);
   }
 
-  // bytes payload = 2;
-  if (this->payload().size() > 0) {
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteBytesToArray(
-        2, this->payload(), target);
+  // .google.protobuf.Any payload = 2;
+  if (this->has_payload()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageNoVirtualToArray(
+        2, *this->payload_, deterministic, target);
   }
 
   // @@protoc_insertion_point(serialize_to_array_end:profanedb.protobuf.StorableMessage)
@@ -858,18 +869,18 @@ size_t StorableMessage::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:profanedb.protobuf.StorableMessage)
   size_t total_size = 0;
 
-  // bytes payload = 2;
-  if (this->payload().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::BytesSize(
-        this->payload());
-  }
-
   // .profanedb.protobuf.Key key = 1;
   if (this->has_key()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
         *this->key_);
+  }
+
+  // .google.protobuf.Any payload = 2;
+  if (this->has_payload()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        *this->payload_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -901,12 +912,11 @@ void StorableMessage::MergeFrom(const StorableMessage& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.payload().size() > 0) {
-
-    payload_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.payload_);
-  }
   if (from.has_key()) {
     mutable_key()->::profanedb::protobuf::Key::MergeFrom(from.key());
+  }
+  if (from.has_payload()) {
+    mutable_payload()->::google::protobuf::Any::MergeFrom(from.payload());
   }
 }
 
@@ -933,8 +943,8 @@ void StorableMessage::Swap(StorableMessage* other) {
   InternalSwap(other);
 }
 void StorableMessage::InternalSwap(StorableMessage* other) {
-  payload_.Swap(&other->payload_);
   std::swap(key_, other->key_);
+  std::swap(payload_, other->payload_);
   std::swap(_cached_size_, other->_cached_size_);
 }
 
@@ -985,56 +995,42 @@ void StorableMessage::set_allocated_key(::profanedb::protobuf::Key* key) {
   // @@protoc_insertion_point(field_set_allocated:profanedb.protobuf.StorableMessage.key)
 }
 
-// bytes payload = 2;
+// .google.protobuf.Any payload = 2;
+bool StorableMessage::has_payload() const {
+  return this != internal_default_instance() && payload_ != NULL;
+}
 void StorableMessage::clear_payload() {
-  payload_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == NULL && payload_ != NULL) delete payload_;
+  payload_ = NULL;
 }
-const ::std::string& StorableMessage::payload() const {
+const ::google::protobuf::Any& StorableMessage::payload() const {
   // @@protoc_insertion_point(field_get:profanedb.protobuf.StorableMessage.payload)
-  return payload_.GetNoArena();
+  return payload_ != NULL ? *payload_
+                         : *::google::protobuf::Any::internal_default_instance();
 }
-void StorableMessage::set_payload(const ::std::string& value) {
+::google::protobuf::Any* StorableMessage::mutable_payload() {
   
-  payload_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:profanedb.protobuf.StorableMessage.payload)
-}
-#if LANG_CXX11
-void StorableMessage::set_payload(::std::string&& value) {
-  
-  payload_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:profanedb.protobuf.StorableMessage.payload)
-}
-#endif
-void StorableMessage::set_payload(const char* value) {
-  GOOGLE_DCHECK(value != NULL);
-  
-  payload_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:profanedb.protobuf.StorableMessage.payload)
-}
-void StorableMessage::set_payload(const void* value, size_t size) {
-  
-  payload_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:profanedb.protobuf.StorableMessage.payload)
-}
-::std::string* StorableMessage::mutable_payload() {
-  
+  if (payload_ == NULL) {
+    payload_ = new ::google::protobuf::Any;
+  }
   // @@protoc_insertion_point(field_mutable:profanedb.protobuf.StorableMessage.payload)
-  return payload_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return payload_;
 }
-::std::string* StorableMessage::release_payload() {
+::google::protobuf::Any* StorableMessage::release_payload() {
   // @@protoc_insertion_point(field_release:profanedb.protobuf.StorableMessage.payload)
   
-  return payload_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::google::protobuf::Any* temp = payload_;
+  payload_ = NULL;
+  return temp;
 }
-void StorableMessage::set_allocated_payload(::std::string* payload) {
-  if (payload != NULL) {
+void StorableMessage::set_allocated_payload(::google::protobuf::Any* payload) {
+  delete payload_;
+  payload_ = payload;
+  if (payload) {
     
   } else {
     
   }
-  payload_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), payload);
   // @@protoc_insertion_point(field_set_allocated:profanedb.protobuf.StorableMessage.payload)
 }
 

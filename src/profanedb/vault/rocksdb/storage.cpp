@@ -33,9 +33,14 @@ Storage::Storage(std::unique_ptr<DB> rocksDb)
 
 void Storage::Store(const StorableMessage & storable)
 {
+    // Type is actually duplicated, as it is there in key as well,
+    // if needed storage space could be reduced by storing only the payload part of Any
+    std::string serializedPayload;
+    storable.payload().SerializeToString(&serializedPayload);
+    
     this->rocksDb->Put(::rocksdb::WriteOptions(),
                        storable.key().SerializeAsString(),
-                       storable.payload());
+                       serializedPayload);
 }
 
 StorableMessage Storage::Retrieve(const Key & key) const
@@ -44,9 +49,13 @@ StorableMessage Storage::Retrieve(const Key & key) const
     
     *stored.mutable_key() = key;
     
+    std::string serializedPayload;
+    
     this->rocksDb->Get(::rocksdb::ReadOptions(),
                        key.SerializeAsString(),
-                       stored.mutable_payload());
+                       &serializedPayload);
+    
+    stored.mutable_payload()->ParseFromString(serializedPayload);
     
     return stored;
 }

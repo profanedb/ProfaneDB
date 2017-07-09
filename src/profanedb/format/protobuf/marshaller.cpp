@@ -96,7 +96,7 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
     
     // Now that normalizedMessage has been populated with the correct data,
     // actual marshalling (or serialization) occurs
-    normalizedMessage->SerializeToString(messageTree.mutable_message()->mutable_payload());
+    messageTree.mutable_message()->mutable_payload()->PackFrom(*normalizedMessage);
     
     return messageTree;
 }
@@ -115,7 +115,7 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
     
     // StorableMessage payload contains the serialized normalized message,
     // as previously stored into the DB
-    normalizedMessage->ParseFromString(storable.payload());
+    storable.payload().UnpackTo(normalizedMessage);
     
     // Similarly to Marshal, set fields are retrieved
     std::vector< const FieldDescriptor * > setFields;
@@ -227,12 +227,15 @@ Key Marshaller::FieldToKey(
     
     const Reflection * reflection = message.GetReflection();
     
+// TODO If concatenating strings, and they contain the separator, it might mess up,
+// we need something much more stable than this
+#define REP_SEP "$"
     if (fd->is_repeated()) {
         for (int y = 0; y < reflection->FieldSize(message, fd);  y++) {
             switch (fd->cpp_type()) {
                 #define HANDLE_TYPE(CPPTYPE,  METHOD)                                                              \
                 case FieldDescriptor::CPPTYPE_##CPPTYPE:                                                           \
-                    *key.mutable_value() += "$" + std::to_string(reflection->GetRepeated##METHOD(message, fd, y)); \
+                    *key.mutable_value() += REP_SEP + std::to_string(reflection->GetRepeated##METHOD(message, fd, y)); \
                     break;
                     
                     HANDLE_TYPE(INT32 , Int32 );
@@ -245,13 +248,13 @@ Key Marshaller::FieldToKey(
                     #undef HANDLE_TYPE
                     
                 case FieldDescriptor::CPPTYPE_ENUM:
-                    *key.mutable_value() += "$" + std::to_string(reflection->GetRepeatedEnum(message, fd, y)->index());
+                    *key.mutable_value() += REP_SEP + std::to_string(reflection->GetRepeatedEnum(message, fd, y)->index());
                     break;
                 case FieldDescriptor::CPPTYPE_STRING:
-                    *key.mutable_value() += "$" + reflection->GetRepeatedString(message, fd, y);
+                    *key.mutable_value() += REP_SEP + reflection->GetRepeatedString(message, fd, y);
                     break;
                 case FieldDescriptor::CPPTYPE_MESSAGE:
-                    *key.mutable_value() += "$" + reflection->GetRepeatedMessage(message, fd, y).SerializeAsString();
+                    *key.mutable_value() += REP_SEP + reflection->GetRepeatedMessage(message, fd, y).SerializeAsString();
                     break;
             }
         }

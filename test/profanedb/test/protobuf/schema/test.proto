@@ -6,29 +6,23 @@ import "profanedb/protobuf/options.proto";
 
 import "nested.proto";
 
-message Test {
-    int32 field_one_int = 1 [ (profanedb.protobuf.options).key = true ];
-    string field_two_str = 2;
-    bool field_three_bool = 3;
-
-    Nested field_five_nested = 5;
-    bytes field_four_bytes = 4;
-
-    ExternalNested field_six_externalnested = 6;
-
-    Nested.KeyableNestedInNested field_seven_repeated_keyable = 7;
+message KeyInt {
+  int32 int_key = 1 [ (profanedb.protobuf.options).key = true ];
 }
 
-message Nested {
-    string nested_field_one_str = 1 [ (profanedb.protobuf.options).key = true ];
-    int64 nested_field_two_int = 2;
-    double nested_field_three_double = 3;
+message KeyStr {
+  string string_key = 1 [ (profanedb.protobuf.options).key = true ];
+}
 
-    message KeyableNestedInNested {
-        repeated string nested_in_nested_field_one_repeated_str = 1 [ (profanedb.protobuf.options).key = true ];
-    }
+message RepeatedKeyInt {
+  repeated int32 int_key_repeated = 1 [ (profanedb.protobuf.options).key = true ];
+}
 
-//    message NotKeyableNestedInNested {
-//        int32 nested_in_nested_field_one_int = 1;
-//    }
+message NonKeyableNested {
+  int32 int_key = 1 [ (profanedb.protobuf.options).key = true ];
+  
+  message Nested {
+    bool boolean = 1;
+  }
+  Nested nested_nonkeyable_message = 2;
 }

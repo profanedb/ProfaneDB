@@ -90,4 +90,13 @@ BOOST_FIXTURE_TEST_CASE(nonkeyable_nested, Format)
     DEBUG_MESSAGE
 }
 
+BOOST_FIXTURE_TEST_CASE(keyable_nested, Format)
+{
+    schema::KeyableNested message;
+    message.set_str_key("oht24oh24t");
+    message.mutable_nested_keyable()->set_int_key(11290142);
+    
+    DEBUG_MESSAGE
+}
+
 #undef DEBUG_MESSAGE

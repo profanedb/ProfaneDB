@@ -45,6 +45,9 @@ Marshaller::Marshaller(
 
 MessageTreeNode Marshaller::Marshal(const Message & message)
 {
+    BOOST_LOG_TRIVIAL(debug) << "Marshalling message " << message.GetTypeName();
+    BOOST_LOG_TRIVIAL(trace) << std::endl << message.DebugString();
+    
     MessageTreeNode messageTree;
     
     // The normalized message will be filled with data coming from input message,
@@ -69,7 +72,9 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
         
         // Check whether in the normalizedPool the message is considered keyable
         const FieldDescriptor * normalizedField = normalizedMessage->GetDescriptor()->field(field->index());
-        if (normalizedField->message_type() == Key::descriptor()) {
+        // HACK It seems Descriptor comparison doesn't work as they come from different Pools
+        if (normalizedField->message_type() != NULL &&
+            normalizedField->message_type()->full_name() == Key::descriptor()->full_name()) {
             const Message & nested = message.GetReflection()->GetMessage(message, field);
             const MessageTreeNode & nestedMessageTree = this->Marshal(nested);
             
@@ -78,6 +83,8 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
             // with the parameter message as root
             *messageTree.add_children() = nestedMessageTree;
             
+            // TODO Needs our own unsafe Copy, as Normalized profanedb.protobuf.Key is different from Schema profanedb.protobuf.Key
+        
             // The field in the normalized message is assigned the root key from the contained message tree
             normalizedMessage->GetReflection()
                 ->MutableMessage(normalizedMessage, normalizedField)

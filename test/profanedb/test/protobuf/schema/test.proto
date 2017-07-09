@@ -26,3 +26,9 @@ message NonKeyableNested {
   }
   Nested nested_nonkeyable_message = 2;
 }
+
+message KeyableNested {
+  string str_key = 1;
+  
+  KeyInt nested_keyable = 2;
+}

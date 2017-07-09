@@ -209,8 +209,13 @@ void Marshaller::CopyField(
                 #undef HANDLE_TYPE
                 
             case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-                toReflection->MutableMessage(to, toField)->MergeFrom(
-                    fromReflection->GetMessage(from, fromField));
+                const Message & nestedFrom = fromReflection->GetMessage(from, fromField);
+                Message * nestedTo = toReflection->MutableMessage(to, toField);
+                
+                std::vector< const FieldDescriptor * > setFields;
+                nestedFrom.GetReflection()->ListFields(from, &setFields);
+                for (auto field: setFields)
+                    this->CopyField(field, nestedFrom, nestedTo);
                 break;
         }
     }

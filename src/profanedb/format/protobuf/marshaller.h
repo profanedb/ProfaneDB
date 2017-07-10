@@ -57,6 +57,11 @@ private:
     // Storage is used to recursively retrieve them.
     const std::shared_ptr<profanedb::vault::Storage> storage;
     
+    // Copy a Message, can't use MergeFrom because it checks Descriptors
+    void CopyMessage(
+        const google::protobuf::Message & from,
+        google::protobuf::Message * to);
+
     // Copy a field from a message to another.
     // Differs from MergeFrom because it doesn't check whether Descriptors match.
     void CopyField(

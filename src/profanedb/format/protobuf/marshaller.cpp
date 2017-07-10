@@ -83,12 +83,10 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
             // with the parameter message as root
             *messageTree.add_children() = nestedMessageTree;
             
-            // TODO Needs our own unsafe Copy, as Normalized profanedb.protobuf.Key is different from Schema profanedb.protobuf.Key
-        
             // The field in the normalized message is assigned the root key from the contained message tree
-            normalizedMessage->GetReflection()
-                ->MutableMessage(normalizedMessage, normalizedField)
-                ->MergeFrom(nestedMessageTree.message().key());
+            this->CopyMessage(nestedMessageTree.message().key(),
+                              normalizedMessage->GetReflection()->MutableMessage(
+                                normalizedMessage, normalizedField));
         }
         else {
             // Other fields are simply copied over,
@@ -145,9 +143,9 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
             const FieldDescriptor * originalField = originalMessage->GetDescriptor()->field(normalizedField->index());
             
             // Copy the nested unmarshalled message to the original one
-            originalMessage->GetReflection()
-                ->MutableMessage(originalMessage, originalField)
-                ->MergeFrom(nestedMessage);
+            this->CopyMessage(nestedMessage,
+                              originalMessage->GetReflection()->MutableMessage(
+                                originalMessage, originalField));
         }
         else { // if field is not a reference
             
@@ -156,9 +154,17 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
             this->CopyField(normalizedField, *normalizedMessage, originalMessage);
         }
     }
-        
-    
+            
     return *originalMessage;
+}
+
+void Marshaller::CopyMessage(const Message & from, Message * to)
+{
+    std::vector< const FieldDescriptor * > setFields;
+    from.GetReflection()->ListFields(from, &setFields);
+
+    for (auto fromField : setFields)
+        this->CopyField(fromField, from, to);
 }
 
 void Marshaller::CopyField(
@@ -216,13 +222,9 @@ void Marshaller::CopyField(
                 #undef HANDLE_TYPE
                 
             case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-                const Message & nestedFrom = fromReflection->GetMessage(from, fromField);
-                Message * nestedTo = toReflection->MutableMessage(to, toField);
-                
-                std::vector< const FieldDescriptor * > setFields;
-                nestedFrom.GetReflection()->ListFields(from, &setFields);
-                for (auto field: setFields)
-                    this->CopyField(field, nestedFrom, nestedTo);
+                this->CopyMessage(
+                        fromReflection->GetMessage(from, fromField),
+                        toReflection->MutableMessage(to, toField));
                 break;
         }
     }

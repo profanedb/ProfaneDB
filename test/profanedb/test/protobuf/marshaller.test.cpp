@@ -13,7 +13,6 @@ using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
 using profanedb::vault::Storage;
 using profanedb::protobuf::MessageTreeNode;
 
-// FIXME Should mock this
 using RocksStorage = profanedb::vault::rocksdb::Storage;
 
 using google::protobuf::Message;
@@ -22,6 +21,7 @@ struct Format
 {
     std::shared_ptr<Loader> loader;
     std::shared_ptr<ProtobufMarshaller> marshaller;
+    std::shared_ptr<RocksStorage> storage;
     
     Format()
     {
@@ -31,7 +31,7 @@ struct Format
         rocksdb::DB *rocks;
         rocksdb::DB::Open(rocksOptions, "/tmp/profane", &rocks);
         
-        auto storage = std::make_shared<RocksStorage>(std::unique_ptr<rocksdb::DB>(rocks));
+        this->storage = std::make_shared<RocksStorage>(std::unique_ptr<rocksdb::DB>(rocks));
         
         auto includeSourceTree = new Loader::RootSourceTree{
             "/usr/include", "/home/giorgio/Documents/ProfaneDB/ProfaneDB/src"};

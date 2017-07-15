@@ -38,7 +38,7 @@ message KeyableNested {
   KeyInt nested_keyable = 2;
 }
 
-// TODO A Key can also be a message
+// A Key can also be a message
 message MessageAsKey {
   message MyKeyObj {
     int32 int = 1;
@@ -54,7 +54,7 @@ message KeyableInNonkeyableNested {
 
   message NonkeyableNested {
     message KeyableNested {
-      int64 int_key = 1;
+      int64 int_key = 1 [ (profanedb.protobuf.options).key = true ];
     }
     KeyableNested nested_keyable = 1;
   }

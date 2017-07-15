@@ -57,7 +57,8 @@ private:
     public:
         DbServiceImpl(
             std::shared_ptr<profanedb::vault::rocksdb::Storage> storage,
-            std::shared_ptr<profanedb::format::protobuf::Marshaller> marshaller);
+            std::shared_ptr<profanedb::format::protobuf::Marshaller> marshaller,
+            std::shared_ptr<profanedb::format::protobuf::Loader> loader);
         
         grpc::Status Get(
             grpc::ServerContext * context,
@@ -79,6 +80,8 @@ private:
         std::shared_ptr<profanedb::format::protobuf::Marshaller> protobufMarshaller;
         
         std::unique_ptr< profanedb::Db<google::protobuf::Message> > profane;
+        
+        std::shared_ptr<profanedb::format::protobuf::Loader> loader;
     };
     std::unique_ptr<DbServiceImpl> service;
 };

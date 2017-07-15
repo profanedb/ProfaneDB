@@ -22,7 +22,7 @@ if(BUILD_PROFANEDB_SERVER)
     set(GRPC_H db.grpc.pb.h)
 
     add_library(profanedb_grpc STATIC ${GRPC_CC} ${GRPC_H})
-    target_link_libraries(profanedb_grpc profanedb_protobuf ${GRPC_LIBRARIES})
+    target_link_libraries(profanedb_grpc profanedb_protobuf grpc++) # TODO FindgRPC doesn't work
     
     if(BUILD_SHARED_LIBS)
         set_target_properties(profanedb_grpc PROPERTIES POSITION_INDEPENDENT_CODE ON)

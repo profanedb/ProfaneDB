@@ -65,7 +65,7 @@ Server::Server()
     
     auto marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
     
-    service = std::make_unique<DbServiceImpl>(storage, marshaller);
+    service = std::make_unique<DbServiceImpl>(storage, marshaller, loader);
 }
 
 Server::~Server()
@@ -96,10 +96,12 @@ void Server::HandleRpcs()
 
 Server::DbServiceImpl::DbServiceImpl(
     std::shared_ptr<RocksStorage> storage,
-    std::shared_ptr<ProtobufMarshaller> marshaller)
+    std::shared_ptr<ProtobufMarshaller> marshaller,
+    std::shared_ptr<Loader> loader)
   : rocksdbStorage(storage)
   , protobufMarshaller(marshaller)
   , profane(std::make_unique< profanedb::Db<Message> >(storage, marshaller))
+  , loader(loader)
 {
 }
 
@@ -121,7 +123,9 @@ Status Server::DbServiceImpl::Put(ServerContext * context, const PutReq * reques
     // (which comes with `type.googleapis.com/` prepended)
     std::string type = request->serializable().type_url();
     Message * unpackedMessage =
-      this->protobufMarshaller->CreateMessage(ProtobufMarshaller::SCHEMA, type.substr(type.rfind('/')+1, std::string::npos));
+      this->loader
+          ->CreateMessage(Loader::SCHEMA, type.substr(type.rfind('/')+1, std::string::npos))
+          ->New();
 
     request->serializable().UnpackTo(unpackedMessage);
     BOOST_LOG_TRIVIAL(trace) << "Unpacked message" << std::endl << unpackedMessage->DebugString();

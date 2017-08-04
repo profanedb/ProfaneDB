@@ -70,14 +70,4 @@ _sym_db.RegisterMessage(ExternalNested)
 
 _EXTERNALNESTED.fields_by_name['field_one_double'].has_options = True
 _EXTERNALNESTED.fields_by_name['field_one_double']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
-try:
-  # THESE ELEMENTS WILL BE DEPRECATED.
-  # Please use the generated *_pb2_grpc.py files instead.
-  import grpc
-  from grpc.beta import implementations as beta_implementations
-  from grpc.beta import interfaces as beta_interfaces
-  from grpc.framework.common import cardinality
-  from grpc.framework.interfaces.face import utilities as face_utilities
-except ImportError:
-  pass
 # @@protoc_insertion_point(module_scope)

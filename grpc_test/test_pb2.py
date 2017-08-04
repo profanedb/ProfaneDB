@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='test.proto',
   package='schema',
   syntax='proto3',
-  serialized_pb=_b('\n\ntest.proto\x12\x06schema\x1a profanedb/protobuf/options.proto\x1a\x0cnested.proto\"\xa0\x02\n\x04Test\x12\x1c\n\rfield_one_int\x18\x01 \x01(\x05\x42\x05\xe2@\x02\x08\x01\x12\x15\n\rfield_two_str\x18\x02 \x01(\t\x12\x18\n\x10\x66ield_three_bool\x18\x03 \x01(\x08\x12)\n\x11\x66ield_five_nested\x18\x05 \x01(\x0b\x32\x0e.schema.Nested\x12\x18\n\x10\x66ield_four_bytes\x18\x04 \x01(\x0c\x12\x38\n\x18\x66ield_six_externalnested\x18\x06 \x01(\x0b\x32\x16.schema.ExternalNested\x12J\n\x1c\x66ield_seven_repeated_keyable\x18\x07 \x01(\x0b\x32$.schema.Nested.KeyableNestedInNested\"\xbf\x01\n\x06Nested\x12#\n\x14nested_field_one_str\x18\x01 \x01(\tB\x05\xe2@\x02\x08\x01\x12\x1c\n\x14nested_field_two_int\x18\x02 \x01(\x03\x12!\n\x19nested_field_three_double\x18\x03 \x01(\x01\x1aO\n\x15KeyableNestedInNested\x12\x36\n\'nested_in_nested_field_one_repeated_str\x18\x01 \x03(\tB\x05\xe2@\x02\x08\x01\x62\x06proto3')
+  serialized_pb=_b('\n\ntest.proto\x12\x06schema\x1a profanedb/protobuf/options.proto\x1a\x0cnested.proto\" \n\x06KeyInt\x12\x16\n\x07int_key\x18\x01 \x01(\x05\x42\x05\xe2@\x02\x08\x01\"#\n\x06KeyStr\x12\x19\n\nstring_key\x18\x01 \x01(\tB\x05\xe2@\x02\x08\x01\"1\n\x0eRepeatedKeyInt\x12\x1f\n\x10int_key_repeated\x18\x01 \x03(\x05\x42\x05\xe2@\x02\x08\x01\"\x89\x01\n\x10NonKeyableNested\x12\x16\n\x07int_key\x18\x01 \x01(\x05\x42\x05\xe2@\x02\x08\x01\x12\x42\n\x19nested_nonkeyable_message\x18\x02 \x01(\x0b\x32\x1f.schema.NonKeyableNested.Nested\x1a\x19\n\x06Nested\x12\x0f\n\x07\x62oolean\x18\x01 \x01(\x08\"O\n\rKeyableNested\x12\x16\n\x07str_key\x18\x01 \x01(\tB\x05\xe2@\x02\x08\x01\x12&\n\x0enested_keyable\x18\x02 \x01(\x0b\x32\x0e.schema.KeyInt\"\x80\x01\n\x0cMessageAsKey\x12\x39\n\x0bmessage_key\x18\x01 \x01(\x0b\x32\x1d.schema.MessageAsKey.MyKeyObjB\x05\xe2@\x02\x08\x01\x1a\x35\n\x08MyKeyObj\x12\x0b\n\x03int\x18\x01 \x01(\x05\x12\x0b\n\x03str\x18\x02 \x01(\t\x12\x0f\n\x07\x62oolean\x18\x03 \x01(\x08\"\x9a\x02\n\x19KeyableInNonkeyableNested\x12\x16\n\x07str_key\x18\x01 \x01(\tB\x05\xe2@\x02\x08\x01\x12M\n\x11nested_nonkeyable\x18\x02 \x01(\x0b\x32\x32.schema.KeyableInNonkeyableNested.NonkeyableNested\x1a\x95\x01\n\x10NonkeyableNested\x12X\n\x0enested_keyable\x18\x01 \x01(\x0b\x32@.schema.KeyableInNonkeyableNested.NonkeyableNested.KeyableNested\x1a\'\n\rKeyableNested\x12\x16\n\x07int_key\x18\x01 \x01(\x03\x42\x05\xe2@\x02\x08\x01\"1\n\x0eRepeatedKeyStr\x12\x1f\n\x10int_key_repeated\x18\x01 \x03(\tB\x05\xe2@\x02\x08\x01\"S\n\x0fRecursionParent\x12\x16\n\x07int_key\x18\x01 \x01(\x05\x42\x05\xe2@\x02\x08\x01\x12(\n\x08\x63hildren\x18\x02 \x03(\x0b\x32\x16.schema.RecursionChild\"Q\n\x0eRecursionChild\x12\x16\n\x07int_key\x18\x01 \x01(\x05\x42\x05\xe2@\x02\x08\x01\x12\'\n\x06parent\x18\x02 \x01(\x0b\x32\x17.schema.RecursionParentb\x06proto3')
   ,
   dependencies=[profanedb_dot_protobuf_dot_options__pb2.DESCRIPTOR,nested__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -29,58 +29,184 @@ _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
-_TEST = _descriptor.Descriptor(
-  name='Test',
-  full_name='schema.Test',
+_KEYINT = _descriptor.Descriptor(
+  name='KeyInt',
+  full_name='schema.KeyInt',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='field_one_int', full_name='schema.Test.field_one_int', index=0,
+      name='int_key', full_name='schema.KeyInt.int_key', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=70,
+  serialized_end=102,
+)
+
+
+_KEYSTR = _descriptor.Descriptor(
+  name='KeyStr',
+  full_name='schema.KeyStr',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='string_key', full_name='schema.KeyStr.string_key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=104,
+  serialized_end=139,
+)
+
+
+_REPEATEDKEYINT = _descriptor.Descriptor(
+  name='RepeatedKeyInt',
+  full_name='schema.RepeatedKeyInt',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='int_key_repeated', full_name='schema.RepeatedKeyInt.int_key_repeated', index=0,
+      number=1, type=5, cpp_type=1, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=141,
+  serialized_end=190,
+)
+
+
+_NONKEYABLENESTED_NESTED = _descriptor.Descriptor(
+  name='Nested',
+  full_name='schema.NonKeyableNested.Nested',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='boolean', full_name='schema.NonKeyableNested.Nested.boolean', index=0,
+      number=1, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=305,
+  serialized_end=330,
+)
+
+_NONKEYABLENESTED = _descriptor.Descriptor(
+  name='NonKeyableNested',
+  full_name='schema.NonKeyableNested',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='int_key', full_name='schema.NonKeyableNested.int_key', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
     _descriptor.FieldDescriptor(
-      name='field_two_str', full_name='schema.Test.field_two_str', index=1,
-      number=2, type=9, cpp_type=9, label=1,
+      name='nested_nonkeyable_message', full_name='schema.NonKeyableNested.nested_nonkeyable_message', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[_NONKEYABLENESTED_NESTED, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=193,
+  serialized_end=330,
+)
+
+
+_KEYABLENESTED = _descriptor.Descriptor(
+  name='KeyableNested',
+  full_name='schema.KeyableNested',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='str_key', full_name='schema.KeyableNested.str_key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      options=None),
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
     _descriptor.FieldDescriptor(
-      name='field_three_bool', full_name='schema.Test.field_three_bool', index=2,
-      number=3, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='field_five_nested', full_name='schema.Test.field_five_nested', index=3,
-      number=5, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='field_four_bytes', full_name='schema.Test.field_four_bytes', index=4,
-      number=4, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b(""),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='field_six_externalnested', full_name='schema.Test.field_six_externalnested', index=5,
-      number=6, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='field_seven_repeated_keyable', full_name='schema.Test.field_seven_repeated_keyable', index=6,
-      number=7, type=11, cpp_type=10, label=1,
+      name='nested_keyable', full_name='schema.KeyableNested.nested_keyable', index=1,
+      number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -97,20 +223,193 @@ _TEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=71,
-  serialized_end=359,
+  serialized_start=332,
+  serialized_end=411,
 )
 
 
-_NESTED_KEYABLENESTEDINNESTED = _descriptor.Descriptor(
-  name='KeyableNestedInNested',
-  full_name='schema.Nested.KeyableNestedInNested',
+_MESSAGEASKEY_MYKEYOBJ = _descriptor.Descriptor(
+  name='MyKeyObj',
+  full_name='schema.MessageAsKey.MyKeyObj',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='nested_in_nested_field_one_repeated_str', full_name='schema.Nested.KeyableNestedInNested.nested_in_nested_field_one_repeated_str', index=0,
+      name='int', full_name='schema.MessageAsKey.MyKeyObj.int', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='str', full_name='schema.MessageAsKey.MyKeyObj.str', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='boolean', full_name='schema.MessageAsKey.MyKeyObj.boolean', index=2,
+      number=3, type=8, cpp_type=7, label=1,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=489,
+  serialized_end=542,
+)
+
+_MESSAGEASKEY = _descriptor.Descriptor(
+  name='MessageAsKey',
+  full_name='schema.MessageAsKey',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='message_key', full_name='schema.MessageAsKey.message_key', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
+  ],
+  extensions=[
+  ],
+  nested_types=[_MESSAGEASKEY_MYKEYOBJ, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=414,
+  serialized_end=542,
+)
+
+
+_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED_KEYABLENESTED = _descriptor.Descriptor(
+  name='KeyableNested',
+  full_name='schema.KeyableInNonkeyableNested.NonkeyableNested.KeyableNested',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='int_key', full_name='schema.KeyableInNonkeyableNested.NonkeyableNested.KeyableNested.int_key', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=788,
+  serialized_end=827,
+)
+
+_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED = _descriptor.Descriptor(
+  name='NonkeyableNested',
+  full_name='schema.KeyableInNonkeyableNested.NonkeyableNested',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='nested_keyable', full_name='schema.KeyableInNonkeyableNested.NonkeyableNested.nested_keyable', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED_KEYABLENESTED, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=678,
+  serialized_end=827,
+)
+
+_KEYABLEINNONKEYABLENESTED = _descriptor.Descriptor(
+  name='KeyableInNonkeyableNested',
+  full_name='schema.KeyableInNonkeyableNested',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='str_key', full_name='schema.KeyableInNonkeyableNested.str_key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
+    _descriptor.FieldDescriptor(
+      name='nested_nonkeyable', full_name='schema.KeyableInNonkeyableNested.nested_nonkeyable', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED, ],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=545,
+  serialized_end=827,
+)
+
+
+_REPEATEDKEYSTR = _descriptor.Descriptor(
+  name='RepeatedKeyStr',
+  full_name='schema.RepeatedKeyStr',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='int_key_repeated', full_name='schema.RepeatedKeyStr.int_key_repeated', index=0,
       number=1, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -128,42 +427,36 @@ _NESTED_KEYABLENESTEDINNESTED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=474,
-  serialized_end=553,
+  serialized_start=829,
+  serialized_end=878,
 )
 
-_NESTED = _descriptor.Descriptor(
-  name='Nested',
-  full_name='schema.Nested',
+
+_RECURSIONPARENT = _descriptor.Descriptor(
+  name='RecursionParent',
+  full_name='schema.RecursionParent',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='nested_field_one_str', full_name='schema.Nested.nested_field_one_str', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      name='int_key', full_name='schema.RecursionParent.int_key', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
     _descriptor.FieldDescriptor(
-      name='nested_field_two_int', full_name='schema.Nested.nested_field_two_int', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='nested_field_three_double', full_name='schema.Nested.nested_field_three_double', index=2,
-      number=3, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
+      name='children', full_name='schema.RecursionParent.children', index=1,
+      number=2, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
   ],
   extensions=[
   ],
-  nested_types=[_NESTED_KEYABLENESTEDINNESTED, ],
+  nested_types=[],
   enum_types=[
   ],
   options=None,
@@ -172,54 +465,193 @@ _NESTED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=362,
-  serialized_end=553,
+  serialized_start=880,
+  serialized_end=963,
 )
 
-_TEST.fields_by_name['field_five_nested'].message_type = _NESTED
-_TEST.fields_by_name['field_six_externalnested'].message_type = nested__pb2._EXTERNALNESTED
-_TEST.fields_by_name['field_seven_repeated_keyable'].message_type = _NESTED_KEYABLENESTEDINNESTED
-_NESTED_KEYABLENESTEDINNESTED.containing_type = _NESTED
-DESCRIPTOR.message_types_by_name['Test'] = _TEST
-DESCRIPTOR.message_types_by_name['Nested'] = _NESTED
 
-Test = _reflection.GeneratedProtocolMessageType('Test', (_message.Message,), dict(
-  DESCRIPTOR = _TEST,
+_RECURSIONCHILD = _descriptor.Descriptor(
+  name='RecursionChild',
+  full_name='schema.RecursionChild',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='int_key', full_name='schema.RecursionChild.int_key', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=_descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))),
+    _descriptor.FieldDescriptor(
+      name='parent', full_name='schema.RecursionChild.parent', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=965,
+  serialized_end=1046,
+)
+
+_NONKEYABLENESTED_NESTED.containing_type = _NONKEYABLENESTED
+_NONKEYABLENESTED.fields_by_name['nested_nonkeyable_message'].message_type = _NONKEYABLENESTED_NESTED
+_KEYABLENESTED.fields_by_name['nested_keyable'].message_type = _KEYINT
+_MESSAGEASKEY_MYKEYOBJ.containing_type = _MESSAGEASKEY
+_MESSAGEASKEY.fields_by_name['message_key'].message_type = _MESSAGEASKEY_MYKEYOBJ
+_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED_KEYABLENESTED.containing_type = _KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED
+_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED.fields_by_name['nested_keyable'].message_type = _KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED_KEYABLENESTED
+_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED.containing_type = _KEYABLEINNONKEYABLENESTED
+_KEYABLEINNONKEYABLENESTED.fields_by_name['nested_nonkeyable'].message_type = _KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED
+_RECURSIONPARENT.fields_by_name['children'].message_type = _RECURSIONCHILD
+_RECURSIONCHILD.fields_by_name['parent'].message_type = _RECURSIONPARENT
+DESCRIPTOR.message_types_by_name['KeyInt'] = _KEYINT
+DESCRIPTOR.message_types_by_name['KeyStr'] = _KEYSTR
+DESCRIPTOR.message_types_by_name['RepeatedKeyInt'] = _REPEATEDKEYINT
+DESCRIPTOR.message_types_by_name['NonKeyableNested'] = _NONKEYABLENESTED
+DESCRIPTOR.message_types_by_name['KeyableNested'] = _KEYABLENESTED
+DESCRIPTOR.message_types_by_name['MessageAsKey'] = _MESSAGEASKEY
+DESCRIPTOR.message_types_by_name['KeyableInNonkeyableNested'] = _KEYABLEINNONKEYABLENESTED
+DESCRIPTOR.message_types_by_name['RepeatedKeyStr'] = _REPEATEDKEYSTR
+DESCRIPTOR.message_types_by_name['RecursionParent'] = _RECURSIONPARENT
+DESCRIPTOR.message_types_by_name['RecursionChild'] = _RECURSIONCHILD
+
+KeyInt = _reflection.GeneratedProtocolMessageType('KeyInt', (_message.Message,), dict(
+  DESCRIPTOR = _KEYINT,
   __module__ = 'test_pb2'
-  # @@protoc_insertion_point(class_scope:schema.Test)
+  # @@protoc_insertion_point(class_scope:schema.KeyInt)
   ))
-_sym_db.RegisterMessage(Test)
+_sym_db.RegisterMessage(KeyInt)
 
-Nested = _reflection.GeneratedProtocolMessageType('Nested', (_message.Message,), dict(
+KeyStr = _reflection.GeneratedProtocolMessageType('KeyStr', (_message.Message,), dict(
+  DESCRIPTOR = _KEYSTR,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.KeyStr)
+  ))
+_sym_db.RegisterMessage(KeyStr)
 
-  KeyableNestedInNested = _reflection.GeneratedProtocolMessageType('KeyableNestedInNested', (_message.Message,), dict(
-    DESCRIPTOR = _NESTED_KEYABLENESTEDINNESTED,
+RepeatedKeyInt = _reflection.GeneratedProtocolMessageType('RepeatedKeyInt', (_message.Message,), dict(
+  DESCRIPTOR = _REPEATEDKEYINT,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.RepeatedKeyInt)
+  ))
+_sym_db.RegisterMessage(RepeatedKeyInt)
+
+NonKeyableNested = _reflection.GeneratedProtocolMessageType('NonKeyableNested', (_message.Message,), dict(
+
+  Nested = _reflection.GeneratedProtocolMessageType('Nested', (_message.Message,), dict(
+    DESCRIPTOR = _NONKEYABLENESTED_NESTED,
     __module__ = 'test_pb2'
-    # @@protoc_insertion_point(class_scope:schema.Nested.KeyableNestedInNested)
+    # @@protoc_insertion_point(class_scope:schema.NonKeyableNested.Nested)
     ))
   ,
-  DESCRIPTOR = _NESTED,
+  DESCRIPTOR = _NONKEYABLENESTED,
   __module__ = 'test_pb2'
-  # @@protoc_insertion_point(class_scope:schema.Nested)
+  # @@protoc_insertion_point(class_scope:schema.NonKeyableNested)
   ))
-_sym_db.RegisterMessage(Nested)
-_sym_db.RegisterMessage(Nested.KeyableNestedInNested)
+_sym_db.RegisterMessage(NonKeyableNested)
+_sym_db.RegisterMessage(NonKeyableNested.Nested)
+
+KeyableNested = _reflection.GeneratedProtocolMessageType('KeyableNested', (_message.Message,), dict(
+  DESCRIPTOR = _KEYABLENESTED,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.KeyableNested)
+  ))
+_sym_db.RegisterMessage(KeyableNested)
+
+MessageAsKey = _reflection.GeneratedProtocolMessageType('MessageAsKey', (_message.Message,), dict(
+
+  MyKeyObj = _reflection.GeneratedProtocolMessageType('MyKeyObj', (_message.Message,), dict(
+    DESCRIPTOR = _MESSAGEASKEY_MYKEYOBJ,
+    __module__ = 'test_pb2'
+    # @@protoc_insertion_point(class_scope:schema.MessageAsKey.MyKeyObj)
+    ))
+  ,
+  DESCRIPTOR = _MESSAGEASKEY,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.MessageAsKey)
+  ))
+_sym_db.RegisterMessage(MessageAsKey)
+_sym_db.RegisterMessage(MessageAsKey.MyKeyObj)
+
+KeyableInNonkeyableNested = _reflection.GeneratedProtocolMessageType('KeyableInNonkeyableNested', (_message.Message,), dict(
+
+  NonkeyableNested = _reflection.GeneratedProtocolMessageType('NonkeyableNested', (_message.Message,), dict(
+
+    KeyableNested = _reflection.GeneratedProtocolMessageType('KeyableNested', (_message.Message,), dict(
+      DESCRIPTOR = _KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED_KEYABLENESTED,
+      __module__ = 'test_pb2'
+      # @@protoc_insertion_point(class_scope:schema.KeyableInNonkeyableNested.NonkeyableNested.KeyableNested)
+      ))
+    ,
+    DESCRIPTOR = _KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED,
+    __module__ = 'test_pb2'
+    # @@protoc_insertion_point(class_scope:schema.KeyableInNonkeyableNested.NonkeyableNested)
+    ))
+  ,
+  DESCRIPTOR = _KEYABLEINNONKEYABLENESTED,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.KeyableInNonkeyableNested)
+  ))
+_sym_db.RegisterMessage(KeyableInNonkeyableNested)
+_sym_db.RegisterMessage(KeyableInNonkeyableNested.NonkeyableNested)
+_sym_db.RegisterMessage(KeyableInNonkeyableNested.NonkeyableNested.KeyableNested)
+
+RepeatedKeyStr = _reflection.GeneratedProtocolMessageType('RepeatedKeyStr', (_message.Message,), dict(
+  DESCRIPTOR = _REPEATEDKEYSTR,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.RepeatedKeyStr)
+  ))
+_sym_db.RegisterMessage(RepeatedKeyStr)
+
+RecursionParent = _reflection.GeneratedProtocolMessageType('RecursionParent', (_message.Message,), dict(
+  DESCRIPTOR = _RECURSIONPARENT,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.RecursionParent)
+  ))
+_sym_db.RegisterMessage(RecursionParent)
+
+RecursionChild = _reflection.GeneratedProtocolMessageType('RecursionChild', (_message.Message,), dict(
+  DESCRIPTOR = _RECURSIONCHILD,
+  __module__ = 'test_pb2'
+  # @@protoc_insertion_point(class_scope:schema.RecursionChild)
+  ))
+_sym_db.RegisterMessage(RecursionChild)
 
 
-_TEST.fields_by_name['field_one_int'].has_options = True
-_TEST.fields_by_name['field_one_int']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
-_NESTED_KEYABLENESTEDINNESTED.fields_by_name['nested_in_nested_field_one_repeated_str'].has_options = True
-_NESTED_KEYABLENESTEDINNESTED.fields_by_name['nested_in_nested_field_one_repeated_str']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
-_NESTED.fields_by_name['nested_field_one_str'].has_options = True
-_NESTED.fields_by_name['nested_field_one_str']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
-try:
-  # THESE ELEMENTS WILL BE DEPRECATED.
-  # Please use the generated *_pb2_grpc.py files instead.
-  import grpc
-  from grpc.beta import implementations as beta_implementations
-  from grpc.beta import interfaces as beta_interfaces
-  from grpc.framework.common import cardinality
-  from grpc.framework.interfaces.face import utilities as face_utilities
-except ImportError:
-  pass
+_KEYINT.fields_by_name['int_key'].has_options = True
+_KEYINT.fields_by_name['int_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_KEYSTR.fields_by_name['string_key'].has_options = True
+_KEYSTR.fields_by_name['string_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_REPEATEDKEYINT.fields_by_name['int_key_repeated'].has_options = True
+_REPEATEDKEYINT.fields_by_name['int_key_repeated']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_NONKEYABLENESTED.fields_by_name['int_key'].has_options = True
+_NONKEYABLENESTED.fields_by_name['int_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_KEYABLENESTED.fields_by_name['str_key'].has_options = True
+_KEYABLENESTED.fields_by_name['str_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_MESSAGEASKEY.fields_by_name['message_key'].has_options = True
+_MESSAGEASKEY.fields_by_name['message_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED_KEYABLENESTED.fields_by_name['int_key'].has_options = True
+_KEYABLEINNONKEYABLENESTED_NONKEYABLENESTED_KEYABLENESTED.fields_by_name['int_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_KEYABLEINNONKEYABLENESTED.fields_by_name['str_key'].has_options = True
+_KEYABLEINNONKEYABLENESTED.fields_by_name['str_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_REPEATEDKEYSTR.fields_by_name['int_key_repeated'].has_options = True
+_REPEATEDKEYSTR.fields_by_name['int_key_repeated']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_RECURSIONPARENT.fields_by_name['int_key'].has_options = True
+_RECURSIONPARENT.fields_by_name['int_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
+_RECURSIONCHILD.fields_by_name['int_key'].has_options = True
+_RECURSIONCHILD.fields_by_name['int_key']._options = _descriptor._ParseOptions(descriptor_pb2.FieldOptions(), _b('\342@\002\010\001'))
 # @@protoc_insertion_point(module_scope)

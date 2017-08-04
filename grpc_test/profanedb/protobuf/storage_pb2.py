@@ -13,14 +13,16 @@ from google.protobuf import descriptor_pb2
 _sym_db = _symbol_database.Default()
 
 
+from google.protobuf import any_pb2 as google_dot_protobuf_dot_any__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='profanedb/protobuf/storage.proto',
   package='profanedb.protobuf',
   syntax='proto3',
-  serialized_pb=_b('\n profanedb/protobuf/storage.proto\x12\x12profanedb.protobuf\"9\n\x03Key\x12\x14\n\x0cmessage_type\x18\x01 \x01(\t\x12\r\n\x05\x66ield\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x0c\"H\n\x0fStorableMessage\x12$\n\x03key\x18\x01 \x01(\x0b\x32\x17.profanedb.protobuf.Key\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"~\n\x0fMessageTreeNode\x12\x34\n\x07message\x18\x01 \x01(\x0b\x32#.profanedb.protobuf.StorableMessage\x12\x35\n\x08\x63hildren\x18\x02 \x03(\x0b\x32#.profanedb.protobuf.MessageTreeNodeBU\n\x16\x63om.profanedb.protobufZ gitlab.com/profanedb/protobuf/db\xa2\x02\x03PDB\xaa\x02\x12ProfaneDB.Protobufb\x06proto3')
-)
+  serialized_pb=_b('\n profanedb/protobuf/storage.proto\x12\x12profanedb.protobuf\x1a\x19google/protobuf/any.proto\"9\n\x03Key\x12\x14\n\x0cmessage_type\x18\x01 \x01(\t\x12\r\n\x05\x66ield\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x0c\"^\n\x0fStorableMessage\x12$\n\x03key\x18\x01 \x01(\x0b\x32\x17.profanedb.protobuf.Key\x12%\n\x07payload\x18\x02 \x01(\x0b\x32\x14.google.protobuf.Any\"~\n\x0fMessageTreeNode\x12\x34\n\x07message\x18\x01 \x01(\x0b\x32#.profanedb.protobuf.StorableMessage\x12\x35\n\x08\x63hildren\x18\x02 \x03(\x0b\x32#.profanedb.protobuf.MessageTreeNodeBU\n\x16\x63om.profanedb.protobufZ gitlab.com/profanedb/protobuf/db\xa2\x02\x03PDB\xaa\x02\x12ProfaneDB.Protobufb\x06proto3')
+  ,
+  dependencies=[google_dot_protobuf_dot_any__pb2.DESCRIPTOR,])
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
@@ -66,8 +68,8 @@ _KEY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=56,
-  serialized_end=113,
+  serialized_start=83,
+  serialized_end=140,
 )
 
 
@@ -87,8 +89,8 @@ _STORABLEMESSAGE = _descriptor.Descriptor(
       options=None),
     _descriptor.FieldDescriptor(
       name='payload', full_name='profanedb.protobuf.StorableMessage.payload', index=1,
-      number=2, type=12, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b(""),
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -104,8 +106,8 @@ _STORABLEMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=115,
-  serialized_end=187,
+  serialized_start=142,
+  serialized_end=236,
 )
 
 
@@ -142,11 +144,12 @@ _MESSAGETREENODE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=189,
-  serialized_end=315,
+  serialized_start=238,
+  serialized_end=364,
 )
 
 _STORABLEMESSAGE.fields_by_name['key'].message_type = _KEY
+_STORABLEMESSAGE.fields_by_name['payload'].message_type = google_dot_protobuf_dot_any__pb2._ANY
 _MESSAGETREENODE.fields_by_name['message'].message_type = _STORABLEMESSAGE
 _MESSAGETREENODE.fields_by_name['children'].message_type = _MESSAGETREENODE
 DESCRIPTOR.message_types_by_name['Key'] = _KEY

@@ -1,5 +1,5 @@
 /*
- * ProfaneDB - A Protocol Buffer database.
+ * ProfaneDB - A Protocol Buffers database.
  * Copyright (C) 2017  "Giorgio Azzinnaro" <giorgio.azzinnaro@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,69 +19,128 @@
 
 #include "server.h"
 
-profanedb::server::Server::Server()
-  : config(
-      profanedb::storage::Config::ProfaneDB(
-        boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/test"),
-        boost::filesystem::path("/home/giorgio/Documents/ProfaneDB/src")
-      ),
-      profanedb::storage::Config::RocksDB(
-        rocksdb::Options(),
-        "/tmp/profanedb"
-      )
-    )
-  , service(config)
+using profanedb::format::protobuf::Loader;
+using profanedb::format::Marshaller;
+using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
+using profanedb::vault::Storage;
+using RocksStorage = profanedb::vault::rocksdb::Storage;
+
+using namespace profanedb::protobuf;
+
+using google::protobuf::Message;
+
+using grpc::ServerBuilder;
+using grpc::ServerContext;
+using grpc::Status;
+
+namespace profanedb {
+namespace server {
+
+Server::Server()
 {
+    // TODO Config
+    boost::log::core::get()->set_filter(
+        boost::log::trivial::severity >= boost::log::trivial::trace
+    );
+    
+    // TODO Config
+    rocksdb::Options rocksOptions;
+    rocksOptions.create_if_missing = true;
+    
+    rocksdb::DB *rocks;
+    rocksdb::DB::Open(rocksOptions, "/tmp/profane", &rocks);
+    
+    auto storage = std::make_shared<RocksStorage>(std::unique_ptr<rocksdb::DB>(rocks));
+    
+    // TODO Should be from config
+    auto includeSourceTree = new Loader::RootSourceTree{
+        "/usr/include", "/home/giorgio/Documents/ProfaneDB/ProfaneDB/src"};
+    
+    // TODO Config
+    auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/ProfaneDB/test/profanedb/test/protobuf/schema"};
+    
+    auto loader = std::make_shared<Loader>(
+        std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),
+        std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
+    
+    auto marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
+    
+    service = std::make_unique<DbServiceImpl>(storage, marshaller, loader);
 }
 
-profanedb::server::Server::~Server()
+Server::~Server()
 {
     server->Shutdown();
 }
 
-void profanedb::server::Server::Run()
+void Server::Run()
 {
     std::string address("0.0.0.0:50051");
 
-    grpc::ServerBuilder builder;
+    ServerBuilder builder;
     
     builder.AddListeningPort(address, grpc::InsecureServerCredentials());
-    builder.RegisterService(&service);
+    builder.RegisterService(service.get());
     
     server = builder.BuildAndStart();
     
-    std::cout << "Server listening on " << address << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Server listening on " << address << std::endl;
     
     HandleRpcs();
 }
 
-void profanedb::server::Server::HandleRpcs()
+void Server::HandleRpcs()
 {
     server->Wait();
 }
 
-profanedb::server::Server::DbServiceImpl::DbServiceImpl(const profanedb::storage::Config & config)
-  : db(config)
+Server::DbServiceImpl::DbServiceImpl(
+    std::shared_ptr<RocksStorage> storage,
+    std::shared_ptr<ProtobufMarshaller> marshaller,
+    std::shared_ptr<Loader> loader)
+  : rocksdbStorage(storage)
+  , protobufMarshaller(marshaller)
+  , profane(std::make_unique< profanedb::Db<Message> >(storage, marshaller))
+  , loader(loader)
 {
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp * response)
+Status Server::DbServiceImpl::Get(ServerContext * context, const GetReq * request, GetResp * response)
 {
-    db.Get(*request);
+    BOOST_LOG_TRIVIAL(debug) << "GET request from " << context->peer();
     
-    return grpc::Status::OK;
+    response->mutable_message()->PackFrom(this->profane->Get(request->key()));
+    
+    return Status::OK;
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response)
+Status Server::DbServiceImpl::Put(ServerContext * context, const PutReq * request, PutResp * response)
 {
-    db.Put(*request);
+    BOOST_LOG_TRIVIAL(debug) << "PUT request from " << context->peer();
     
-    return grpc::Status::OK;
+    // Because the incoming request brings a google::protobuf::Any message,
+    // we must dynamically create the actual message according to its type
+    // (which comes with `type.googleapis.com/` prepended)
+    std::string type = request->serializable().type_url();
+    Message * unpackedMessage =
+      this->loader
+          ->CreateMessage(Loader::SCHEMA, type.substr(type.rfind('/')+1, std::string::npos))
+          ->New();
+
+    request->serializable().UnpackTo(unpackedMessage);
+    BOOST_LOG_TRIVIAL(trace) << "Unpacked message" << std::endl << unpackedMessage->DebugString();
+
+    this->profane->Put(*unpackedMessage);
+    
+    return Status::OK;
 }
 
-grpc::Status profanedb::server::Server::DbServiceImpl::Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response)
+Status Server::DbServiceImpl::Delete(ServerContext * context, const DelReq * request, DelResp * response)
 {
-    db.Delete(*request);
+    BOOST_LOG_TRIVIAL(debug) << "DELETE request from " << context->peer();
     
-    return grpc::Status::OK;
+    return Status::OK;
+}
+
+}
 }

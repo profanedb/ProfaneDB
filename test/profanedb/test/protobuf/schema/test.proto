@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package schema;
+
+import "profanedb/protobuf/options.proto";
+
+import "nested.proto";
+
+// Simply check that key is serialized properly
+message KeyInt {
+  int32 int_key = 1 [ (profanedb.protobuf.options).key = true ];
+}
+
+// Key should match the provided value
+message KeyStr {
+  string string_key = 1 [ (profanedb.protobuf.options).key = true ];
+}
+
+// Check repeated key with separator
+message RepeatedKeyInt {
+  repeated int32 int_key_repeated = 1 [ (profanedb.protobuf.options).key = true ];
+}
+
+// The nested message shouldn't appear in the MessageTree
+message NonKeyableNested {
+  int32 int_key = 1 [ (profanedb.protobuf.options).key = true ];
+  
+  message Nested {
+    bool boolean = 1;
+  }
+  Nested nested_nonkeyable_message = 2;
+}
+
+// `nested_keyable` should be in root MessageTree children
+message KeyableNested {
+  string str_key = 1 [ (profanedb.protobuf.options).key = true ];
+  
+  KeyInt nested_keyable = 2;
+}
+
+// A Key can also be a message
+message MessageAsKey {
+  message MyKeyObj {
+    int32 int = 1;
+    string str = 2;
+    bool boolean = 3;
+  }
+  MyKeyObj message_key = 1 [ (profanedb.protobuf.options).key = true ];
+}
+
+// TODO `nested_nonkeyable.nested_keyable` Key should appear in MessageTree
+message KeyableInNonkeyableNested {
+  string str_key = 1 [ (profanedb.protobuf.options).key = true ];
+
+  message NonkeyableNested {
+    message KeyableNested {
+      int64 int_key = 1 [ (profanedb.protobuf.options).key = true ];
+    }
+    KeyableNested nested_keyable = 1;
+  }
+  NonkeyableNested nested_nonkeyable = 2;
+}
+
+// TODO This is to test collisions with repeated Key separator (currently $)
+message RepeatedKeyStr {
+  repeated string int_key_repeated = 1 [ (profanedb.protobuf.options).key = true ];
+}
+
+// TODO Avoid circular recursion,
+// multiple occurrencies when writing,
+// infinite loop when reading
+message RecursionParent {
+  int32 int_key = 1 [ (profanedb.protobuf.options).key = true ];
+
+  repeated RecursionChild children = 2;
+}
+
+message RecursionChild {
+  int32 int_key = 1 [ (profanedb.protobuf.options).key = true ];
+
+  RecursionParent parent = 2;
+}

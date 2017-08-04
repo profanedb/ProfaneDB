@@ -17,12 +17,22 @@
  *
  */
 
-#include "server.h" 
+#ifndef PROFANEDB_FORMAT_MARSHALLER_H
+#define PROFANEDB_FORMAT_MARSHALLER_H
 
-int main(int argc, char* argv[]) {
-    
-    profanedb::server::Server server;
-    server.Run();
-    
-    return 0;
+#include <profanedb/protobuf/storage.pb.h>
+
+namespace profanedb {
+namespace format {
+
+template<typename Message>
+class Marshaller
+{
+public:
+    virtual profanedb::protobuf::MessageTreeNode Marshal(const Message & message) = 0;
+    virtual const Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) = 0;
+};
 }
+}
+
+#endif // PROFANEDB_FORMAT_MARSHALLER_H

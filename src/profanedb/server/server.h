@@ -1,5 +1,5 @@
 /*
- * ProfaneDB - A Protocol Buffer database.
+ * ProfaneDB - A Protocol Buffers database.
  * Copyright (C) 2017  "Giorgio Azzinnaro" <giorgio.azzinnaro@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,19 +20,26 @@
 #ifndef PROFANEDB_STORAGE_SERVER_H
 #define PROFANEDB_STORAGE_SERVER_H
 
+#include <profanedb/protobuf/db.pb.h>
+#include <profanedb/protobuf/db.grpc.pb.h>
+
 #include <grpc++/grpc++.h>
 #include <grpc/support/log.h>
 
-#include <profanedb/storage/db.h>
-#include <profanedb/storage/config.h>
+#include <boost/di.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
-#include <profanedb/protobuf/db.pb.h>
-#include <profanedb/protobuf/db.grpc.pb.h>
+#include <profanedb/format/protobuf/marshaller.h>
+#include <profanedb/vault/rocksdb/storage.h>
+
+#include <profanedb/db.hpp>
 
 namespace profanedb {
 namespace server {
 
-// This is a thin layer to use ProfaneDB with gRPC
+// This is a layer to use ProfaneDB with gRPC and Protobuf objects
 class Server
 {
 public:
@@ -42,26 +49,41 @@ public:
     void Run();
     
 private:
-    profanedb::storage::Config config;
-    
     void HandleRpcs();
     
     std::unique_ptr<grpc::Server> server;
     
     class DbServiceImpl : public profanedb::protobuf::Db::Service {
     public:
-        DbServiceImpl(const profanedb::storage::Config & config);
+        DbServiceImpl(
+            std::shared_ptr<profanedb::vault::rocksdb::Storage> storage,
+            std::shared_ptr<profanedb::format::protobuf::Marshaller> marshaller,
+            std::shared_ptr<profanedb::format::protobuf::Loader> loader);
         
-        grpc::Status Get(grpc::ServerContext * context, const profanedb::protobuf::GetReq * request, profanedb::protobuf::GetResp* response) override;
+        grpc::Status Get(
+            grpc::ServerContext * context,
+            const profanedb::protobuf::GetReq * request,
+            profanedb::protobuf::GetResp* response) override;
         
-        grpc::Status Put(grpc::ServerContext * context, const profanedb::protobuf::PutReq * request, profanedb::protobuf::PutResp * response) override;
+        grpc::Status Put(
+            grpc::ServerContext * context,
+            const profanedb::protobuf::PutReq * request,
+            profanedb::protobuf::PutResp * response) override;
         
-        grpc::Status Delete(grpc::ServerContext * context, const profanedb::protobuf::DelReq * request, profanedb::protobuf::DelResp * response) override;
+        grpc::Status Delete(
+            grpc::ServerContext * context,
+            const profanedb::protobuf::DelReq * request,
+            profanedb::protobuf::DelResp * response) override;
         
     private:
-        profanedb::storage::Db db;
+        std::shared_ptr<profanedb::vault::rocksdb::Storage> rocksdbStorage;
+        std::shared_ptr<profanedb::format::protobuf::Marshaller> protobufMarshaller;
+        
+        std::unique_ptr< profanedb::Db<google::protobuf::Message> > profane;
+        
+        std::shared_ptr<profanedb::format::protobuf::Loader> loader;
     };
-    DbServiceImpl service;
+    std::unique_ptr<DbServiceImpl> service;
 };
 
 }

@@ -17,12 +17,23 @@
  *
  */
 
-#include "server.h" 
+#ifndef PROFANEDB_VAULT_STORAGE_H
+#define PROFANEDB_VAULT_STORAGE_H
 
-int main(int argc, char* argv[]) {
-    
-    profanedb::server::Server server;
-    server.Run();
-    
-    return 0;
+#include <profanedb/protobuf/storage.pb.h>
+
+namespace profanedb {
+namespace vault {
+
+// Storage takes care of saving and retrieving the data from the actual DB
+class Storage {
+public:
+    virtual void Store(const protobuf::StorableMessage & storable) = 0;
+    virtual protobuf::StorableMessage Retrieve(const protobuf::Key & key) const = 0;
+};
 }
+}
+
+#endif // PROFANEDB_VAULT_STORAGE_H
+
+

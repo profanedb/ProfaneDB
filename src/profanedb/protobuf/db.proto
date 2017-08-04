@@ -1,5 +1,5 @@
 /*
- * ProfaneDB - A Protocol Buffer database.
+ * ProfaneDB - A Protocol Buffers database.
  * Copyright (C) 2017  "Giorgio Azzinnaro" <giorgio.azzinnaro@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,8 @@ option objc_class_prefix = "PDB";
 
 import "google/protobuf/any.proto";
 
+import "profanedb/protobuf/storage.proto";
+
 service Db {
   rpc Get (GetReq) returns (GetResp);
 
@@ -37,9 +39,11 @@ service Db {
 }
 
 message GetReq {
+  Key key = 1; // TODO How about getting multiple objects at once
 }
 
 message GetResp {
+  google.protobuf.Any message = 1;
 }
 
 message PutReq {
@@ -47,9 +51,11 @@ message PutReq {
 }
 
 message PutResp {
+  Key key = 1; // TODO Maybe should be repeated for all stored keys?
 }
 
 message DelReq {
+  Key key = 1;
 }
 
 message DelResp {

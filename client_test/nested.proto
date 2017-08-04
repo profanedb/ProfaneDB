@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package test;
-
-import "profanedb/protobuf/options.proto";
-
-message ExternalNested {
-  double field_one_double = 1 [ (profanedb.protobuf.options).key = true ];
-}

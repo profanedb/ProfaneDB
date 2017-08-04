@@ -1,31 +1,16 @@
 import grpc
 from google.protobuf import any_pb2
 
-from profanedb.protobuf import db_pb2, db_pb2_grpc
+from profanedb.protobuf import db_pb2, db_pb2_grpc, storage_pb2
 
-import test_pb2, nested_pb2
+import test_pb2
 
 def run():
     channel = grpc.insecure_channel('localhost:50051')
     stub = db_pb2_grpc.DbStub(channel)
 
-    to_serialize = test_pb2.Test(
-        field_one_int = 123,
-        field_two_str = "my_string",
-        field_three_bool = True,
-        field_four_bytes = b'bytes',
-
-        field_five_nested =
-            test_pb2.Nested(
-                nested_field_one_str = "nested string",
-                nested_field_two_int = 1902923490,
-                nested_field_three_double = 1728.543344
-            ),
-
-        field_six_externalnested =
-            nested_pb2.ExternalNested(
-                field_one_double = 123.456
-            )
+    to_serialize = test_pb2.KeyInt(
+            int_key = 12312
     )
 
     serializable = any_pb2.Any()
@@ -34,6 +19,18 @@ def run():
     stub.Put(db_pb2.PutReq(
         serializable = serializable
     ))
+
+    key = storage_pb2.Key(
+            message_type = "schema.KeyInt",
+            field = "int_key",
+            value = b"12312"
+    )
+
+    retrieved = stub.Get(db_pb2.GetReq(
+        key = key
+    ))
+
+    print(retrieved)
 
 
 if __name__ == '__main__':

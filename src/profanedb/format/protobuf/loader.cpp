@@ -41,7 +41,7 @@ namespace profanedb {
 namespace format {
 namespace protobuf {
 
-Loader::RootSourceTree::RootSourceTree(std::initializer_list<path> paths)
+Loader::RootSourceTree::RootSourceTree(std::vector<path> paths)
   : paths(paths)
 {
     if (paths.size() == 0)

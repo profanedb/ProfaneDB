@@ -17,11 +17,20 @@
  *
  */
 
-#include "server.h" 
+#include "server.h"
+
+// TODO Move in separate class
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
+    profanedb::server::Config config(argc, argv);
     
-    profanedb::server::Server server;
+    // If help message was requested stop execution here
+    if (config.ShowHelp())
+        return 0;
+    
+    profanedb::server::Server server(config);
     server.Run();
     
     return 0;

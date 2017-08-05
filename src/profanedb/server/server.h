@@ -36,6 +36,8 @@
 
 #include <profanedb/db.hpp>
 
+#include "config.h"
+
 namespace profanedb {
 namespace server {
 
@@ -43,7 +45,7 @@ namespace server {
 class Server
 {
 public:
-    Server();
+    Server(const profanedb::server::Config & config);
     ~Server();
     
     void Run();
@@ -84,6 +86,8 @@ private:
         std::shared_ptr<profanedb::format::protobuf::Loader> loader;
     };
     std::unique_ptr<DbServiceImpl> service;
+    
+    const profanedb::server::Config & config;
 };
 
 }

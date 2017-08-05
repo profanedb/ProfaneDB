@@ -6,6 +6,10 @@ The key used for retrieval of objects is defined within `.proto` files, this is 
 
 ## Configuration and usage
 
+For a more detailed explanation, go to the [project's website](http://profanedb.gitlab.io/docs/quick-start/).
+
+### Schema definition
+
 Schema definition comes with every message definition, using [Protocol Buffer field options](https://developers.google.com/protocol-buffers/docs/proto#options):
 
 *At the moment only one key per message can be set*
@@ -29,47 +33,21 @@ message Nested {
 }
 ```
 
-ProfaneDB can either be used as a gRPC server (service definition in prodisdb/protobuf/db.proto) or as a library (interface in prodisdb/storage/db.h).
+ProfaneDB can either be used as a gRPC server (service definition in profanedb/protobuf/db.proto) or as a library (interface in profanedb/db.hpp).
 
+### CLI parameters
 
-## Storage
-
-Data is simply serialized using Protobuf own encoding, and stored in a RocksDB database.  
-However, since Protobuf allows nesting messages, whenever a nested message has a primary key set, the parent message is modified to use a reference to the key, and the child object is stored on its own.
-
-Assuming at least Test.field_one_int and Nested.nested_field_one_str are set in the previous sample definition, an encoded message could look like this:
-
-*(in protobuf text format)*
-
-```protobuf
-Test {
-    field_one_int: 123
-    field_two_str: "a string"
-    
-    field_five_nested: Nested {
-        nested_field_one_str: "unique key"
-    }
-}
+```
+profanedb_server --rocksdb_path /tmp/profanedb -I /usr/include -S /your/schema/dir
 ```
 
-Messages are now split. Nested comes with its own key `nested_field_one_str`,
-which identifies it as a unique entity.  
-`Test.field_five_nested` is now made into a `string` field,
-to hold a reference to that message unique key: `Nested$unique key`.
+The most important parameters are the include path (`-I`) and schema path (`-S`).
 
-```protobuf
-Nested {
-    nested_field_one_str: "unique key"
-}
+- The **include path** is used to retrieve `google/protobuf/*.proto`,
+  `profanedb/protobuf/*.proto` and any other dependencies.
+- The **schema path** has your definitions with the *key* option set.
 
-Test {
-    field_one_int: 123
-    field_two_str: "a string"
-    
-    field_five_nested: "Nested.nested_field_one_str$unique key"
-}
-```
 
-The data is then stored in RocksDB
-with `Test.field_one_int$123` and `Nested.nested_field_one_str$unique key`
-as keys.
+## Build
+
+ProfaneDB uses [CMake](https://cmake.org/), and depends on Protobuf, gRPC, RocksDB, Boost.

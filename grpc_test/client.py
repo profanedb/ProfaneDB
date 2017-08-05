@@ -30,7 +30,11 @@ def run():
         key = key
     ))
 
-    print(retrieved)
+    retrieved_unpacked = test_pb2.KeyInt()
+
+    retrieved.message.Unpack(retrieved_unpacked)
+
+    print(retrieved_unpacked)
 
 
 if __name__ == '__main__':

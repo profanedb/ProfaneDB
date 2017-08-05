@@ -6,3 +6,5 @@ include_directories (${Boost_INCLUDE_DIRS})
 
 add_executable(profanedb_server main.cpp server.cpp config.cpp)
 target_link_libraries(profanedb_server ${Boost_LIBRARIES} profanedb_format profanedb_vault profanedb_grpc)
+
+install(TARGETS profanedb_server RUNTIME DESTINATION bin)

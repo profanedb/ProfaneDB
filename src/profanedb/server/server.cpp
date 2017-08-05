@@ -24,8 +24,14 @@ using profanedb::format::Marshaller;
 using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
 using profanedb::vault::Storage;
 using RocksStorage = profanedb::vault::rocksdb::Storage;
+using profanedb::server::Config;
 
-using namespace profanedb::protobuf;
+using profanedb::protobuf::GetReq;
+using profanedb::protobuf::GetResp;
+using profanedb::protobuf::PutReq;
+using profanedb::protobuf::PutResp;
+using profanedb::protobuf::DelReq;
+using profanedb::protobuf::DelResp;
 
 using google::protobuf::Message;
 
@@ -33,31 +39,26 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
 
+using boost::program_options::variables_map;
+
 namespace profanedb {
 namespace server {
 
-Server::Server()
+Server::Server(const Config & config)
+  : config(config)
 {
-    // TODO Config
     boost::log::core::get()->set_filter(
-        boost::log::trivial::severity >= boost::log::trivial::trace
+        boost::log::trivial::severity >= config.LogLevel()
     );
     
-    // TODO Config
-    rocksdb::Options rocksOptions;
-    rocksOptions.create_if_missing = true;
-    
     rocksdb::DB *rocks;
-    rocksdb::DB::Open(rocksOptions, "/tmp/profane", &rocks);
+    rocksdb::DB::Open(config.RocksOptions(), config.RocksPath().string(), &rocks);
     
     auto storage = std::make_shared<RocksStorage>(std::unique_ptr<rocksdb::DB>(rocks));
     
-    // TODO Should be from config
-    auto includeSourceTree = new Loader::RootSourceTree{
-        "/usr/include", "/home/giorgio/Documents/ProfaneDB/ProfaneDB/src"};
+    auto includeSourceTree = new Loader::RootSourceTree(config.IncludePath());
     
-    // TODO Config
-    auto schemaSourceTree = new Loader::RootSourceTree{"/home/giorgio/Documents/ProfaneDB/ProfaneDB/test/profanedb/test/protobuf/schema"};
+    auto schemaSourceTree = new Loader::RootSourceTree(config.SchemaPath());
     
     auto loader = std::make_shared<Loader>(
         std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),

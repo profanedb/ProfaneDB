@@ -47,7 +47,7 @@ public:
         friend class Loader;
         
     public:
-        RootSourceTree(std::initializer_list<boost::filesystem::path> paths);
+        RootSourceTree(std::vector<boost::filesystem::path> paths);
         
     private:
         std::vector<boost::filesystem::path> paths;

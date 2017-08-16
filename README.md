@@ -51,3 +51,11 @@ The most important parameters are the include path (`-I`) and schema path (`-S`)
 ## Build
 
 ProfaneDB uses [CMake](https://cmake.org/), and depends on Protobuf, gRPC, RocksDB, Boost.
+
+### Options
+
+| CMake Option | Default | Description |
+|--------------|:-------:|-------------|
+| `BUILD_SHARED_LIBS` | `ON` | Build libprofanedb.so, to embed __ProfaneDB__ |
+| `BUILD_PROFANEDB_SERVER` | `OFF` | Build __ProfaneDB__ gRPC server |
+| `BUILD_TESTS` | `OFF` | Build tests, run with `ctest` |

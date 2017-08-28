@@ -19,46 +19,74 @@
 
 #include "config.h"
 
+// TODO OS dependent default paths
+
 using boost::program_options::value;
 using boost::log::trivial::severity_level;
 using boost::filesystem::path;
+using boost::filesystem::ifstream;
 
 namespace profanedb {
 namespace server {
 
 // TODO Config file
 Config::Config(int argc, char * argv[])
+  : conf("Configuration")
+  , cmd("Command line options")
+  , file("File configuration")
 {
-    desc.add_options()
-        ("help,h",
-         "Display this help message")
-        
+    conf.add_options()
         ("log_level",
          value<severity_level>(),
          "trace, debug, info, warning, error, fatal")
         
         ("proto_path,I",
-         value< std::vector< path > >(),
+         value< std::vector< path > >()
+            ->default_value(std::vector<path>(), "/usr/include")
+            ->composing(),
          "Specify the paths to import proto files (google/protobuf/..., profanedb/protobuf/...)")
         
         ("schema_path,S",
-         value< std::vector< path > >(),
-         "Specify the paths to load the user defined schema")
+         value< std::vector< path > >()->composing(),
+         "Specify the paths to load the user defined schema");
         
-        ("rocksdb_path",
-         value<path>(),
+    cmd.add_options()
+        ("help,h",
+         "Display this help message")
+        
+        ("profanedb_config_file",
+         value<path>()->default_value("/etc/profanedb.conf"),
+         "The path to ProfaneDB configuration file");
+    cmd.add(conf);
+    
+    file.add_options()
+        ("rocksdb.path",
+         value<path>()->default_value("/var/profanedb/rocksdb"),
          "Set the path RocksDB uses to store its content");
-        
+    file.add(conf);
+    
+    
+    // Command line parameters have the highest priority
     boost::program_options::store(
-        boost::program_options::parse_command_line(argc, argv, desc), vm
+        boost::program_options::parse_command_line(argc, argv, cmd), vm
     );
+    
+    // Now read config file
+    // TODO Check file exists
+    ifstream config_file(vm["profanedb_config_file"].as<path>());
+    
+    // Parse config file and set missing options
+    boost::program_options::store(
+        boost::program_options::parse_config_file(config_file, file), vm
+    );
+    
     boost::program_options::notify(vm);
 }
 
 const bool Config::ShowHelp() const
 {
     if (this->vm.count("help")) {
-        std::cout << this->desc << std::endl;
+        std::cout << this->cmd << std::endl;
         return true;
     }
     return false;

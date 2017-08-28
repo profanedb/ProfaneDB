@@ -57,7 +57,15 @@ public:
     const rocksdb::Options RocksOptions() const;
     
 private:
-    boost::program_options::options_description desc;
+    // Generic options both for command line and file configuration
+    boost::program_options::options_description conf;
+    
+    // cmd allows basic options (conf) + help and setting the configuration file path
+    boost::program_options::options_description cmd;
+    
+    // file options allow finer customisation
+    boost::program_options::options_description file;
+    
     boost::program_options::variables_map vm;
 };
 }

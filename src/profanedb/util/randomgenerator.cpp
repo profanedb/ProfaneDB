@@ -19,7 +19,7 @@
 
 #include "randomgenerator.h"
 
-using boost::random::random_device;
+using boost::random::mt19937;
 using boost::random::uniform_int_distribution;
 using boost::random::uniform_real_distribution;
 
@@ -33,18 +33,17 @@ using std::numeric_limits;
 namespace profanedb {
 namespace util {
 
-RandomGenerator::RandomGenerator(const random_device & rng)
-  : rng(rng)
+RandomGenerator::RandomGenerator(mt19937 & gen)
+  : gen(gen)
 {
 }
 
 #define RANDOM_VALUE(TYPE, BODY) template<> TYPE RandomGenerator::RandomValue< TYPE >() { BODY }
 #define INT_RANDOM_VALUE(TYPE) RANDOM_VALUE(TYPE, \
-    boost::random::mt19937 gen;                   \
     uniform_int_distribution< TYPE > range(       \
         numeric_limits< TYPE >::min(),            \
         numeric_limits< TYPE >::min());           \
-    return range(gen);                            )
+    return range(this->gen);                            )
 
 INT_RANDOM_VALUE(google::protobuf::int32);
 INT_RANDOM_VALUE(google::protobuf::int64);
@@ -59,11 +58,10 @@ RANDOM_VALUE(google::protobuf::string,
 )
 
 #define REAL_RANDOM_VALUE(TYPE) RANDOM_VALUE(TYPE, \
-    boost::random::mt19937 gen;                    \
     uniform_real_distribution<> range(             \
         numeric_limits< TYPE >::min(),             \
         numeric_limits< TYPE >::max());            \
-    return range(gen);                             )
+    return range(this->gen);                             )
 
 REAL_RANDOM_VALUE(double);
 REAL_RANDOM_VALUE(float);

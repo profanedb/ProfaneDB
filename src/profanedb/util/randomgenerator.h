@@ -34,8 +34,8 @@ namespace util {
 class RandomGenerator
 {
 public:
-    RandomGenerator(const boost::random::random_device & rng);
-    
+    RandomGenerator(boost::random::mt19937 & gen);
+   
     // Iterate through all fields and fill with random data
     void FillRandomly(google::protobuf::Message * message);
     
@@ -44,7 +44,7 @@ public:
     T RandomValue();
     
 private:
-    const boost::random::random_device & rng;
+    boost::random::mt19937 & gen;
     
     void GenerateField(
         google::protobuf::Message * message,

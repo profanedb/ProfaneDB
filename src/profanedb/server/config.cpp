@@ -54,7 +54,7 @@ Config::Config(int argc, char * argv[])
         ("help,h",
          "Display this help message")
         
-        ("profanedb_config_file",
+        ("profanedb_config_file,c",
          value<path>()->default_value("/etc/profanedb.conf"),
          "The path to ProfaneDB configuration file");
     cmd.add(conf);
@@ -112,7 +112,7 @@ const path Config::RocksPath() const
     return this->vm["rocksdb_path"].as<path>();
 }
 
-// TODO
+// TODO From file
 const rocksdb::Options Config::RocksOptions() const
 {
     rocksdb::Options options;

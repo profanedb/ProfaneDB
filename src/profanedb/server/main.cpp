@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
     profanedb::server::Config config(argc, argv);
     
     // If help message was requested stop execution here
+    // TODO If schema path was not set
     if (config.ShowHelp())
         return 0;
     

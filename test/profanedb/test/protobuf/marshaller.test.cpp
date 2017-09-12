@@ -7,6 +7,8 @@
 #include <profanedb/format/protobuf/marshaller.h>
 #include <profanedb/vault/rocksdb/storage.h>
 
+#include <profanedb/util/randomgenerator.h>
+
 using profanedb::format::protobuf::Loader;
 using profanedb::format::Marshaller;
 using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
@@ -14,6 +16,8 @@ using profanedb::vault::Storage;
 using profanedb::protobuf::MessageTreeNode;
 
 using RocksStorage = profanedb::vault::rocksdb::Storage;
+
+using profanedb::util::RandomGenerator;
 
 using google::protobuf::Message;
 
@@ -23,7 +27,10 @@ struct Format
     std::shared_ptr<ProtobufMarshaller> marshaller;
     std::shared_ptr<RocksStorage> storage;
     
+    RandomGenerator randomGen;
+    
     Format()
+      : randomGen(rng)
     {
         rocksdb::Options rocksOptions;
         rocksOptions.create_if_missing = true;
@@ -45,6 +52,9 @@ struct Format
             
         this->marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
     }
+    
+private:
+    boost::random::random_device rng;
 };
 
 
@@ -57,7 +67,8 @@ BOOST_FIXTURE_TEST_SUITE(marshal, Format)
 BOOST_AUTO_TEST_CASE(int_key)
 {
     schema::KeyInt message;
-    message.set_int_key(17526); // TODO Should be random
+    
+    randomGen.FillRandomly(&message);
     
     DEBUG_MESSAGE
 
@@ -67,7 +78,8 @@ BOOST_AUTO_TEST_CASE(int_key)
 BOOST_AUTO_TEST_CASE(string_key)
 {
     schema::KeyStr message;
-    message.set_string_key("hp9gh3bv3wgqq"); // TODO Should be random
+   
+    randomGen.FillRandomly(&message);
     
     DEBUG_MESSAGE
     

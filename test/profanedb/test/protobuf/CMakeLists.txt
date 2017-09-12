@@ -14,7 +14,7 @@ foreach(Test ${Tests})
     get_filename_component(Name ${Test} NAME_WE)
     
     add_executable(${Name} ${Test})
-    target_link_libraries(${Name} ${Boost_LIBRARIES} profanedb profanedb_test_protobuf_schema)
+    target_link_libraries(${Name} ${Boost_LIBRARIES} profanedb profanedb_test_protobuf_schema profanedb_util)
     
     add_test(NAME ${Name} COMMAND ${Name})
 endforeach()

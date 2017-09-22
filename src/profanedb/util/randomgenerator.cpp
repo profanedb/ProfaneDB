@@ -42,8 +42,8 @@ RandomGenerator::RandomGenerator(mt19937 & gen)
 #define INT_RANDOM_VALUE(TYPE) RANDOM_VALUE(TYPE, \
     uniform_int_distribution< TYPE > range(       \
         numeric_limits< TYPE >::min(),            \
-        numeric_limits< TYPE >::min());           \
-    return range(this->gen);                            )
+        numeric_limits< TYPE >::max());           \
+    return range(this->gen);                      )
 
 INT_RANDOM_VALUE(google::protobuf::int32);
 INT_RANDOM_VALUE(google::protobuf::int64);
@@ -53,15 +53,26 @@ INT_RANDOM_VALUE(google::protobuf::uint64);
 #undef INT_RANDOM_VALUE
 
 RANDOM_VALUE(google::protobuf::string,
-    // TODO
-    return "string";
+    std::string random;         
+    std::string chars(
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "1234567890"
+        "!@#$%^&*()"
+        "`~-_=+[{]}\\|;:'\",<.>/? ");
+    
+    uniform_int_distribution<> index_dist(0, chars.size() - 1);
+    for(int i = 0; i < this->RandomValue<uint>(); i++)
+        random += chars[index_dist(gen)];
+        
+    return random;
 )
 
 #define REAL_RANDOM_VALUE(TYPE) RANDOM_VALUE(TYPE, \
     uniform_real_distribution<> range(             \
         numeric_limits< TYPE >::min(),             \
         numeric_limits< TYPE >::max());            \
-    return range(this->gen);                             )
+    return range(this->gen);                       )
 
 REAL_RANDOM_VALUE(double);
 REAL_RANDOM_VALUE(float);
@@ -96,12 +107,12 @@ void RandomGenerator::GenerateField(
     const Reflection * reflection,
     const FieldDescriptor * fd)
 {
+    // TODO Enums
     if (fd->is_repeated()) {
-        // TODO If is repeated, generate a random number of random fields
         for (uint k = 0; k < this->RandomValue<google::protobuf::uint32>(); k++) {
             switch (fd->cpp_type()) {
-            #define HANDLE_TYPE(CPPTYPE, METHOD, TYPE)                      \
-            case FieldDescriptor::CPPTYPE_##CPPTYPE:                        \
+            #define HANDLE_TYPE(CPPTYPE, METHOD, TYPE)                           \
+            case FieldDescriptor::CPPTYPE_##CPPTYPE:                             \
                 reflection->Add##METHOD(message, fd, this->RandomValue<TYPE>()); \
                 break;
         
@@ -115,13 +126,16 @@ void RandomGenerator::GenerateField(
             HANDLE_TYPE(BOOL  , Bool  , bool                    );
         
             #undef HANDLE_TYPE
+            
+            case FieldDescriptor::CPPTYPE_MESSAGE:
+                this->FillRandomly(reflection->AddMessage(message, fd));
             }
         }
     }
     else {
         switch (fd->cpp_type()) {
-        #define HANDLE_TYPE(CPPTYPE, METHOD, TYPE)                      \
-        case FieldDescriptor::CPPTYPE_##CPPTYPE:                        \
+        #define HANDLE_TYPE(CPPTYPE, METHOD, TYPE)                           \
+        case FieldDescriptor::CPPTYPE_##CPPTYPE:                             \
             reflection->Set##METHOD(message, fd, this->RandomValue<TYPE>()); \
             break;
         
@@ -135,11 +149,12 @@ void RandomGenerator::GenerateField(
         HANDLE_TYPE(BOOL  , Bool  , bool                    );
         
         #undef HANDLE_TYPE
+        
+        case FieldDescriptor::CPPTYPE_MESSAGE:
+            this->FillRandomly(reflection->MutableMessage(message, fd));
+            break;
         }
     }
-    
-    
-    // TODO Message
 }
 
 }

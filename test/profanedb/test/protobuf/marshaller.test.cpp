@@ -1,6 +1,8 @@
 #define BOOST_TEST_MODULE Marshaller
 #include <boost/test/included/unit_test.hpp>
 
+#include <boost/log/expressions.hpp>
+
 #include <profanedb/test/protobuf/schema/test.pb.h>
 #include <profanedb/protobuf/storage.pb.h>
 
@@ -26,6 +28,10 @@ using boost::random::mt19937;
 
 struct Format
 {
+private:
+    mt19937 gen;
+
+public:
     std::shared_ptr<Loader> loader;
     std::shared_ptr<ProtobufMarshaller> marshaller;
     std::shared_ptr<RocksStorage> storage;
@@ -33,7 +39,7 @@ struct Format
     RandomGenerator randomGen;
     
     Format()
-      : gen(rng)
+      : gen(std::time(0))
       , randomGen(gen)
     {
         rocksdb::Options rocksOptions;
@@ -56,13 +62,7 @@ struct Format
             
         this->marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
     }
-    
-private:
-    random_device rng;
-    mt19937 gen;
 };
-
-
 
 BOOST_FIXTURE_TEST_SUITE(marshal, Format)
 
@@ -84,5 +84,6 @@ RANDOM_TEST(NonKeyableNested);
 RANDOM_TEST(KeyableNested);
 RANDOM_TEST(MessageAsKey);
 
+#undef RANDOM_TEST
+
 BOOST_AUTO_TEST_SUITE_END()
-#undef DEBUG_MESSAGE

@@ -3,6 +3,8 @@ add_subdirectory(protobuf) # Generated Protobuf (& gRPC if neeeded) code
 add_subdirectory(format)
 add_subdirectory(vault)
 
+add_subdirectory(util)
+
 add_library(profanedb)
 target_link_libraries(profanedb profanedb_format profanedb_vault profanedb_protobuf)
 

@@ -25,12 +25,21 @@
 namespace profanedb {
 namespace format {
 
+// Marshaller does the actual manipulation on Messages,
+// it takes care of converting them into a message tree
+// and deserialise a single message as coming from the database back to the original format
 template<typename Message>
 class Marshaller
 {
 public:
+    // Create the whole graph with all nested referenced messages
     virtual profanedb::protobuf::MessageTreeNode Marshal(const Message & message) = 0;
+    
+    // Turn a stored message back into the original format
     virtual const Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) = 0;
+    
+    // Retrieve the Key from the given Message
+    virtual const profanedb::protobuf::Key & GetKey(const Message & message) = 0;
 };
 }
 }

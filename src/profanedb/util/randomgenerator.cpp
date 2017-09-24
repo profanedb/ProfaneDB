@@ -52,6 +52,17 @@ INT_RANDOM_VALUE(google::protobuf::uint64);
 
 #undef INT_RANDOM_VALUE
 
+#define REAL_RANDOM_VALUE(TYPE) RANDOM_VALUE(TYPE, \
+    uniform_real_distribution<> range(             \
+        numeric_limits< TYPE >::min(),             \
+        numeric_limits< TYPE >::max());            \
+    return range(this->gen);                       )
+
+REAL_RANDOM_VALUE(double);
+REAL_RANDOM_VALUE(float);
+
+#undef REAL_RANDOM_VALUE
+
 RANDOM_VALUE(google::protobuf::string,
     std::string random;         
     std::string chars(
@@ -68,22 +79,10 @@ RANDOM_VALUE(google::protobuf::string,
     return random;
 )
 
-#define REAL_RANDOM_VALUE(TYPE) RANDOM_VALUE(TYPE, \
-    uniform_real_distribution<> range(             \
-        numeric_limits< TYPE >::min(),             \
-        numeric_limits< TYPE >::max());            \
-    return range(this->gen);                       )
-
-REAL_RANDOM_VALUE(double);
-REAL_RANDOM_VALUE(float);
-
-#undef REAL_RANDOM_VALUE
-
 RANDOM_VALUE(bool,
-    // TODO
-    return true;
+    uniform_int_distribution<> range(0, 1);
+    return (bool) range(this->gen);
 )
-
 #undef RANDOM_VALUE
 
 void RandomGenerator::FillRandomly(Message * message)

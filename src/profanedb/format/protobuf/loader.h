@@ -35,6 +35,7 @@ namespace profanedb {
 namespace format {
 namespace protobuf {
 
+// TODO Loader could populate a lookup table with the Key field and other info for any given Message
 // Loader is a utility class to populate a schemaPool and normalizedPool
 // which profanedb::format::protobuf::Marshaller requires
 class Loader

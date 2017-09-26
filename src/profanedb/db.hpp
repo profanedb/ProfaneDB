@@ -24,8 +24,9 @@
 
 #include <profanedb/protobuf/storage.pb.h>
 
-#include <profanedb/format/marshaller.h>
 #include <profanedb/vault/storage.h>
+#include <profanedb/format/marshaller.h>
+#include <profanedb/format/unmarshaller.h>
 
 #include <boost/log/trivial.hpp>
 
@@ -37,9 +38,11 @@ class Db
 {
 public:
     Db(std::shared_ptr<vault::Storage> storage,
-       std::shared_ptr< format::Marshaller<Message> > marshaller)
+       std::shared_ptr< format::Marshaller<Message> > marshaller,
+       std::shared_ptr< format::Unmarshaller<Message> > unmarshaller)
       : storage(storage)
       , marshaller(marshaller)
+      , unmarshaller(unmarshaller)
     {
     }
 
@@ -47,7 +50,7 @@ public:
     {
         BOOST_LOG_TRIVIAL(debug) << "Retrieving " << key.message_type();
         
-        return this->marshaller->Unmarshal(this->storage->Retrieve(key));
+        return this->unmarshaller->Unmarshal(this->storage->Retrieve(key));
     }
     
     bool Put(const Message & message)
@@ -84,6 +87,7 @@ protected:
 private:
     std::shared_ptr<vault::Storage> storage;
     std::shared_ptr< format::Marshaller<Message> > marshaller;
+    std::shared_ptr< format::Unmarshaller<Message> > unmarshaller;
 };
 }
 

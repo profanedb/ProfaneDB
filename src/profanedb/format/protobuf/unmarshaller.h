@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
-#define PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
+#ifndef PROFANEDB_FORMAT_PROTOBUF_UNMARSHALLER_H
+#define PROFANEDB_FORMAT_PROTOBUF_UNMARSHALLER_H
 
 #include <memory>
 
@@ -31,32 +31,33 @@
 
 #include <boost/log/trivial.hpp>
 
-#include <profanedb/format/marshaller.h>
+#include <profanedb/format/unmarshaller.h>
 
-#include "loader.h"
 #include "util.h"
+#include "loader.h"
 
 namespace profanedb {
 namespace format {
 namespace protobuf {
 
-class Marshaller : public profanedb::format::Marshaller<google::protobuf::Message>
+class Unmarshaller : public profanedb::format::Unmarshaller<google::protobuf::Message>
 {
 public:
-    Marshaller(std::shared_ptr<Loader> loader);
+    Unmarshaller(
+        std::shared_ptr<profanedb::vault::Storage> storage,
+        std::shared_ptr<Loader> loader);
     
-    virtual profanedb::protobuf::MessageTreeNode Marshal(const google::protobuf::Message & message) override;
+    virtual const google::protobuf::Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) override;
 private:
     // Loader contains the schemaPool and normalizedPool
     const std::shared_ptr<Loader> loader;
     
-    // Convert a field from a message to a Key object
-    profanedb::protobuf::Key FieldToKey(
-        const google::protobuf::Message & message,
-        const google::protobuf::FieldDescriptor * fd);
+    // Because a StorableMessage only holds references to its children objects,
+    // Storage is used to recursively retrieve them.
+    const std::shared_ptr<profanedb::vault::Storage> storage;
 };
 }
 }
 }
 
-#endif // PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
+#endif // PROFANEDB_FORMAT_PROTOBUF_UNMARSHALLER_H

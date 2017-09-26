@@ -17,24 +17,24 @@
  *
  */
 
-#ifndef PROFANEDB_FORMAT_MARSHALLER_H
-#define PROFANEDB_FORMAT_MARSHALLER_H
+#ifndef PROFANEDB_FORMAT_UNMARSHALLER_H
+#define PROFANEDB_FORMAT_UNMARSHALLER_H
 
 #include <profanedb/protobuf/storage.pb.h>
 
 namespace profanedb {
 namespace format {
 
-// Marshaller does the actual manipulation on Messages,
-// it takes care of converting them into a message tree
+// Unmarshaller deserialises a single message as coming from the database back to the original format,
+// it would usually require to interact with profanedb::vault::Storage as well
 template<typename Message>
-class Marshaller
+class Unmarshaller
 {
 public:
-    // Create the whole graph with all nested referenced messages
-    virtual profanedb::protobuf::MessageTreeNode Marshal(const Message & message) = 0;
+    // Turn a stored message back into the original format
+    virtual const Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) = 0;
 };
 }
 }
 
-#endif // PROFANEDB_FORMAT_MARSHALLER_H
+#endif // PROFANEDB_FORMAT_UNMARSHALLER_H

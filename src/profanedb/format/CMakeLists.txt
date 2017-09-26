@@ -3,7 +3,11 @@ find_package(Boost 1.54
              REQUIRED
              COMPONENTS log filesystem) # Boost Filesystem scans the .proto directory
 
-add_library(profanedb_format STATIC protobuf/marshaller.cpp protobuf/loader.cpp)
+add_library(profanedb_format STATIC
+            protobuf/marshaller.cpp
+            protobuf/unmarshaller.cpp
+            protobuf/loader.cpp
+            protobuf/util.cpp)
 target_link_libraries(profanedb_format profanedb_protobuf ${Boost_LIBRARIES})
 
 if(BUILD_SHARED_LIBS)

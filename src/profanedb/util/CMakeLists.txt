@@ -1,4 +1,6 @@
-find_package(Boost REQUIRED COMPONENTS random)
+find_package(Boost 1.15
+             REQUIRED
+             COMPONENTS random)
 include_directories (${Boost_INCLUDE_DIRS})
 
 add_library(profanedb_util randomgenerator.cpp)

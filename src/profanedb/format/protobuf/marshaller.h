@@ -48,9 +48,6 @@ public:
     
     virtual profanedb::protobuf::MessageTreeNode Marshal(const google::protobuf::Message & message) override;
     virtual const google::protobuf::Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) override;
-    
-    // TODO Instead of iterating through all fields, Loader should give this info
-    virtual const profanedb::protobuf::Key & GetKey(const google::protobuf::Message & message) override;
 private:
     // Loader contains the schemaPool and normalizedPool
     const std::shared_ptr<Loader> loader;

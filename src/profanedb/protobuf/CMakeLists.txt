@@ -1,5 +1,6 @@
 find_package(Threads REQUIRED)
 find_package(Protobuf REQUIRED) # Protobuf does the serialisation for the DB
+# TODO gRPC and Protobuf should be embedded
 
 # Proto are no longer generated in build,
 # but come from https://gitlab.com/ProfaneDB/protobuf

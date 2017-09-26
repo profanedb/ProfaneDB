@@ -4,7 +4,9 @@ set(PROTOBUF_IMPORT_DIRS ${PROTOBUF_IMPORT_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(schema)
 
 add_definitions(-DBOOST_TEST_DYN_LINK) # This is for Boost Test to use the shared library
-find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+find_package(Boost 1.21
+             REQUIRED
+             COMPONENTS unit_test_framework)
 include_directories (${Boost_INCLUDE_DIRS})
 
 file(GLOB Tests RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.test.cpp")

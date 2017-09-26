@@ -158,13 +158,6 @@ const Message & Marshaller::Unmarshal(const StorableMessage & storable)
     return *originalMessage;
 }
 
-// TODO Get Key from Loader without iteration
-const Key & Marshaller::GetKey(const Message & message)
-{
-    Key key;
-    return key;
-}
-
 void Marshaller::CopyMessage(const Message & from, Message * to)
 {
     std::vector< const FieldDescriptor * > setFields;

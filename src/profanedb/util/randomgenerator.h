@@ -31,6 +31,7 @@
 namespace profanedb {
 namespace util {
 
+// RandomGenerator takes care of filling a protobuf message with random data for testing/benchmark purposes
 class RandomGenerator
 {
 public:

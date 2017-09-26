@@ -37,9 +37,6 @@ public:
     
     // Turn a stored message back into the original format
     virtual const Message & Unmarshal(const profanedb::protobuf::StorableMessage & storable) = 0;
-    
-    // Retrieve the Key from the given Message
-    virtual const profanedb::protobuf::Key & GetKey(const Message & message) = 0;
 };
 }
 }

@@ -65,17 +65,15 @@ Loader::Loader(
   , schemaSourceTree(std::move(schema))
   , includeDb(includeSourceTree.get())
   , schemaDb(schemaSourceTree.get())
-  , schemaPool(new MergedDescriptorDatabase(&includeDb, &schemaDb), &errorCollector)
-  , normalizedPool(new MergedDescriptorDatabase(&includeDb, &normalizedDescriptorDb), &errorCollector)
 {
-     // profanedb.protobuf.options.key is defined in here
-     // It is used to mark the primary key on Messages
-//      const FileDescriptor * optionsFile = schemaPool.FindFileByName("profanedb/protobuf/options.proto");
-//      FileDescriptorProto optionsProto;
-//      optionsFile->CopyTo(&optionsProto);
-//      normalizedDescriptorDb.AddAndOwn(&optionsProto);
-
-//      BOOST_LOG_TRIVIAL(debug) << "Loading profanedb/protobuf/options.proto and copying to normalized descriptor db";
+    auto schemaPool = std::make_shared<DescriptorPool>(
+        new MergedDescriptorDatabase(&includeDb, &schemaDb), &errorCollector);
+    
+    auto normalizedPool = std::make_shared<DescriptorPool>(
+        new MergedDescriptorDatabase(&includeDb, &normalizedDescriptorDb), &errorCollector);
+    
+    this->pools.emplace(SCHEMA, schemaPool);
+    this->pools.emplace(NORMALIZED, normalizedPool);
 
     // Just in case schema is defined in more than one place
     for (const auto & path: schemaSourceTree->paths) {
@@ -92,7 +90,7 @@ Loader::Loader(
                 // The file is now retrieved, and its path for Protobuf must be relative to the mapping
                 // it's parsed, normalized (nested keyable messages are removed)
                 FileDescriptorProto * normalizedProto = this->ParseFile(
-                      schemaPool.FindFileByName(file.path().lexically_relative(path).string()));
+                      this->GetPool(SCHEMA).FindFileByName(file.path().lexically_relative(path).string()));
                 
                 BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto->name();
                 BOOST_LOG_TRIVIAL(trace) << std::endl << normalizedProto->DebugString();
@@ -177,7 +175,7 @@ bool Loader::IsKeyable(const Descriptor * descriptor) const
 
 const DescriptorPool & Loader::GetPool(PoolType poolType) const
 {
-    return (poolType == SCHEMA) ? this->schemaPool : this->normalizedPool;
+    return *this->pools.at(poolType);
 }
 
 const Descriptor * Loader::GetDescriptor(PoolType poolType, std::string typeName) const

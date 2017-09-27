@@ -20,6 +20,8 @@
 #ifndef PROFANEDB_FORMAT_PROTOBUF_LOADER_H
 #define PROFANEDB_FORMAT_PROTOBUF_LOADER_H
 
+#include <unordered_map>
+
 #include <profanedb/protobuf/options.pb.h>
 #include <profanedb/protobuf/storage.pb.h>
 
@@ -116,12 +118,10 @@ private:
     
     google::protobuf::SimpleDescriptorDatabase normalizedDescriptorDb;
     
-    // schemaPool keeps track of the original messages
-    google::protobuf::DescriptorPool schemaPool;
-    
-    // For each keyable message in schema, there is a normalized version
-    // which has Key in place of nested keyable messages
-    google::protobuf::DescriptorPool normalizedPool;
+    // SCHEMA and NORMALIZED pools are stored in here
+    // SCHEMA is the original DescriptorPool as provided by the user
+    // NORMALIZED holds references to nested keyable messages
+    std::unordered_map< PoolType, std::shared_ptr<google::protobuf::DescriptorPool> > pools;
 
     // The message factory is used to create new messages from the pools
     google::protobuf::DynamicMessageFactory messageFactory;

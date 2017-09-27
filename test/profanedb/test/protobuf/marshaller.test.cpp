@@ -7,17 +7,13 @@
 #include <profanedb/protobuf/storage.pb.h>
 
 #include <profanedb/format/protobuf/marshaller.h>
-#include <profanedb/vault/rocksdb/storage.h>
 
 #include <profanedb/util/randomgenerator.h>
 
 using profanedb::format::protobuf::Loader;
 using profanedb::format::Marshaller;
 using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
-using profanedb::vault::Storage;
 using profanedb::protobuf::MessageTreeNode;
-
-using RocksStorage = profanedb::vault::rocksdb::Storage;
 
 using profanedb::util::RandomGenerator;
 
@@ -34,7 +30,6 @@ private:
 public:
     std::shared_ptr<Loader> loader;
     std::shared_ptr<ProtobufMarshaller> marshaller;
-    std::shared_ptr<RocksStorage> storage;
     
     RandomGenerator randomGen;
     
@@ -42,14 +37,6 @@ public:
       : gen(std::time(0))
       , randomGen(gen)
     {
-        rocksdb::Options rocksOptions;
-        rocksOptions.create_if_missing = true;
-        
-        rocksdb::DB *rocks;
-        rocksdb::DB::Open(rocksOptions, "/tmp/profane", &rocks);
-        
-        this->storage = std::make_shared<RocksStorage>(std::unique_ptr<rocksdb::DB>(rocks));
-        
         auto includeSourceTree = new Loader::RootSourceTree({
             "/usr/include", "/home/giorgio/Documents/ProfaneDB/ProfaneDB/src"});
             
@@ -60,7 +47,7 @@ public:
             std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),
             std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
             
-        this->marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
+        this->marshaller = std::make_shared<ProtobufMarshaller>(loader);
     }
 };
 

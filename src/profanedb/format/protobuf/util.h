@@ -17,46 +17,31 @@
  *
  */
 
-#ifndef PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
-#define PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
-
-#include <memory>
-
-#include <profanedb/protobuf/options.pb.h>
-#include <profanedb/vault/storage.h>
+#ifndef PROFANEDB_FORMAT_PROTOBUF_UTIL_H
+#define PROFANEDB_FORMAT_PROTOBUF_UTIL_H
 
 #include <google/protobuf/message.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/dynamic_message.h>
 
-#include <boost/log/trivial.hpp>
-
-#include <profanedb/format/marshaller.h>
-
-#include "loader.h"
-#include "util.h"
-
 namespace profanedb {
 namespace format {
 namespace protobuf {
 
-class Marshaller : public profanedb::format::Marshaller<google::protobuf::Message>
-{
-public:
-    Marshaller(std::shared_ptr<Loader> loader);
-    
-    virtual profanedb::protobuf::MessageTreeNode Marshal(const google::protobuf::Message & message) override;
-private:
-    // Loader contains the schemaPool and normalizedPool
-    const std::shared_ptr<Loader> loader;
-    
-    // Convert a field from a message to a Key object
-    profanedb::protobuf::Key FieldToKey(
-        const google::protobuf::Message & message,
-        const google::protobuf::FieldDescriptor * fd);
-};
+// Copy a Message, can't use MergeFrom because it checks Descriptors
+void CopyMessage(
+    const google::protobuf::Message & from,
+    google::protobuf::Message * to);
+
+// Copy a field from a message to another.
+// Differs from MergeFrom because it doesn't check whether Descriptors match.
+void CopyField(
+    const google::protobuf::FieldDescriptor * fromField,
+    const google::protobuf::Message & from,
+    google::protobuf::Message * to);
 }
 }
 }
 
-#endif // PROFANEDB_FORMAT_PROTOBUF_MARSHALLER_H
+#endif // PROFANEDB_FORMAT_PROTOBUF_UTIL_H
+

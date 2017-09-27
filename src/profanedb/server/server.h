@@ -31,8 +31,9 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
-#include <profanedb/format/protobuf/marshaller.h>
 #include <profanedb/vault/rocksdb/storage.h>
+#include <profanedb/format/protobuf/marshaller.h>
+#include <profanedb/format/protobuf/unmarshaller.h>
 
 #include <profanedb/db.hpp>
 
@@ -60,6 +61,7 @@ private:
         DbServiceImpl(
             std::shared_ptr<profanedb::vault::rocksdb::Storage> storage,
             std::shared_ptr<profanedb::format::protobuf::Marshaller> marshaller,
+            std::shared_ptr<profanedb::format::protobuf::Unmarshaller> unmarshaller,
             std::shared_ptr<profanedb::format::protobuf::Loader> loader);
         
         grpc::Status Get(
@@ -79,7 +81,9 @@ private:
         
     private:
         std::shared_ptr<profanedb::vault::rocksdb::Storage> rocksdbStorage;
+        
         std::shared_ptr<profanedb::format::protobuf::Marshaller> protobufMarshaller;
+        std::shared_ptr<profanedb::format::protobuf::Unmarshaller> protobufUnmarshaller;
         
         std::unique_ptr< profanedb::Db<google::protobuf::Message> > profane;
         

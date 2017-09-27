@@ -22,6 +22,8 @@
 using profanedb::format::protobuf::Loader;
 using profanedb::format::Marshaller;
 using ProtobufMarshaller = profanedb::format::protobuf::Marshaller;
+using profanedb::format::Unmarshaller;
+using ProtobufUnmarshaller = profanedb::format::protobuf::Unmarshaller;
 using profanedb::vault::Storage;
 using RocksStorage = profanedb::vault::rocksdb::Storage;
 using profanedb::server::Config;
@@ -64,9 +66,13 @@ Server::Server(const Config & config)
         std::unique_ptr<Loader::RootSourceTree>(includeSourceTree),
         std::unique_ptr<Loader::RootSourceTree>(schemaSourceTree));
     
-    auto marshaller = std::make_shared<ProtobufMarshaller>(storage, loader);
+    auto marshaller = std::make_shared<ProtobufMarshaller>(loader);
+    auto unmarshaller = std::make_shared<ProtobufUnmarshaller>(storage, loader);
     
-    service = std::make_unique<DbServiceImpl>(storage, marshaller, loader);
+    service = std::make_unique<DbServiceImpl>(storage,
+                                              marshaller,
+                                              unmarshaller,
+                                              loader);
 }
 
 Server::~Server()
@@ -98,10 +104,12 @@ void Server::HandleRpcs()
 Server::DbServiceImpl::DbServiceImpl(
     std::shared_ptr<RocksStorage> storage,
     std::shared_ptr<ProtobufMarshaller> marshaller,
+    std::shared_ptr<ProtobufUnmarshaller> unmarshaller,
     std::shared_ptr<Loader> loader)
   : rocksdbStorage(storage)
   , protobufMarshaller(marshaller)
-  , profane(std::make_unique< profanedb::Db<Message> >(storage, marshaller))
+  , protobufUnmarshaller(unmarshaller)
+  , profane(std::make_unique< profanedb::Db<Message> >(storage, marshaller, unmarshaller))
   , loader(loader)
 {
 }

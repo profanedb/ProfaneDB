@@ -36,10 +36,8 @@ namespace format {
 namespace protobuf {
 
 Marshaller::Marshaller(
-    std::shared_ptr<Storage> storage,
     std::shared_ptr<Loader> loader)
   : loader(loader)
-  , storage(storage)
 {
 }
 
@@ -84,7 +82,7 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
             *messageTree.add_children() = nestedMessageTree;
             
             // The field in the normalized message is assigned the root key from the contained message tree
-            this->CopyMessage(nestedMessageTree.message().key(),
+            CopyMessage(nestedMessageTree.message().key(),
                               normalizedMessage->GetReflection()->MutableMessage(
                                 normalizedMessage, normalizedField));
         }
@@ -95,7 +93,7 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
             // We are pretty much sure at this point that we can copy the data,
             // because messages in normalizedPool differ from those in schemaPool
             // only on nested keyable messages, which we've already taken care of
-            this->CopyField(field, message, normalizedMessage);
+            CopyField(field, message, normalizedMessage);
         }
     }
     
@@ -104,130 +102,6 @@ MessageTreeNode Marshaller::Marshal(const Message & message)
     messageTree.mutable_message()->mutable_payload()->PackFrom(*normalizedMessage);
     
     return messageTree;
-}
-
-const Message & Marshaller::Unmarshal(const StorableMessage & storable)
-{
-    // An empty normalized message is generated using the Key
-    Message * normalizedMessage
-        = this->loader->CreateMessage(Loader::NORMALIZED,
-                                      storable.key().message_type())->New();
-
-    // The original message is also retrieved
-    Message * originalMessage
-        = this->loader->CreateMessage(Loader::SCHEMA,
-                                      storable.key().message_type())->New();
-    
-    // StorableMessage payload contains the serialized normalized message,
-    // as previously stored into the DB
-    storable.payload().UnpackTo(normalizedMessage);
-    
-    // Similarly to Marshal, set fields are retrieved
-    std::vector< const FieldDescriptor * > setFields;
-    normalizedMessage->GetReflection()->ListFields(*normalizedMessage, &setFields);
-    
-    for (const auto normalizedField: setFields) {
-        
-        // Whenever a Key is found, it is considered a separate normalized message to be retrieved
-        if (normalizedField->type() == FieldDescriptor::TYPE_MESSAGE
-            && normalizedField->message_type() == Key::descriptor()
-        ) {
-            // Get the key of the nested message (is embedded as Key object)
-            Key nestedKey;
-            nestedKey.MergeFrom(normalizedMessage->GetReflection()->GetMessage(*normalizedMessage, normalizedField));
-            
-            // Retrieve the nested message from storage and unmarshal it as well
-            const Message & nestedMessage = this->Unmarshal(this->storage->Retrieve(nestedKey));
-            
-            // We need the original descriptor field to set the message
-            const FieldDescriptor * originalField = originalMessage->GetDescriptor()->field(normalizedField->index());
-            
-            // Copy the nested unmarshalled message to the original one
-            this->CopyMessage(nestedMessage,
-                              originalMessage->GetReflection()->MutableMessage(
-                                originalMessage, originalField));
-        }
-        else { // if field is not a reference
-            
-            // Just like in Marshal, other fields are simply copied over,
-            // as normalized and original descriptors look the same except for nested keyable messages
-            this->CopyField(normalizedField, *normalizedMessage, originalMessage);
-        }
-    }
-            
-    return *originalMessage;
-}
-
-void Marshaller::CopyMessage(const Message & from, Message * to)
-{
-    std::vector< const FieldDescriptor * > setFields;
-    from.GetReflection()->ListFields(from, &setFields);
-
-    for (auto fromField : setFields)
-        this->CopyField(fromField, from, to);
-}
-
-void Marshaller::CopyField(
-    const FieldDescriptor * fromField,
-    const Message & from,
-    Message * to)
-{
-    const Reflection * fromReflection = from.GetReflection();
-    const Reflection * toReflection = to->GetReflection();
-    const FieldDescriptor * toField = to->GetDescriptor()->field(fromField->index());
-    
-    if (fromField->is_repeated()) {
-        for (int y = 0; y < fromReflection->FieldSize(from, fromField); y++) {
-            switch (fromField->cpp_type()) {
-                #define HANDLE_TYPE(CPPTYPE, METHOD)                          \
-                case FieldDescriptor::CPPTYPE_##CPPTYPE:                      \
-                    toReflection->Add##METHOD(to, toField,                    \
-                    fromReflection->GetRepeated##METHOD(from, fromField, y)); \
-                    break;
-                    
-                    HANDLE_TYPE(INT32 , Int32 );
-                    HANDLE_TYPE(INT64 , Int64 );
-                    HANDLE_TYPE(UINT32, UInt32);
-                    HANDLE_TYPE(UINT64, UInt64);
-                    HANDLE_TYPE(DOUBLE, Double);
-                    HANDLE_TYPE(FLOAT , Float );
-                    HANDLE_TYPE(BOOL  , Bool  );
-                    HANDLE_TYPE(STRING, String);
-                    HANDLE_TYPE(ENUM  , Enum  );
-                    #undef HANDLE_TYPE
-                    
-                case FieldDescriptor::CPPTYPE_MESSAGE:
-                    toReflection->AddMessage(to, toField)->MergeFrom(
-                        fromReflection->GetRepeatedMessage(from, fromField, y));
-                    break;
-            }
-        }
-    } else {
-        switch (fromField->cpp_type()) {
-            #define HANDLE_TYPE(CPPTYPE, METHOD)               \
-            case FieldDescriptor::CPPTYPE_##CPPTYPE:           \
-                toReflection->Set##METHOD(to, toField,         \
-                fromReflection->Get##METHOD(from, fromField)); \
-                break;
-                
-                HANDLE_TYPE(INT32 , Int32 );
-                HANDLE_TYPE(INT64 , Int64 );
-                HANDLE_TYPE(UINT32, UInt32);
-                HANDLE_TYPE(UINT64, UInt64);
-                HANDLE_TYPE(DOUBLE, Double);
-                HANDLE_TYPE(FLOAT , Float );
-                HANDLE_TYPE(BOOL  , Bool  );
-                HANDLE_TYPE(STRING, String);
-                HANDLE_TYPE(ENUM  , Enum  );
-                #undef HANDLE_TYPE
-                
-            case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
-                this->CopyMessage(
-                        fromReflection->GetMessage(from, fromField),
-                        toReflection->MutableMessage(to, toField));
-                break;
-        }
-    }
 }
 
 // TODO Should serialize differently... int(123) shouldn't become string("123")

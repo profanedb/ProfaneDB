@@ -65,12 +65,12 @@ Loader::Loader(
   , schemaSourceTree(std::move(schema))
   , includeDb(includeSourceTree.get())
   , schemaDb(schemaSourceTree.get())
+  , mergedSchema(&includeDb, &schemaDb)
+  , mergedNormalized(&includeDb, &normalizedDescriptorDb)
 {
-    auto schemaPool = std::make_shared<DescriptorPool>(
-        new MergedDescriptorDatabase(&includeDb, &schemaDb), &errorCollector);
+    auto schemaPool = std::make_shared<DescriptorPool>(&mergedSchema, &errorCollector);
     
-    auto normalizedPool = std::make_shared<DescriptorPool>(
-        new MergedDescriptorDatabase(&includeDb, &normalizedDescriptorDb), &errorCollector);
+    auto normalizedPool = std::make_shared<DescriptorPool>(&mergedNormalized, &errorCollector);
     
     this->pools.emplace(SCHEMA, schemaPool);
     this->pools.emplace(NORMALIZED, normalizedPool);

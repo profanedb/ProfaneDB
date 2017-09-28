@@ -38,6 +38,7 @@ namespace format {
 namespace protobuf {
 
 // TODO Loader could populate a lookup table with the Key field and other info for any given Message
+
 // Loader is a utility class to populate a schemaPool and normalizedPool
 // which profanedb::format::protobuf::Marshaller requires
 class Loader
@@ -110,13 +111,27 @@ private:
     };
     BoostLogErrorCollector errorCollector;
 
+    // Loading proto files from a path is done using RootSourceTree
     std::unique_ptr<RootSourceTree> includeSourceTree;
     std::unique_ptr<RootSourceTree> schemaSourceTree;
-    
+   
+    // includeDb is common to both DescriptorPools (SCHEMA and NORMALIZED)
+    // it usually holds files such as google/protobuf/any.proto
     google::protobuf::compiler::SourceTreeDescriptorDatabase includeDb;
-    google::protobuf::compiler::SourceTreeDescriptorDatabase schemaDb;
     
+    // schemaDb is loaded from schemaSourceTree,
+    // it keeps user defined schemas
+    google::protobuf::compiler::SourceTreeDescriptorDatabase schemaDb;
+   
+    // normalizedDescriptorDb is populated during Loader initialization,
+    // changing nested keyable messages into references
     google::protobuf::SimpleDescriptorDatabase normalizedDescriptorDb;
+    
+    // MergedDescriptorDatabases put together the include path (includeDb)
+    // respectively with schemaDb,
+    // and normalizedDescriptorDb
+    google::protobuf::MergedDescriptorDatabase mergedSchema;
+    google::protobuf::MergedDescriptorDatabase mergedNormalized;
     
     // SCHEMA and NORMALIZED pools are stored in here
     // SCHEMA is the original DescriptorPool as provided by the user

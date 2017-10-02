@@ -4,8 +4,6 @@ package schema;
 
 import "profanedb/protobuf/options.proto";
 
-import "nested.proto";
-
 // Simply check that key is serialized properly
 message KeyInt {
   int32 int_key = 1 [ (profanedb.protobuf.options).key = true ];

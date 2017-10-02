@@ -87,10 +87,18 @@ Loader::Loader(
             // TODO This might be configured differently
             if (file.path().extension() == ".proto") {
                 
+                const std::string relativeProtoPath = file.path().lexically_relative(path).string();
+                
+                const FileDescriptor * fileDescriptor = this->GetPool(SCHEMA).FindFileByName(relativeProtoPath);
+                    
+                if (fileDescriptor == nullptr) {
+                    BOOST_LOG_TRIVIAL(error) << "File at " << relativeProtoPath << " couldn't be loaded";
+                    throw std::runtime_error(relativeProtoPath + " couldn't be loaded");
+                }
+                
                 // The file is now retrieved, and its path for Protobuf must be relative to the mapping
                 // it's parsed, normalized (nested keyable messages are removed)
-                FileDescriptorProto * normalizedProto = this->ParseFile(
-                      this->GetPool(SCHEMA).FindFileByName(file.path().lexically_relative(path).string()));
+                FileDescriptorProto * normalizedProto = this->ParseFile(fileDescriptor);
                 
                 BOOST_LOG_TRIVIAL(debug) << "Adding normalized proto " << normalizedProto->name();
                 BOOST_LOG_TRIVIAL(trace) << std::endl << normalizedProto->DebugString();

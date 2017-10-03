@@ -17,35 +17,27 @@
  *
  */
 
-#ifndef PROFANEDB_VAULT_ROCKSDB_STORAGE_H
-#define PROFANEDB_VAULT_ROCKSDB_STORAGE_H
+#include "storage.h"
 
-#include <rocksdb/db.h>
+using profanedb::protobuf::StorableMessage;
+using profanedb::protobuf::Key;
 
-#include <profanedb/vault/storage.h>
-
-using rocksdb::DB;
+using google::protobuf::Any;
 
 namespace profanedb {
 namespace vault {
-namespace rocksdb {
-
-// A Storage backend using RocksDB
-class Storage : public profanedb::vault::Storage
+namespace memory {
+    
+void Storage::Store(const StorableMessage & storable)
 {
-public:
-    Storage(std::unique_ptr<DB> rocksDb);
-    
-    virtual void Store(const profanedb::protobuf::StorableMessage & storable) override;
-    
-protected:
-    virtual const google::protobuf::Any LoadFromStorage(const profanedb::protobuf::Key & key) const override;
-    
-private:
-    const std::unique_ptr<DB> rocksDb;
-};
-}
-}
+    this->memory.insert({storable.key().SerializeAsString(), storable.payload()});
 }
 
-#endif // PROFANEDB_VAULT_ROCKSDB_STORAGE_H
+const Any Storage::LoadFromStorage(const Key & key) const
+{
+    return this->memory.at(key.SerializeAsString());
+}
+
+}
+}
+}

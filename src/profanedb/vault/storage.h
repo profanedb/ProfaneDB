@@ -28,8 +28,22 @@ namespace vault {
 // Storage takes care of saving and retrieving the data from the actual DB
 class Storage {
 public:
+    // Override this to store your message
     virtual void Store(const protobuf::StorableMessage & storable) = 0;
-    virtual protobuf::StorableMessage Retrieve(const protobuf::Key & key) const = 0;
+    
+    // Retrieve also takes care of setting key for you, override LoadFromStorage
+    virtual protobuf::StorableMessage Retrieve(const protobuf::Key & key) const
+    {
+        protobuf::StorableMessage storable;
+        *storable.mutable_key() = key;
+        *storable.mutable_payload() = this->LoadFromStorage(key);
+        
+        return storable;
+    }
+    
+protected:
+    // Does the actual loading and conversion to Any, override this instead of Retrieve
+    virtual const google::protobuf::Any LoadFromStorage(const protobuf::Key & key) const = 0;
 };
 }
 }

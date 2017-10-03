@@ -22,6 +22,8 @@
 using profanedb::protobuf::StorableMessage;
 using profanedb::protobuf::Key;
 
+using google::protobuf::Any;
+
 namespace profanedb {
 namespace vault {
 namespace rocksdb {
@@ -43,21 +45,18 @@ void Storage::Store(const StorableMessage & storable)
                        serializedPayload);
 }
 
-StorableMessage Storage::Retrieve(const Key & key) const
+const Any Storage::LoadFromStorage(const Key & key) const
 {
-    StorableMessage stored;
-    
-    *stored.mutable_key() = key;
-    
+    Any any;
     std::string serializedPayload;
     
     this->rocksDb->Get(::rocksdb::ReadOptions(),
                        key.SerializeAsString(),
                        &serializedPayload);
     
-    stored.mutable_payload()->ParseFromString(serializedPayload);
-    
-    return stored;
+   any.ParseFromString(serializedPayload);
+   
+   return any;
 }
 
 }

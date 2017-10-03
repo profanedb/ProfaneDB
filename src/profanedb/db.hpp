@@ -53,7 +53,7 @@ public:
         return this->unmarshaller->Unmarshal(this->storage->Retrieve(key));
     }
     
-    bool Put(const Message & message)
+    profanedb::protobuf::Key Put(const Message & message)
     {
         BOOST_LOG_TRIVIAL(debug) << "Marshalling message for storage";
         const protobuf::MessageTreeNode & messageTree = this->marshaller->Marshal(message);
@@ -62,8 +62,7 @@ public:
         
         this->StoreMessageTree(messageTree);
         
-        // TODO Check exceptions
-        return true;
+        return messageTree.message().key();
     }
     
     bool Delete(const protobuf::Key & key)

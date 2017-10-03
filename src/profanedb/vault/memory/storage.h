@@ -17,35 +17,32 @@
  *
  */
 
-#ifndef PROFANEDB_VAULT_ROCKSDB_STORAGE_H
-#define PROFANEDB_VAULT_ROCKSDB_STORAGE_H
+#ifndef PROFANEDB_VAULT_MEMORY_STORAGE_H
+#define PROFANEDB_VAULT_MEMORY_STORAGE_H
 
-#include <rocksdb/db.h>
+#include <unordered_map>
 
 #include <profanedb/vault/storage.h>
 
-using rocksdb::DB;
-
 namespace profanedb {
 namespace vault {
-namespace rocksdb {
+namespace memory {
 
-// A Storage backend using RocksDB
+// A Storage backend using temporary memory
 class Storage : public profanedb::vault::Storage
 {
 public:
-    Storage(std::unique_ptr<DB> rocksDb);
-    
     virtual void Store(const profanedb::protobuf::StorableMessage & storable) override;
     
 protected:
     virtual const google::protobuf::Any LoadFromStorage(const profanedb::protobuf::Key & key) const override;
     
 private:
-    const std::unique_ptr<DB> rocksDb;
+    std::unordered_map<std::string, const google::protobuf::Any &> memory;
 };
 }
 }
 }
 
 #endif // PROFANEDB_VAULT_ROCKSDB_STORAGE_H
+

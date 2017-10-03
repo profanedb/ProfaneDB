@@ -4,6 +4,7 @@ set(PROTOBUF_IMPORT_DIRS ${PROTOBUF_IMPORT_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(schema)
 
 add_definitions(-DBOOST_TEST_DYN_LINK) # This is for Boost Test to use the shared library
+add_definitions(-DBOOST_LOG_DYN_LINK) # This is for the Boost Log library to load the proper target namespace for the current platform
 find_package(Boost 1.21
              REQUIRED
              COMPONENTS unit_test_framework)

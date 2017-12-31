@@ -38,7 +38,6 @@
 namespace grpc {
 class CompletionQueue;
 class Channel;
-class RpcService;
 class ServerCompletionQueue;
 class ServerContext;
 }  // namespace grpc
@@ -58,18 +57,30 @@ class Db final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::GetResp>> AsyncGet(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::GetResp>>(AsyncGetRaw(context, request, cq));
     }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::GetResp>> PrepareAsyncGet(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::GetResp>>(PrepareAsyncGetRaw(context, request, cq));
+    }
     virtual ::grpc::Status Put(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::profanedb::protobuf::PutResp* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::PutResp>> AsyncPut(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::PutResp>>(AsyncPutRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::PutResp>> PrepareAsyncPut(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::PutResp>>(PrepareAsyncPutRaw(context, request, cq));
     }
     virtual ::grpc::Status Delete(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::profanedb::protobuf::DelResp* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::DelResp>> AsyncDelete(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::DelResp>>(AsyncDeleteRaw(context, request, cq));
     }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::DelResp>> PrepareAsyncDelete(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::DelResp>>(PrepareAsyncDeleteRaw(context, request, cq));
+    }
   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::GetResp>* AsyncGetRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::GetResp>* PrepareAsyncGetRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::PutResp>* AsyncPutRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::PutResp>* PrepareAsyncPutRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::DelResp>* AsyncDeleteRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::profanedb::protobuf::DelResp>* PrepareAsyncDeleteRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -78,23 +89,35 @@ class Db final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>> AsyncGet(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>>(AsyncGetRaw(context, request, cq));
     }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>> PrepareAsyncGet(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>>(PrepareAsyncGetRaw(context, request, cq));
+    }
     ::grpc::Status Put(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::profanedb::protobuf::PutResp* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>> AsyncPut(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>>(AsyncPutRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>> PrepareAsyncPut(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>>(PrepareAsyncPutRaw(context, request, cq));
     }
     ::grpc::Status Delete(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::profanedb::protobuf::DelResp* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>> AsyncDelete(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>>(AsyncDeleteRaw(context, request, cq));
     }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>> PrepareAsyncDelete(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>>(PrepareAsyncDeleteRaw(context, request, cq));
+    }
 
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
     ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>* AsyncGetRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>* PrepareAsyncGetRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>* AsyncPutRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>* PrepareAsyncPutRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>* AsyncDeleteRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) override;
-    const ::grpc::RpcMethod rpcmethod_Get_;
-    const ::grpc::RpcMethod rpcmethod_Put_;
-    const ::grpc::RpcMethod rpcmethod_Delete_;
+    ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>* PrepareAsyncDeleteRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) override;
+    const ::grpc::internal::RpcMethod rpcmethod_Get_;
+    const ::grpc::internal::RpcMethod rpcmethod_Put_;
+    const ::grpc::internal::RpcMethod rpcmethod_Delete_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -225,7 +248,7 @@ class Db final {
    public:
     WithStreamedUnaryMethod_Get() {
       ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::StreamedUnaryHandler< ::profanedb::protobuf::GetReq, ::profanedb::protobuf::GetResp>(std::bind(&WithStreamedUnaryMethod_Get<BaseClass>::StreamedGet, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::profanedb::protobuf::GetReq, ::profanedb::protobuf::GetResp>(std::bind(&WithStreamedUnaryMethod_Get<BaseClass>::StreamedGet, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_Get() override {
       BaseClassMustBeDerivedFromService(this);
@@ -245,7 +268,7 @@ class Db final {
    public:
     WithStreamedUnaryMethod_Put() {
       ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::StreamedUnaryHandler< ::profanedb::protobuf::PutReq, ::profanedb::protobuf::PutResp>(std::bind(&WithStreamedUnaryMethod_Put<BaseClass>::StreamedPut, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::profanedb::protobuf::PutReq, ::profanedb::protobuf::PutResp>(std::bind(&WithStreamedUnaryMethod_Put<BaseClass>::StreamedPut, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_Put() override {
       BaseClassMustBeDerivedFromService(this);
@@ -265,7 +288,7 @@ class Db final {
    public:
     WithStreamedUnaryMethod_Delete() {
       ::grpc::Service::MarkMethodStreamed(2,
-        new ::grpc::StreamedUnaryHandler< ::profanedb::protobuf::DelReq, ::profanedb::protobuf::DelResp>(std::bind(&WithStreamedUnaryMethod_Delete<BaseClass>::StreamedDelete, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::profanedb::protobuf::DelReq, ::profanedb::protobuf::DelResp>(std::bind(&WithStreamedUnaryMethod_Delete<BaseClass>::StreamedDelete, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_Delete() override {
       BaseClassMustBeDerivedFromService(this);

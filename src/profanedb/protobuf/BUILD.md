@@ -2,7 +2,7 @@
 ProfaneDB/protobuf build - master
 ======
 
-f415123843fb9513a4ad6794a3635ee42e82e601
+552295886bdcdccbb08c537f96438d1ba05a07b3
 
-*built by giorgio.azzinnaro@gmail.com on Sat Jul  8 16:51:00 UTC 2017*
+*built by giorgio.azzinnaro@gmail.com on Sun Dec 31 04:25:43 UTC 2017*
 

@@ -28,50 +28,62 @@ std::unique_ptr< Db::Stub> Db::NewStub(const std::shared_ptr< ::grpc::ChannelInt
 }
 
 Db::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_Get_(Db_method_names[0], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Put_(Db_method_names[1], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Delete_(Db_method_names[2], ::grpc::RpcMethod::NORMAL_RPC, channel)
+  : channel_(channel), rpcmethod_Get_(Db_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Put_(Db_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Delete_(Db_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status Db::Stub::Get(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::profanedb::protobuf::GetResp* response) {
-  return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_Get_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Get_, context, request, response);
 }
 
 ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>* Db::Stub::AsyncGetRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>::Create(channel_.get(), cq, rpcmethod_Get_, context, request);
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::profanedb::protobuf::GetResp>::Create(channel_.get(), cq, rpcmethod_Get_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::GetResp>* Db::Stub::PrepareAsyncGetRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::GetReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::profanedb::protobuf::GetResp>::Create(channel_.get(), cq, rpcmethod_Get_, context, request, false);
 }
 
 ::grpc::Status Db::Stub::Put(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::profanedb::protobuf::PutResp* response) {
-  return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_Put_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Put_, context, request, response);
 }
 
 ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>* Db::Stub::AsyncPutRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>::Create(channel_.get(), cq, rpcmethod_Put_, context, request);
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::profanedb::protobuf::PutResp>::Create(channel_.get(), cq, rpcmethod_Put_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::PutResp>* Db::Stub::PrepareAsyncPutRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::PutReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::profanedb::protobuf::PutResp>::Create(channel_.get(), cq, rpcmethod_Put_, context, request, false);
 }
 
 ::grpc::Status Db::Stub::Delete(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::profanedb::protobuf::DelResp* response) {
-  return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_Delete_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Delete_, context, request, response);
 }
 
 ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>* Db::Stub::AsyncDeleteRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>::Create(channel_.get(), cq, rpcmethod_Delete_, context, request);
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::profanedb::protobuf::DelResp>::Create(channel_.get(), cq, rpcmethod_Delete_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::profanedb::protobuf::DelResp>* Db::Stub::PrepareAsyncDeleteRaw(::grpc::ClientContext* context, const ::profanedb::protobuf::DelReq& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::profanedb::protobuf::DelResp>::Create(channel_.get(), cq, rpcmethod_Delete_, context, request, false);
 }
 
 Db::Service::Service() {
-  AddMethod(new ::grpc::RpcServiceMethod(
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
       Db_method_names[0],
-      ::grpc::RpcMethod::NORMAL_RPC,
-      new ::grpc::RpcMethodHandler< Db::Service, ::profanedb::protobuf::GetReq, ::profanedb::protobuf::GetResp>(
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Db::Service, ::profanedb::protobuf::GetReq, ::profanedb::protobuf::GetResp>(
           std::mem_fn(&Db::Service::Get), this)));
-  AddMethod(new ::grpc::RpcServiceMethod(
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
       Db_method_names[1],
-      ::grpc::RpcMethod::NORMAL_RPC,
-      new ::grpc::RpcMethodHandler< Db::Service, ::profanedb::protobuf::PutReq, ::profanedb::protobuf::PutResp>(
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Db::Service, ::profanedb::protobuf::PutReq, ::profanedb::protobuf::PutResp>(
           std::mem_fn(&Db::Service::Put), this)));
-  AddMethod(new ::grpc::RpcServiceMethod(
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
       Db_method_names[2],
-      ::grpc::RpcMethod::NORMAL_RPC,
-      new ::grpc::RpcMethodHandler< Db::Service, ::profanedb::protobuf::DelReq, ::profanedb::protobuf::DelResp>(
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< Db::Service, ::profanedb::protobuf::DelReq, ::profanedb::protobuf::DelResp>(
           std::mem_fn(&Db::Service::Delete), this)));
 }
 

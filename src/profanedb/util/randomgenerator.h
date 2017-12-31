@@ -27,6 +27,7 @@
 #include <boost/random/uniform_int_distribution.hpp>
 
 #include <google/protobuf/message.h>
+#include <google/protobuf/stubs/port.h>
 
 namespace profanedb {
 namespace util {

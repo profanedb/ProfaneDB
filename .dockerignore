@@ -1,0 +1,25 @@
+
+# Created by https://www.gitignore.io/api/kate,cmake,kdevelop4
+
+### CMake ###
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+build/
+
+### Kate ###
+# Swap Files #
+.*.kate-swp
+.swp.*
+
+### KDevelop4 ###
+*.kdev4
+.kdev4/
+
+# End of https://www.gitignore.io/api/kate,cmake,kdevelop4

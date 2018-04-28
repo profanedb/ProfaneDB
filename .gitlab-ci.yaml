@@ -1,0 +1,35 @@
+image: docker:stable
+services:
+  - docker:dind
+
+stages:
+  - build
+  - test
+  - release
+
+variables:
+  CONTAINER_TEST_IMAGE: registry.gitlab.com/profanedb/profanedb:$CI_COMMIT_REF_NAME
+  CONTAINER_REL_IMAGE: registry.gitlab.com/profanedb/profanedb:latest
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+
+build:
+  stage: build
+  script:
+    - docker build --pull -t $CONTAINER_TEST_IMAGE .
+    - docker push $CONTAINER_TEST_IMAGE
+
+test:
+  stage: test
+  script:
+    - echo "TODO"
+
+release:
+  stage: release
+  script:
+    - docker pull $CONTAINER_TEST_IMAGE
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_REL_IMAGE
+    - docker push $CONTAINER_REL_IMAGE
+  only:
+    - master

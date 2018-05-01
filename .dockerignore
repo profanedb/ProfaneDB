@@ -23,3 +23,11 @@ build/
 .kdev4/
 
 # End of https://www.gitignore.io/api/kate,cmake,kdevelop4
+
+.gitlab-ci.yml
+CONTRIBUTING.md
+README.md
+logo.png
+logo.xcf
+.gitignore
+.git

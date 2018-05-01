@@ -8,7 +8,7 @@ RUN apt-get update -y &&                                                \
         libgflags-dev                                                   \
         liblz4-dev                                                      \
         libsnappy-dev                                                   \
-        libzstd-dev                                                     \
+        # libzstd-dev   Doesn't work during linking for some reason...
         zlib1g-dev &&                                                   \
     wget https://github.com/facebook/rocksdb/archive/v5.12.4.tar.gz &&  \
     tar xzvf v5.12.4.tar.gz &&                                          \
@@ -42,11 +42,19 @@ RUN apt-get update -y &&                \
         libboost-log-dev                \
         libboost-program-options-dev    \
         libboost-random-dev             \
-        libboost-test-dev
-#     mkdir /profanedb/build &&           \
-#     cd /profanedb/build &&              \
-#     cmake                               \
-#         -D BUILD_PROFANEDB_SERVER=ON    \
-#         -D BUILD_TESTS=ON               \
-#         .. &&                           \
-#     make -j$(nproc)
+        libboost-test-dev               \
+        libbz2-dev                      \
+        libgflags-dev                   \
+        liblz4-dev                      \
+        libsnappy-dev                   \
+        zlib1g-dev &&                   \
+    mkdir /profanedb/build &&           \
+    cd /profanedb/build &&              \
+    cmake                               \
+        -D BUILD_PROFANEDB_SERVER=ON    \
+        -D BUILD_TESTS=ON               \
+        .. &&                           \
+    make -j$(nproc) &&                  \
+    make install
+
+CMD [ "profanedb_server", "-c /usr/local/etc/profanedb/server.conf" ]

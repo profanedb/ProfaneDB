@@ -57,4 +57,6 @@ RUN apt-get update -y &&                \
     make -j$(nproc) &&                  \
     make install
 
+VOLUME [ "/var/profanedb/schema" ]
+
 CMD [ "profanedb_server", "-c /usr/local/etc/profanedb/server.conf" ]
